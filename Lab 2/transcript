@@ -1,0 +1,18 @@
+# Compile of lab2_week1.v was successful.
+vsim -gui work.testbench
+# vsim -gui work.testbench 
+# Start time: 15:48:30 on Mar 08,2024
+# Loading work.testbench
+# Loading work.mandelbrot
+# Loading work.signed_mult
+add wave -position insertpoint sim:/testbench/*
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: jcs556  Hostname: EN-EC-LPH238-48  ProcessID: 15096
+#           Attempting to use alternate WLF file "./wlftfhijjx".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftfhijjx
+run -all
+restart
+run -all
+# End time: 16:38:45 on Mar 08,2024, Elapsed time: 0:50:15
+# Errors: 0, Warnings: 2

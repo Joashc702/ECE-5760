@@ -1,0 +1,180 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/programs/intelFPGA/18.1
+vcombin
+!s110 1708563088
+!i10b 1
+!s100 <chUilHaD0Fm?dMCBJgO>2
+I^2][Xn=FEm=P0e<HfU_Z;2
+Z0 VDg1SIo80bB@j0V0VzS_@n1
+Z1 dC:/Users/jcs556/Documents/ECE 5760/Lab 2
+w1708563079
+Z2 8C:/Users/jcs556/Documents/ECE 5760/Lab 2/lab2_week1.v
+Z3 FC:/Users/jcs556/Documents/ECE 5760/Lab 2/lab2_week1.v
+L0 103
+Z4 OV;L;10.5b;63
+r1
+!s85 0
+31
+!s108 1708563088.000000
+!s107 C:/Users/jcs556/Documents/ECE 5760/Lab 2/lab2_week1.v|
+Z5 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/jcs556/Documents/ECE 5760/Lab 2/lab2_week1.v|
+!i113 1
+Z6 o-work work
+Z7 tCvgOpt 0
+vDE1_SoC_Computer
+Z8 !s110 1709242105
+!i10b 1
+!s100 CmBF[zjC0Z<S8ZdFW6P[A3
+IBiMgiXF8U:MJc=if1F]Ce2
+R0
+R1
+Z9 w1709242095
+Z10 8C:/Users/jcs556/Documents/ECE 5760/Lab 2/VGA_to_M10k/VGA_to_M10k/VGA_to_M10k/verilog/DE1_SoC_Computer.v
+Z11 FC:/Users/jcs556/Documents/ECE 5760/Lab 2/VGA_to_M10k/VGA_to_M10k/VGA_to_M10k/verilog/DE1_SoC_Computer.v
+L0 6
+R4
+r1
+!s85 0
+31
+Z12 !s108 1709242105.000000
+Z13 !s107 C:/Users/jcs556/Documents/ECE 5760/Lab 2/VGA_to_M10k/VGA_to_M10k/VGA_to_M10k/verilog/DE1_SoC_Computer.v|
+Z14 !s90 -reportprogress|300|-work|work|C:/Users/jcs556/Documents/ECE 5760/Lab 2/VGA_to_M10k/VGA_to_M10k/VGA_to_M10k/verilog/DE1_SoC_Computer.v|
+!i113 1
+R6
+R7
+n@d@e1_@so@c_@computer
+vkey_debouncing
+R8
+!i10b 1
+!s100 cHRHF66ka@WWN[YO?mSTD2
+I0mdNk86hACF7AI`JeHleZ3
+R0
+R1
+R9
+R10
+R11
+L0 822
+R4
+r1
+!s85 0
+31
+R12
+R13
+R14
+!i113 1
+R6
+R7
+vM10K_1000_8
+R8
+!i10b 1
+!s100 O0hUQYjVFlFEgS7O7M8no3
+IB=VR;W3^2Ok_@Yl=ASaMI1
+R0
+R1
+R9
+R10
+R11
+L0 1121
+R4
+r1
+!s85 0
+31
+R12
+R13
+R14
+!i113 1
+R6
+R7
+n@m10@k_1000_8
+vmandelbrot
+Z15 !s110 1709930894
+!i10b 1
+!s100 a]W6[C[ijB2h`iPD<@2Ri3
+IcGE8:lF35^PILS>U3gB;61
+R0
+R1
+Z16 w1708714322
+R2
+R3
+L0 54
+R4
+r1
+!s85 0
+31
+Z17 !s108 1709930894.000000
+Z18 !s107 C:/Users/jcs556/Documents/ECE 5760/Lab 2/lab2_week1.v|
+R5
+!i113 1
+R6
+R7
+vsigned_mult
+R15
+!i10b 1
+!s100 RP5:hS@BEdEVV<Z5eFLGF1
+I4Ie]l6k9G]Zg_NRPT`ZN[0
+R0
+R1
+R16
+R2
+R3
+L0 100
+R4
+r1
+!s85 0
+31
+R17
+R18
+R5
+!i113 1
+R6
+R7
+vtestbench
+R15
+!i10b 1
+!s100 OIhZH>=iB=O@3KYOM9ho83
+IYY7QmgQF_TOci35WJJNmJ0
+R0
+R1
+R16
+R2
+R3
+L0 7
+R4
+r1
+!s85 0
+31
+R17
+R18
+R5
+!i113 1
+R6
+R7
+vvga_driver
+R8
+!i10b 1
+!s100 dm05=alSE;eFPFBBR?VRd3
+ISV<e1GhaS5bnTImeK>=:c1
+R0
+R1
+R9
+R10
+R11
+L0 866
+R4
+r1
+!s85 0
+31
+R12
+R13
+R14
+!i113 1
+R6
+R7

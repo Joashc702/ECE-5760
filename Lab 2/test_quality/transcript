@@ -1,0 +1,18 @@
+vsim -gui work.testbench
+# vsim -gui work.testbench 
+# Start time: 14:53:08 on Mar 08,2024
+# Loading work.testbench
+# Loading work.mandelbrot
+# Loading work.signed_mult
+# Loading work.color_write
+add wave -position insertpoint sim:/testbench/*
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: jcs556  Hostname: EN-EC-LPH238-48  ProcessID: 1296
+#           Attempting to use alternate WLF file "./wlftk89t3z".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftk89t3z
+run -all
+# ** Note: (vish-4074) File C:/Users/jcs556/Documents/ECE 5760/Lab 2/vsim.wlf is still open, viewing file in live viewing mode.
+# 
+# End time: 15:47:52 on Mar 08,2024, Elapsed time: 0:54:44
+# Errors: 0, Warnings: 2

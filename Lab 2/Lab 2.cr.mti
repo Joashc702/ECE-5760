@@ -1,0 +1,10 @@
+{C:/Users/jcs556/Documents/ECE 5760/Lab 2/lab2_week1.v} {1 {vlog -work work -stats=none {C:/Users/jcs556/Documents/ECE 5760/Lab 2/lab2_week1.v}
+Model Technology ModelSim - Intel FPGA Edition vlog 10.5b Compiler 2016.10 Oct  5 2016
+-- Compiling module testbench
+-- Compiling module mandelbrot
+-- Compiling module signed_mult
+
+Top level modules:
+	testbench
+
+} {} {}}
