@@ -1,0 +1,28 @@
+vsim -gui work.testbench
+# vsim -gui work.testbench 
+# Start time: 14:51:11 on Feb 16,2024
+# Loading work.testbench
+# Loading work.DDA
+# Loading work.dxdt
+# Loading work.signed_mult
+# Loading work.dydt
+# Loading work.dzdt
+# Loading work.integrator
+add wave -position insertpoint sim:/testbench/*
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: jcs556  Hostname: EN-EC-LPH238-48  ProcessID: 11460
+#           Attempting to use alternate WLF file "./wlft3zfef5".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlft3zfef5
+add wave -position insertpoint  \
+sim:/testbench/testbench_out_x \
+sim:/testbench/testbench_out_y \
+sim:/testbench/testbench_out_z
+run -10000
+# Unknown option: 10000
+# ** Error: (vsim-4005) Invalid argument '-10000'.
+# Usage: run [<timesteps> [<time_units>]] | -all | -continue | -next | -step | -over | -out | -init | -final
+run 10000
+run -all
+# End time: 14:56:11 on Feb 16,2024, Elapsed time: 0:05:00
+# Errors: 1, Warnings: 2
