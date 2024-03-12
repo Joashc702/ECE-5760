@@ -1,0 +1,73 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+dC:/programs/intelFPGA/18.1
+vdrum
+Z0 !s110 1710212701
+!i10b 1
+!s100 o0LYVo72@>0OCT`EGhB?Z0
+IC>G2DT]3EHljhHUOLe;iC0
+Z1 VDg1SIo80bB@j0V0VzS_@n1
+Z2 dC:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3
+Z3 w1710212697
+Z4 8C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+Z5 FC:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+L0 62
+Z6 OV;L;10.5b;63
+r1
+!s85 0
+31
+Z7 !s108 1710212701.000000
+Z8 !s107 C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v|
+Z9 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v|
+!i113 1
+Z10 o-work work
+Z11 tCvgOpt 0
+vsigned_mult
+R0
+!i10b 1
+!s100 C?f=UgRG1IfX=5eEEfRoH2
+I<I5<Lo77d1W]J7z0YkNFo0
+R1
+R2
+R3
+R4
+R5
+L0 83
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+vtestbench
+R0
+!i10b 1
+!s100 JG1^_mFmgMmd7:87LhLbK3
+Ie>=b8XTkf5@M[E8d1FTZX1
+R1
+R2
+R3
+R4
+R5
+L0 7
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
