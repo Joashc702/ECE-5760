@@ -36,41 +36,26 @@ module testbench();
 	reg we, we_prev;
     
     // Drum node variables
-	reg signed [17:0] curr_u, prev_u;
-    reg signed [17:0] u_up, u_down;
-    reg [17:0] rho_eff = {1'b0, 17'b00010000000000000};
+	reg signed [17:0] curr_reg, prev_u;
+    reg signed [17:0] u_up, down_reg, bottom_reg;
+    reg [17:0] rho_eff_init;
     wire signed [17:0] next_u;
 
     // index rows
     reg [4:0] index_rows;
     
     // increment/decrement between nodes
-    reg [17:0] step_size = {1'b0, 17'b00000011111111111}; // (1/8) / 32
+    reg [17:0] step_size;
 
-    /*
-	always @(posedge clk_50) begin
-		if (reset) begin
-			curr_u <= {1'b0, 17'b00100000000000000};
-			prev_u <= {1'b0, 17'b00100000000000000};
-		end
-		else begin
-			curr_u <= next_u;
-			prev_u <= curr_u;
-		end
-	end
+	// intermediate drum instantiation flag check
+	wire [4:0] up_check;
+	wire [4:0] down_check; 
+	wire [4:0] curr_check;
 	
-	// Instantiation of Device Under Test
-    drum oneNode (.clk(clk_50), 
-				  .reset(reset), 
-				  .rho_eff({1'b0, 17'b00010000000000000}),
-				  .curr_u(curr_u),
-				  .prev_u(prev_u),
-				  .u_left(18'd0),
-				  .u_right(18'd0),
-				  .u_up(18'd0),
-				  .u_down(18'd0),
-				  .next(next_u));
-    */
+	assign rho_eff_init = {1'b0, 17'b00010000000000000};
+	assign up_check = (index_rows == 5'd29) ? 5'b0 : u_up;      // checks if up node reaches top, otherwise increments
+	assign down_check = (index_rows == 5'd0) ? 5'b0 : down_reg; // checks if down node is at bottom, otherwise increments
+	assign curr_check = (index_rows == 5'd0) ? bottom_reg : curr_reg; // checks bottom_u for compute module
 
 // genvar i;
 // generate 
@@ -81,21 +66,25 @@ module testbench();
     
     // drum instantiation
     drum oneNode (.clk(clk_50), 
-				  .reset(reset), // can remove now that it's handled in SM
-				  .rho_eff({1'b0, 17'b00010000000000000}),
-				  .curr_u(curr_u), // TODO
+				  .rho_eff(rho_eff_init),
+				  .curr_u(curr_check),
 				  .prev_u(prev_u),
 				  .u_left(18'd0),
 				  .u_right(18'd0),
-				  .u_up((index_rows == 5'd29) ? 5'b0 : u_up),
-				  .u_down((index_rows == 5'd0) ? 5'b0 : u_down),
-				  .next(out));
+				  .u_up(up_check),
+				  .u_down(down_check),
+				  .next(next_u));
     
+	// state variables
     reg [2:0] state;
-    reg signed [17:0] initial_val = {1'b0, 17'b00000011111111111}; // (1/8) / 32
+    reg signed [17:0] initial_val;
     reg signed [17:0] intermed_val;
     reg signed [17:0] out_val;
-    
+	
+	assign initial_val = {1'b0, 17'b00000000000000000}; // 0
+	//assign step_size = {1'b0, 17'b00000111111111111};   // (1/8) / 32
+    assign step_size = {1'b0, 17'b00001111111111110};   // (1/8) / 16
+	
     always @(posedge clk_50) begin
         if (reset) begin
             state <= 3'd0;
@@ -115,7 +104,7 @@ module testbench();
                     we <= 1'd0;
                 end
                 else begin // init curr node and prev_u M10k blocks
-                    if (index_rows < 5'd29) begin
+                    if (index_rows < 5'd15) begin
                         we <= 1'd1;
                         we_prev <= 1'd1;
                         read_addr <= index_rows;
@@ -124,7 +113,7 @@ module testbench();
                         write_addr_prev <= index_rows;
                         d <= initial_val;
                         d_prev <= initial_val;
-                        // TODO --> 
+                        bottom_reg <= initial_val;
                         initial_val <= initial_val + step_size;
                     end
                     else begin
@@ -158,7 +147,7 @@ module testbench();
             // State 3 - Set inputs
             else if (state == 3'd3) begin
                 if (index_rows < 5'd29) begin // if not at top
-                    u_up <= q; // since each ndoe's next state depends on its own state and the one above it
+                    u_up <= q; // since each node's next state depends on its own state and the one above it
                 end
                 
                 prev_u <= q_prev; // q_prev would be data read from memory that stores prev state of curr node
@@ -172,13 +161,17 @@ module testbench();
                 
                 we_prev <= 1'd1;
                 write_addr_prev <= index_rows;
-                d_prev <= ; // TODO
+                d_prev <= (index_rows == 5'd0) ? bottom_reg : curr_reg; // update prev M10k block
                 
-                
+                if (index_rows == 5'd15) begin
+					intermed_val <= curr_reg;
+				end
+				
+				down_reg <= curr_reg;
             end
             // State 5 - Output value
             else if (state == 3'd5) begin
-                out_val <= intermed_val;
+                out_val <= intermed_val; // outputs amplitude
                 state <= 3'd2;
             end
         end
@@ -191,8 +184,8 @@ endmodule
 //////////////////////////////////////////////////////////////
 ////////////	Mandelbrot Set Visualizer	    //////////////
 //////////////////////////////////////////////////////////////
-module drum (clk, reset, rho_eff, curr_u, prev_u, u_left, u_right, u_up, u_down, next); 
-	input clk, reset;
+module drum (clk, rho_eff, curr_u, prev_u, u_left, u_right, u_up, u_down, next); 
+	input clk;
     input [17:0] rho_eff;
 	input signed [17:0] curr_u, prev_u;
 	//input signed [17:0] init_condition; // u
