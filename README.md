@@ -4,4 +4,7 @@ Lab 1: \
 
 Lab 2: \
   main C code: mandelbrot_final_cleaned.c \
-  top-level module Verilog: DE1_SoC_Computer_cleaned.v  
+  top-level module Verilog: DE1_SoC_Computer_cleaned.v \
+
+Lab 3:
+  
