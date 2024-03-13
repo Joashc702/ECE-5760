@@ -3,5 +3,5 @@ Lab 1: \
   top-level module Verilog: /computer_640_16bit_video_18_1/computer_640_16bit_video/verilog/DE1_SoC_Computer.v 
 
 Lab 2: \
-  main C code: mandelbrot_final.c \
-  top-level module Verilog: /VGA_to_M10k/VGA_to_M10k/VGA_to_M10k/verilog/DE1_SoC_Computer.v 
+  main C code: mandelbrot_final_cleaned.c \
+  top-level module Verilog: DE1_SoC_Computer_cleaned.v  
