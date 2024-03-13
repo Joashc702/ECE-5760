@@ -1,160 +1,16 @@
 # Compile of lab3w1.v was successful.
 vsim -gui work.testbench
 # vsim -gui work.testbench 
-# Start time: 22:07:15 on Mar 11,2024
+# Start time: 20:07:05 on Mar 12,2024
 # Loading work.testbench
 # Loading work.drum
 # Loading work.signed_mult
-# ** Error (suppressible): (vsim-3053) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(33): Illegal output or inout port connection for port 'next'.
-#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
-# Error loading design
-# End time: 22:07:16 on Mar 11,2024, Elapsed time: 0:00:01
-# Errors: 1, Warnings: 0
-# Compile of lab3w1.v was successful.
-vsim -gui work.testbench
-# vsim -gui work.testbench 
-# Start time: 22:07:46 on Mar 11,2024
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-# ** Error (suppressible): (vsim-3053) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(33): Illegal output or inout port connection for port 'next'.
-#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
-# Error loading design
-# End time: 22:07:46 on Mar 11,2024, Elapsed time: 0:00:00
-# Errors: 1, Warnings: 0
-# Compile of lab3w1.v was successful.
-# Compile of lab3w1.v was successful.
-vsim -gui work.testbench
-# vsim -gui work.testbench 
-# Start time: 22:08:23 on Mar 11,2024
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-add wave -position insertpoint sim:/testbench/*
 add wave -position insertpoint  \
-sim:/testbench/oneNode/rho_eff \
-sim:/testbench/oneNode/init_condition \
-sim:/testbench/oneNode/u_left \
-sim:/testbench/oneNode/u_right \
-sim:/testbench/oneNode/u_up \
-sim:/testbench/oneNode/u_down \
-sim:/testbench/oneNode/curr_u \
-sim:/testbench/oneNode/prev_u \
-sim:/testbench/oneNode/next \
-sim:/testbench/oneNode/u_sum \
-sim:/testbench/oneNode/rho_usum \
-sim:/testbench/oneNode/inter_val
-run -all
-run 100000
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
+sim:/testbench/clk_50 \
+sim:/testbench/reset \
+sim:/testbench/out \
+sim:/testbench/curr_u \
+sim:/testbench/prev_u
 restart
 run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-restart
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-restart
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-# Warning in wave window restart: (vish-4014) No objects found matching '/testbench/oneNode/init_condition'. 
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-restart
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-restart
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
-# Compile of lab3w1.v was successful.
-restart
-# Loading work.testbench
-# Loading work.drum
-# Loading work.signed_mult
-run -all
+run 30ns

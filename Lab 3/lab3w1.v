@@ -69,7 +69,7 @@ module drum (clk, reset, rho_eff, curr_u, prev_u, u_left, u_right, u_up, u_down,
 	
 	wire signed [17:0] u_sum, rho_usum, inter_val;
 	
-	assign u_sum = u_left + u_right + u_up + u_down - (curr_u <<< 2);
+	assign u_sum = u_left - curr_u + u_right -curr_u + u_up -curr_u + u_down - curr_u;//(curr_u <<< 2)
 	signed_mult rho_mult_usum(.out(rho_usum), .a(u_sum), .b(rho_eff)); 
 	assign inter_val = rho_usum + (curr_u <<< 1) - prev_u + (prev_u >>> 10);
 	assign next = inter_val - (inter_val >>> 9);
