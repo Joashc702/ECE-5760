@@ -7,8 +7,7 @@
 module testbench();
 	
 	reg clk_50, reset;
-	wire signed [17:0] out;
-	reg signed [17:0] curr_u, prev_u;
+    
 	// Initialize clock
 	initial begin
 		clk_50 = 1'b0;
@@ -20,7 +19,6 @@ module testbench();
 		clk_50  = !clk_50;
 	end
 	
-	
 	// Intialize and drive signals
 	initial begin
 		reset  = 1'b0;
@@ -29,14 +27,34 @@ module testbench();
 		#30
 		reset  = 1'b0;
 	end
-	
+    
+    // M10K variables
+    wire signed [17:0] q, q_prev; // read value
+	reg signed [17:0] d, d_prev;  // write value
+	reg [4:0] write_addr, write_addr_prev;
+	reg [4:0] read_addr, read_addr_prev;
+	reg we, we_prev;
+    
+    // Drum node variables
+	reg signed [17:0] curr_u, prev_u;
+    reg signed [17:0] u_up, u_down;
+    reg [17:0] rho_eff = {1'b0, 17'b00010000000000000};
+    wire signed [17:0] next_u;
+
+    // index rows
+    reg [4:0] index_rows;
+    
+    // increment/decrement between nodes
+    reg [17:0] step_size = {1'b0, 17'b00000011111111111}; // (1/8) / 32
+
+    /*
 	always @(posedge clk_50) begin
 		if (reset) begin
 			curr_u <= {1'b0, 17'b00100000000000000};
 			prev_u <= {1'b0, 17'b00100000000000000};
 		end
 		else begin
-			curr_u <= out;
+			curr_u <= next_u;
 			prev_u <= curr_u;
 		end
 	end
@@ -51,14 +69,128 @@ module testbench();
 				  .u_right(18'd0),
 				  .u_up(18'd0),
 				  .u_down(18'd0),
+				  .next(next_u));
+    */
+
+// genvar i;
+// generate 
+// for (i = 0; i < 1; i = i+1) begin: initCols
+    // curr and prev M10k block instantiations
+    M10K_32_5 m10k_curr(.q(q), .d(d), .write_address(write_addr), .read_address(read_addr), .we(we), .clk(clk_50));
+    M10K_32_5 m10k_prev(.q(q_prev), .d(d_prev), .write_address(write_addr_prev), .read_address(read_addr_prev), .we(we_prev), .clk(clk_50));
+    
+    // drum instantiation
+    drum oneNode (.clk(clk_50), 
+				  .reset(reset), // can remove now that it's handled in SM
+				  .rho_eff({1'b0, 17'b00010000000000000}),
+				  .curr_u(curr_u), // TODO
+				  .prev_u(prev_u),
+				  .u_left(18'd0),
+				  .u_right(18'd0),
+				  .u_up((index_rows == 5'd29) ? 5'b0 : u_up),
+				  .u_down((index_rows == 5'd0) ? 5'b0 : u_down),
 				  .next(out));
+    
+    reg [2:0] state;
+    reg signed [17:0] initial_val = {1'b0, 17'b00000011111111111}; // (1/8) / 32
+    reg signed [17:0] intermed_val;
+    reg signed [17:0] out_val;
+    
+    always @(posedge clk_50) begin
+        if (reset) begin
+            state <= 3'd0;
+        end
+        else begin
+            // State 0 - Reset
+            if (state == 3'd0) begin
+                state <= 3'd1;
+                index_rows <= 5'd0;
+            end
+            // State 1 - Init
+            else if (state == 3'd1) begin
+                // once all 30 nodes are init
+                if (index_rows > 5'd29) begin // if it exceeds the top
+                    state <= 3'd2;
+                    index_rows <= 5'd0;
+                    we <= 1'd0;
+                end
+                else begin // init curr node and prev_u M10k blocks
+                    if (index_rows < 5'd29) begin
+                        we <= 1'd1;
+                        we_prev <= 1'd1;
+                        read_addr <= index_rows;
+                        read_addr_prev <= index_rows;
+                        write_addr <= index_rows;
+                        write_addr_prev <= index_rows;
+                        d <= initial_val;
+                        d_prev <= initial_val;
+                        // TODO --> 
+                        initial_val <= initial_val + step_size;
+                    end
+                    else begin
+                        we <= 1'd1;
+                        we_prev <= 1'd1;
+                        read_addr <= index_rows;
+                        read_addr_prev <= index_rows;
+                        write_addr <= index_rows;
+                        write_addr_prev <= index_rows;
+                        d <= initial_val;
+                        d_prev <= initial_val;
+                        initial_val <= initial_val - step_size;
+                    end
+                    
+                    index_rows <= index_rows + 5'd1; // increment the index to check rows
+                    state <= 3'd1;
+                end
+            end
+            // State 2 - Set up read address for M10k blocks
+            else if (state == 3'd2) begin
+                if (index_rows < 5'd29) begin // if not at top
+                    read_addr <= index_rows + 5'd1; // sets read address to this if node isn't the last one  
+                    we <= 0; // make sure you're reading
+                end
+                
+                read_addr_prev <= index_rows; // set prev read addr to index_rows value to read prev_u of the current node
+                we_prev <= 0; // make sure you're reading
+                
+                state <= 3'd3;
+            end
+            // State 3 - Set inputs
+            else if (state == 3'd3) begin
+                if (index_rows < 5'd29) begin // if not at top
+                    u_up <= q; // since each ndoe's next state depends on its own state and the one above it
+                end
+                
+                prev_u <= q_prev; // q_prev would be data read from memory that stores prev state of curr node
+                state <= 3'd4;
+            end
+            // State 4 - Get out (next node) and write and set up next row
+            else if (state == 3'd4) begin
+                we <= 1'd1;
+                write_addr <= index_rows;
+                d <= next_u;
+                
+                we_prev <= 1'd1;
+                write_addr_prev <= index_rows;
+                d_prev <= ; // TODO
+                
+                
+            end
+            // State 5 - Output value
+            else if (state == 3'd5) begin
+                out_val <= intermed_val;
+                state <= 3'd2;
+            end
+        end
+    end
+// end (for loop)
+// endgenerate
 	
 endmodule
 
 //////////////////////////////////////////////////////////////
 ////////////	Mandelbrot Set Visualizer	    //////////////
 //////////////////////////////////////////////////////////////
-
 module drum (clk, reset, rho_eff, curr_u, prev_u, u_left, u_right, u_up, u_down, next); 
 	input clk, reset;
     input [17:0] rho_eff;
@@ -69,13 +201,33 @@ module drum (clk, reset, rho_eff, curr_u, prev_u, u_left, u_right, u_up, u_down,
 	
 	wire signed [17:0] u_sum, rho_usum, inter_val;
 	
-	assign u_sum = u_left - curr_u + u_right -curr_u + u_up -curr_u + u_down - curr_u;//(curr_u <<< 2)
+	assign u_sum = u_left - curr_u + u_right - curr_u + u_up - curr_u + u_down - curr_u; // (curr_u <<< 2)
 	signed_mult rho_mult_usum(.out(rho_usum), .a(u_sum), .b(rho_eff)); 
 	assign inter_val = rho_usum + (curr_u <<< 1) - prev_u + (prev_u >>> 10);
 	assign next = inter_val - (inter_val >>> 9);
 endmodule
 
-
+//============================================================
+// M10K module
+//============================================================
+module M10K_32_5( 
+    output reg [17:0] q,
+    input [17:0] d,
+    input [4:0] write_address, read_address,
+    input we, clk
+);
+    // force M10K ram style
+    // 307200 words of 8 bits
+    reg [17:0] mem [31:0]  /* synthesis ramstyle = "no_rw_check, M10K" */;
+	 
+    always @ (posedge clk) begin
+        if (we) begin
+            mem[write_address] <= d;
+		  end
+		  
+        q <= mem[read_address]; // q doesn't get d in this clock cycle
+    end
+endmodule
 
 //////////////////////////////////////////////////
 //// signed mult of 1.17 format 2'comp////////////
