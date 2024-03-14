@@ -168,6 +168,16 @@ module testbench();
 				end
 				
 				down_reg <= curr_reg;
+				curr_reg <= u_up;
+				
+				if (index_rows < 5'd29) begin
+					index_rows <= index_rows + 5'd1;
+				end
+				else begin 
+					index_rows <= 0;
+				end
+				
+				state <= 3'd5;
             end
             // State 5 - Output value
             else if (state == 3'd5) begin
