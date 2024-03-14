@@ -225,3 +225,54 @@ restart
 # ** Warning: (vsim-3015) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(69): [PCDPC] - Port size (18) does not match connection size (5) for port 'u_down'. The port definition is at: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(214).
 #    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
 run -all
+# WARNING: No extended dataflow license exists
+# Compile of lab3w1.v was successful.
+vsim -gui work.testbench
+# End time: 23:50:54 on Mar 13,2024, Elapsed time: 0:31:32
+# Errors: 0, Warnings: 18
+# vsim -gui work.testbench 
+# Start time: 23:50:54 on Mar 13,2024
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+# ** Warning: (vsim-3015) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(69): [PCDPC] - Port size (18) does not match connection size (5) for port 'curr_u'. The port definition is at: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(211).
+#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+# ** Warning: (vsim-3015) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(69): [PCDPC] - Port size (18) does not match connection size (5) for port 'u_up'. The port definition is at: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(211).
+#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+# ** Warning: (vsim-3015) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(69): [PCDPC] - Port size (18) does not match connection size (5) for port 'u_down'. The port definition is at: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(211).
+#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+add wave -position insertpoint sim:/testbench/*
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: hh759  Hostname: EN-EC-LPH238-48  ProcessID: 11840
+#           Attempting to use alternate WLF file "./wlftvzm25y".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftvzm25y
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+# ** Warning: (vsim-3015) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(69): [PCDPC] - Port size (18) does not match connection size (5) for port 'curr_u'. The port definition is at: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(214).
+#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+# ** Warning: (vsim-3015) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(69): [PCDPC] - Port size (18) does not match connection size (5) for port 'u_up'. The port definition is at: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(214).
+#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+# ** Warning: (vsim-3015) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(69): [PCDPC] - Port size (18) does not match connection size (5) for port 'u_down'. The port definition is at: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(214).
+#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+run -all
+# Compile of lab3w1.v failed with 1 errors.
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+# ** Warning: (vsim-3015) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(69): [PCDPC] - Port size (18) does not match connection size (5) for port 'curr_u'. The port definition is at: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(214).
+#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+# ** Warning: (vsim-3015) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(69): [PCDPC] - Port size (18) does not match connection size (5) for port 'u_up'. The port definition is at: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(214).
+#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+# ** Warning: (vsim-3015) C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(69): [PCDPC] - Port size (18) does not match connection size (5) for port 'u_down'. The port definition is at: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v(214).
+#    Time: 0 ns  Iteration: 0  Instance: /testbench/oneNode File: C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
+run -all

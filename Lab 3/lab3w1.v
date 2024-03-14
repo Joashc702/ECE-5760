@@ -152,17 +152,20 @@ module testbench();
                 
                 state <= 3'd3;
             end
+			else if (state == 3'd3) begin
+				state <= 3'd4;
+			end
             // State 3 - Set inputs
-            else if (state == 3'd3) begin
+            else if (state == 3'd4) begin
                 if (index_rows < 5'd29) begin // if not at top
                     u_up <= q; // since each node's next state depends on its own state and the one above it
                 end
                 
                 prev_u <= q_prev; // q_prev would be data read from memory that stores prev state of curr node
-                state <= 3'd4;
+                state <= 3'd5;
             end
             // State 4 - Get out (next node) and write and set up next row
-            else if (state == 3'd4) begin
+            else if (state == 3'd5) begin
                 we <= 1'd1;
                 write_addr <= index_rows;
                 d <= next_u;
@@ -190,11 +193,11 @@ module testbench();
 				else begin 
 					index_rows_prev <= index_rows_prev + 5'd1;
 					index_rows <= 5'd0;
-					state <= 3'd5;
+					state <= 3'd6;
 				end
             end
             // State 5 - Output value
-            else if (state == 3'd5) begin
+            else if (state == 3'd6) begin
                 out_val <= intermed_val; // outputs amplitude
                 state <= 3'd2;
             end
