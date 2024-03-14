@@ -9,37 +9,59 @@ z2
 cModel Technology
 dC:/programs/intelFPGA/18.1
 vdrum
-Z0 !s110 1710288418
+Z0 !s110 1710387447
 !i10b 1
-!s100 BTM[PKG>N6VSkBL[LAoY^1
-Ic4LIE6TYQQ^[d8AX59hKH2
+!s100 ET0aLIESl0ZWm9UX:QHbH3
+IZG[g@I?:WIK_nHSkchLH00
 Z1 VDg1SIo80bB@j0V0VzS_@n1
 Z2 dC:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3
-Z3 w1710288411
+Z3 w1710387432
 Z4 8C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
 Z5 FC:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v
-L0 62
+L0 214
 Z6 OV;L;10.5b;63
 r1
 !s85 0
 31
-Z7 !s108 1710288418.000000
+Z7 !s108 1710387447.000000
 Z8 !s107 C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v|
 Z9 !s90 -reportprogress|300|-work|work|-stats=none|C:/Users/hh759/Documents/GitHub/ECE-5760/Lab 3/lab3w1.v|
 !i113 1
 Z10 o-work work
 Z11 tCvgOpt 0
-vsigned_mult
+vM10K_32_5
 R0
 !i10b 1
-!s100 C?f=UgRG1IfX=5eEEfRoH2
-I<I5<Lo77d1W]J7z0YkNFo0
+!s100 enRLn@GKQRcn;P9Y;A92;2
+I<m=c<XCT?W^FRCNlkTW7]2
 R1
 R2
 R3
 R4
 R5
-L0 83
+L0 233
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+R11
+n@m10@k_32_5
+vsigned_mult
+R0
+!i10b 1
+!s100 ?R]7PW[V4T3]<JRhDc28j0
+I89B460J]7H6R7L33EJ<i21
+R1
+R2
+R3
+R4
+R5
+L0 255
 R6
 r1
 !s85 0
@@ -53,8 +75,8 @@ R11
 vtestbench
 R0
 !i10b 1
-!s100 JG1^_mFmgMmd7:87LhLbK3
-Ie>=b8XTkf5@M[E8d1FTZX1
+!s100 6k0RJNda:laD0LCC2;Vk40
+IU?a7ikan;^0R8mH?JO]F?3
 R1
 R2
 R3

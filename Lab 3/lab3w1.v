@@ -38,14 +38,15 @@ module testbench();
     // Drum node variables
 	reg signed [17:0] curr_reg, prev_u;
     reg signed [17:0] u_up, down_reg, bottom_reg;
-    reg [17:0] rho_eff_init;
+    wire [17:0] rho_eff_init;
     wire signed [17:0] next_u;
 
     // index rows
     reg [4:0] index_rows;
+	reg [4:0] index_rows_prev;
     
     // increment/decrement between nodes
-    reg [17:0] step_size;
+    wire [17:0] step_size;
 
 	// intermediate drum instantiation flag check
 	wire [4:0] up_check;
@@ -81,9 +82,9 @@ module testbench();
     reg signed [17:0] intermed_val;
     reg signed [17:0] out_val;
 	
-	assign initial_val = {1'b0, 17'b00000000000000000}; // 0
+	//assign initial_val = {1'b0, 17'b00000000000000000}; // 0
 	//assign step_size = {1'b0, 17'b00000111111111111};   // (1/8) / 32
-    assign step_size = {1'b0, 17'b00001111111111110};   // (1/8) / 16
+    assign step_size = {1'b0, 17'b00000010000000000};   // (1/8) / 16
 	
     always @(posedge clk_50) begin
         if (reset) begin
@@ -93,12 +94,15 @@ module testbench();
             // State 0 - Reset
             if (state == 3'd0) begin
                 state <= 3'd1;
+				initial_val <= {1'b0, 17'b00000000000000000};
                 index_rows <= 5'd0;
+				index_rows_prev <= 5'd0;
+				bottom_reg <= {1'b0, 17'b00000000000000000};
             end
             // State 1 - Init
             else if (state == 3'd1) begin
                 // once all 30 nodes are init
-                if (index_rows > 5'd29) begin // if it exceeds the top
+                if (index_rows == 5'd30) begin // if it exceeds the top
                     state <= 3'd2;
                     index_rows <= 5'd0;
                     we <= 1'd0;
@@ -113,7 +117,11 @@ module testbench();
                         write_addr_prev <= index_rows;
                         d <= initial_val;
                         d_prev <= initial_val;
-                        bottom_reg <= initial_val;
+						/*
+						if (index_rows == 5'd0) begin
+							bottom_reg <= initial_val;
+						end
+						*/
                         initial_val <= initial_val + step_size;
                     end
                     else begin
@@ -161,23 +169,29 @@ module testbench();
                 
                 we_prev <= 1'd1;
                 write_addr_prev <= index_rows;
-                d_prev <= (index_rows == 5'd0) ? bottom_reg : curr_reg; // update prev M10k block
+                d_prev <= (index_rows == 5'd0) ? bottom_reg : curr_reg;
                 
                 if (index_rows == 5'd15) begin
 					intermed_val <= curr_reg;
 				end
+				if (index_rows == 5'd0) begin
+					bottom_reg <= next_u;
+				end
 				
-				down_reg <= curr_reg;
-				curr_reg <= u_up;
+				//down_reg <= curr_reg;
+				//curr_reg <= u_up;
 				
 				if (index_rows < 5'd29) begin
+					down_reg <= (index_rows == 5'd0) ? bottom_reg : curr_reg;
+					curr_reg <= u_up;
 					index_rows <= index_rows + 5'd1;
+					state <= 3'd2;
 				end
 				else begin 
-					index_rows <= 0;
+					index_rows_prev <= index_rows_prev + 5'd1;
+					index_rows <= 5'd0;
+					state <= 3'd5;
 				end
-				
-				state <= 3'd5;
             end
             // State 5 - Output value
             else if (state == 3'd5) begin
