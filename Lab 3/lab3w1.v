@@ -55,8 +55,8 @@ module testbench();
 	wire signed [17:0] curr_check;
 	
 	assign rho_eff_init = {1'b0, 17'b00010000000000000};
-	assign up_check = (index_rows == 5'd29) ? 17'b0 : q;      // checks if up node reaches top, otherwise increments
-	assign down_check = (index_rows == 5'd0) ? 17'b0 : down_reg; // checks if down node is at bottom, otherwise increments
+	assign up_check = (index_rows >= 5'd29) ? 18'b0 : q;      // checks if up node reaches top, otherwise increments
+	assign down_check = (index_rows == 5'd0) ? 18'b0 : down_reg; // checks if down node is at bottom, otherwise increments
 	assign curr_check = (index_rows == 5'd0) ? bottom_reg : curr_reg; // checks bottom_u for compute module
 
 // genvar i;
@@ -69,12 +69,12 @@ module testbench();
     // drum instantiation
     drum oneNode (.clk(clk_50), 
 				  .rho_eff(rho_eff_init),
-				  .curr_u(curr_check),
+				  .curr_u(curr_reg),
 				  .prev_u(q_prev),
 				  .u_left(18'd0),
 				  .u_right(18'd0),
-				  .u_up(up_check),
-				  .u_down(down_check),
+				  .u_up(q),
+				  .u_down(down_reg),
 				  .next(next_u));
     
 	// state variables
@@ -105,9 +105,13 @@ module testbench();
             else if (state == 3'd1) begin
                 // once all 30 nodes are init
                 if (index_rows == 5'd30) begin // if it exceeds the top
-                    state <= 3'd2;
-                    index_rows <= 5'd0;
-                    we <= 1'd0;
+					index_rows <= 5'd0;
+					read_addr <=  5'd1; // sets read address to this if node isn't the last one  
+					read_addr_prev <= 5'd0; // set prev read addr to index_rows value to read prev_u of the current node
+                    we <= 0; // make sure you're reading
+					we_prev <= 0; // make sure you're reading
+					state <= 3'd2;
+				
                 end
                 else begin // init curr node and prev_u M10k blocks
                     if (index_rows < 5'd15) begin
@@ -142,20 +146,69 @@ module testbench();
                     state <= 3'd1;
                 end
             end
-            // State 2 - Set up read address for M10k blocks
+			else if (state == 3'd2) begin
+					read_addr <=  5'd2;   
+					read_addr_prev <= 5'd1; 
+					state <= 3'd3;
+					write_addr <= 5'd0;
+					write_addr_prev <= 5'd0;
+			end
+			// State 2 -> bottom case + prepare read/write for the next cycle
+			else if (state == 3'd3) begin
+				bottom_reg <= next_u;
+				d_prev <= bottom_reg;
+				down_reg <= bottom_reg;
+				curr_reg <= q;
+				read_addr <=  read_addr + 5'd1; // sets read address to this if node isn't the last one  
+				read_addr_prev <= read_addr_prev + 5'd1; // set prev read addr to index_rows value to read prev_u of the current node
+				write_addr <= write_addr + 5'd1;
+       			write_addr_prev <= write_addr_prev + 5'd1;
+				we <= 1; // make sure you're reading
+				we_prev <= 1; // make sure you're reading
+				state <= 3'd4;
+			end
+			// State 3 -> move up case + prepare
+			else if (state == 3'd4) begin
+				d <= next_u;
+				down_reg <= curr_reg;
+				d_prev <= curr_reg;
+				curr_reg <= q;
+				read_addr <= (read_addr == 5'd29) ?  read_addr : read_addr + 5'd1; // sets read address to this if node isn't the last one  
+				read_addr_prev <= read_addr_prev + 5'd1; // set prev read addr to index_rows value to read prev_u of the current node
+				write_addr <= write_addr + 5'd1;
+                write_addr_prev <= write_addr_prev + 5'd1;
+				state <= (read_addr_prev == 5'd28) ? 3'd5 : 3'd4;
+			end
+			// State 4 -> top case
+			else if (state == 3'd5) begin
+				d <= next_u;
+				d_prev <= curr_reg;
+				read_addr <= 5'd1;
+				read_addr_prev <= 5'd0;  
+				state <= 3'd2;
+				write_addr <= write_addr + 5'd1;
+                write_addr_prev <= write_addr_prev + 5'd1;
+			end
+			
+			
+/*
+            // State 2 - Set up read/write address for M10k blocks
             else if (state == 3'd2) begin
                 if (index_rows < 5'd30) begin // if not at top
 					read_addr <= (index_rows == 5'd29) ? index_rows : index_rows + 5'd1; // sets read address to this if node isn't the last one  
 					read_addr_prev <= index_rows; // set prev read addr to index_rows value to read prev_u of the current node
-					
+					index_rows <= index_rows +1;
                     we <= 0; // make sure you're reading
 					we_prev <= 0; // make sure you're reading
 				end
-                
+				else begin
+					index_rows <= (write_rows == 5'd29) ? 5'd0 : index_rows;
+				end
+				
 				if(index_rows > 1)begin
-					write_addr <= (write_rows < 5'd30) ? write_rows : 0;	
-					write_addr_prev <= (write_rows < 5'd30) ? write_rows : 0;
-					write_rows <= (write_rows < 5'd30) ? write_rows + 1 : 0;
+					write_addr <= (write_rows < 5'd30) ? write_rows : 5'd0;	
+					write_addr_prev <= (write_rows < 5'd30) ? write_rows : 5'd0;
+					write_rows <= (write_rows < 5'd29) ? write_rows + 5'd1 : 5'd0;
 					we <= 1; // make sure you're reading
 					we_prev <= 1; // make sure you're reading
 					if(write_rows == 5'd0) begin
@@ -169,10 +222,6 @@ module testbench();
             end
 			// State 3
             else if (state == 3'd3) begin
-				//if (index_rows < 5'd29) begin // if not at top
-                //    u_up <= q; // since each node's next state depends on its own state and the one above it
-                //end
-                
 				if (write_rows == 29) begin
 					d <= next_u;
 					d_prev <= curr_reg;
@@ -193,16 +242,23 @@ module testbench();
 				if (index_rows == 5'd15) begin
 					out_val <= curr_reg;
 				end
-				
-				if (index_rows == 5'd30 && write_rows == 5'd30) begin
+
+				//index_rows <= index_rows + 1;
+				state <= 3'd2;
+			end
+*/
+
+
+
+				/*if (index_rows == 5'd30 && write_rows == 5'd29) begin
 					index_rows <= 5'd0;
 					state <= 3'd2;
 				end
 				else begin
 					index_rows <= (index_rows == 5'd30) ? index_rows : index_rows + 1;
 					state <= 3'd2;
-				end
-			end
+				end*/
+
 			//else if (state == 3'd6) begin
 			//	out_val <= intermed_val; // outputs amplitude
             //    state <= 3'd2;
@@ -284,13 +340,14 @@ module M10K_32_5(
     // force M10K ram style
     // 307200 words of 8 bits
     reg [17:0] mem [31:0]  /* synthesis ramstyle = "no_rw_check, M10K" */;
+	reg [4:0] inter; 
 	 
     always @ (posedge clk) begin
         if (we) begin
             mem[write_address] <= d;
 		  end
-		  
-        q <= mem[read_address]; // q doesn't get d in this clock cycle
+		inter <= read_address;
+        q <= mem[inter]; // q doesn't get d in this clock cycle
     end
 endmodule
 

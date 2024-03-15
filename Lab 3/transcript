@@ -1,7 +1,7 @@
 # Compile of lab3w1.v was successful.
 vsim -gui work.testbench
 # vsim -gui work.testbench 
-# Start time: 20:49:08 on Mar 14,2024
+# Start time: 23:29:40 on Mar 14,2024
 # Loading work.testbench
 # Loading work.M10K_32_5
 # Loading work.drum
@@ -10,7 +10,182 @@ add wave -position insertpoint  \
 sim:/testbench/next_u
 # ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
 #           File in use by: hh759  Hostname: EN-EC-LPH238-48  ProcessID: 11840
-#           Attempting to use alternate WLF file "./wlft24wt6f".
+#           Attempting to use alternate WLF file "./wlftkfx06g".
 # ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
-#           Using alternate file: ./wlft24wt6f
+#           Using alternate file: ./wlftkfx06g
+restart
+run -all
+restart
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+add wave -position insertpoint  \
+sim:/testbench/out_val
+restart
+run -all
+add wave -position insertpoint  \
+sim:/testbench/initial_val
+restart
+run -all
+add wave -position insertpoint  \
+sim:/testbench/m10k_curr/mem
+add wave -position insertpoint  \
+sim:/testbench/m10k_prev/mem
+restart
+run -all
+add wave -position 36  sim:/testbench/write_addr
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+add wave -position 37  sim:/testbench/d
+restart
+run -all
+add wave -position insertpoint  \
+sim:/testbench/write_addr \
+sim:/testbench/write_addr_prev \
+sim:/testbench/read_addr \
+sim:/testbench/read_addr_prev
+restart
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+add wave -position insertpoint  \
+sim:/testbench/state
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+# Break key hit
+run -all
+# Compile of lab3w1.v was successful.
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+restart
+run -100
+# Unknown option: 100
+# ** Error: (vsim-4005) Invalid argument '-100'.
+# Usage: run [<timesteps> [<time_units>]] | -all | -continue | -next | -step | -over | -out | -init | -final
+run 100
+run 1000
+run 2000
+restart
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
+run -all
+# Compile of lab3w1.v was successful.
+restart
+# Loading work.testbench
+# Loading work.M10K_32_5
+# Loading work.drum
+# Loading work.signed_mult
 run -all
