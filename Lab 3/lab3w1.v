@@ -36,26 +36,27 @@ module testbench();
 	reg we, we_prev;
     
     // Drum node variables
-	reg signed [17:0] curr_reg, prev_u;
-    reg signed [17:0] u_up, down_reg, bottom_reg;
+	reg signed [17:0] curr_reg;
+    reg signed [17:0] down_reg, bottom_reg;
     wire [17:0] rho_eff_init;
     wire signed [17:0] next_u;
 
     // index rows
     reg [4:0] index_rows;
-	reg [4:0] index_rows_prev;
+	reg [4:0] write_rows;
+	//reg [4:0] index_rows_prev;
     
     // increment/decrement between nodes
     wire [17:0] step_size;
 
 	// intermediate drum instantiation flag check
-	wire [4:0] up_check;
-	wire [4:0] down_check; 
-	wire [4:0] curr_check;
+	wire signed [17:0] up_check;
+	wire signed [17:0] down_check; 
+	wire signed [17:0] curr_check;
 	
 	assign rho_eff_init = {1'b0, 17'b00010000000000000};
-	assign up_check = (index_rows == 5'd29) ? 5'b0 : u_up;      // checks if up node reaches top, otherwise increments
-	assign down_check = (index_rows == 5'd0) ? 5'b0 : down_reg; // checks if down node is at bottom, otherwise increments
+	assign up_check = (index_rows == 5'd29) ? 17'b0 : q;      // checks if up node reaches top, otherwise increments
+	assign down_check = (index_rows == 5'd0) ? 17'b0 : down_reg; // checks if down node is at bottom, otherwise increments
 	assign curr_check = (index_rows == 5'd0) ? bottom_reg : curr_reg; // checks bottom_u for compute module
 
 // genvar i;
@@ -69,7 +70,7 @@ module testbench();
     drum oneNode (.clk(clk_50), 
 				  .rho_eff(rho_eff_init),
 				  .curr_u(curr_check),
-				  .prev_u(prev_u),
+				  .prev_u(q_prev),
 				  .u_left(18'd0),
 				  .u_right(18'd0),
 				  .u_up(up_check),
@@ -96,7 +97,8 @@ module testbench();
                 state <= 3'd1;
 				initial_val <= {1'b0, 17'b00000000000000000};
                 index_rows <= 5'd0;
-				index_rows_prev <= 5'd0;
+				write_rows <= 5'd0;
+				//index_rows_prev <= 5'd0;
 				bottom_reg <= {1'b0, 17'b00000000000000000};
             end
             // State 1 - Init
@@ -142,29 +144,71 @@ module testbench();
             end
             // State 2 - Set up read address for M10k blocks
             else if (state == 3'd2) begin
-                if (index_rows < 5'd29) begin // if not at top
-                    read_addr <= index_rows + 5'd1; // sets read address to this if node isn't the last one  
+                if (index_rows < 5'd30) begin // if not at top
+					read_addr <= (index_rows == 5'd29) ? index_rows : index_rows + 5'd1; // sets read address to this if node isn't the last one  
+					read_addr_prev <= index_rows; // set prev read addr to index_rows value to read prev_u of the current node
+					
                     we <= 0; // make sure you're reading
-                end
+					we_prev <= 0; // make sure you're reading
+				end
                 
-                read_addr_prev <= index_rows; // set prev read addr to index_rows value to read prev_u of the current node
-                we_prev <= 0; // make sure you're reading
-                
-                state <= 3'd3;
+				if(index_rows > 1)begin
+					write_addr <= (write_rows < 5'd30) ? write_rows : 0;	
+					write_addr_prev <= (write_rows < 5'd30) ? write_rows : 0;
+					write_rows <= (write_rows < 5'd30) ? write_rows + 1 : 0;
+					we <= 1; // make sure you're reading
+					we_prev <= 1; // make sure you're reading
+					if(write_rows == 5'd0) begin
+						bottom_reg <= next_u;
+						down_reg <= bottom_reg;
+						curr_reg <= up_check;
+						d_prev <= bottom_reg;
+					end
+				end
+				state <= 3'd3;
             end
-			else if (state == 3'd3) begin
+			// State 3
+            else if (state == 3'd3) begin
+				//if (index_rows < 5'd29) begin // if not at top
+                //    u_up <= q; // since each node's next state depends on its own state and the one above it
+                //end
+                
+				if (write_rows == 29) begin
+					d <= next_u;
+					d_prev <= curr_reg;
+				end
+				else begin
+					d <= next_u;
+					down_reg <= curr_reg;
+					d_prev <= curr_reg;
+					curr_reg <= up_check;	
+				end
+
 				state <= 3'd4;
-			end
-            // State 3 - Set inputs
-            else if (state == 3'd4) begin
-                if (index_rows < 5'd29) begin // if not at top
-                    u_up <= q; // since each node's next state depends on its own state and the one above it
-                end
-                
-                prev_u <= q_prev; // q_prev would be data read from memory that stores prev state of curr node
-                state <= 3'd5;
+                //prev_u <= q_prev; // q_prev would be data read from memory that stores prev state of curr node -> I think it's curr u 
+               
             end
-            // State 4 - Get out (next node) and write and set up next row
+			
+			else if (state == 3'd4) begin
+				if (index_rows == 5'd15) begin
+					out_val <= curr_reg;
+				end
+				
+				if (index_rows == 5'd30 && write_rows == 5'd30) begin
+					index_rows <= 5'd0;
+					state <= 3'd2;
+				end
+				else begin
+					index_rows <= (index_rows == 5'd30) ? index_rows : index_rows + 1;
+					state <= 3'd2;
+				end
+			end
+			//else if (state == 3'd6) begin
+			//	out_val <= intermed_val; // outputs amplitude
+            //    state <= 3'd2;
+			//end
+            
+			/*// State 4 - Get out (next node) and write and set up next row
             else if (state == 3'd5) begin
                 we <= 1'd1;
                 write_addr <= index_rows;
@@ -201,6 +245,7 @@ module testbench();
                 out_val <= intermed_val; // outputs amplitude
                 state <= 3'd2;
             end
+			*/
         end
     end
 // end (for loop)
