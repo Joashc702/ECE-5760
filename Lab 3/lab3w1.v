@@ -49,24 +49,24 @@ module testbench();
     wire [17:0] step_size;
 
 	// intermediate drum instantiation flag check
-	wire [4:0] up_check;
-	wire [4:0] down_check; 
-	wire [4:0] curr_check;
+	wire signed [17:0] up_check;
+	wire signed [17:0] down_check; 
+	wire signed [17:0] curr_check;
 	
 	assign rho_eff_init = {1'b0, 17'b00010000000000000};
 	assign up_check = (index_rows == 5'd29) ? 5'b0 : u_up;      // checks if up node reaches top, otherwise increments
 	assign down_check = (index_rows == 5'd0) ? 5'b0 : down_reg; // checks if down node is at bottom, otherwise increments
 	assign curr_check = (index_rows == 5'd0) ? bottom_reg : curr_reg; // checks bottom_u for compute module
 
-// genvar i;
-// generate 
-// for (i = 0; i < 1; i = i+1) begin: initCols
-    // curr and prev M10k block instantiations
-    M10K_32_5 m10k_curr(.q(q), .d(d), .write_address(write_addr), .read_address(read_addr), .we(we), .clk(clk_50));
-    M10K_32_5 m10k_prev(.q(q_prev), .d(d_prev), .write_address(write_addr_prev), .read_address(read_addr_prev), .we(we_prev), .clk(clk_50));
-    
-    // drum instantiation
-    drum oneNode (.clk(clk_50), 
+//genvar i;
+//generate 
+	//for (i = 0; i < 1; i = i+1) begin: initCols
+	// curr and prev M10k block instantiations
+	M10K_32_5 m10k_curr(.q(q), .d(d), .write_address(write_addr), .read_address(read_addr), .we(we), .clk(clk_50));
+	M10K_32_5 m10k_prev(.q(q_prev), .d(d_prev), .write_address(write_addr_prev), .read_address(read_addr_prev), .we(we_prev), .clk(clk_50));
+	
+	// drum instantiation
+	drum oneNode (.clk(clk_50), 
 				  .rho_eff(rho_eff_init),
 				  .curr_u(curr_check),
 				  .prev_u(prev_u),
@@ -75,106 +75,105 @@ module testbench();
 				  .u_up(up_check),
 				  .u_down(down_check),
 				  .next(next_u));
-    
+	
 	// state variables
-    reg [2:0] state;
-    reg signed [17:0] initial_val;
-    reg signed [17:0] intermed_val;
-    reg signed [17:0] out_val;
+	reg [2:0] state;
+	reg signed [17:0] initial_val;
+	reg signed [17:0] intermed_val;
+	reg signed [17:0] out_val;
 	
 	//assign initial_val = {1'b0, 17'b00000000000000000}; // 0
 	//assign step_size = {1'b0, 17'b00000111111111111};   // (1/8) / 32
-    assign step_size = {1'b0, 17'b00000010000000000};   // (1/8) / 16
+	assign step_size = {1'b0, 17'b00000010000000000};   // (1/8) / 16
 	
-    always @(posedge clk_50) begin
-        if (reset) begin
-            state <= 3'd0;
-        end
-        else begin
-            // State 0 - Reset
-            if (state == 3'd0) begin
-                state <= 3'd1;
+	always @(posedge clk_50) begin
+		if (reset) begin
+			state <= 3'd0;
+		end
+		else begin
+			// State 0 - Reset
+			if (state == 3'd0) begin
+				state <= 3'd1;
 				initial_val <= {1'b0, 17'b00000000000000000};
-                index_rows <= 5'd0;
+				index_rows <= 5'd0;
 				index_rows_prev <= 5'd0;
-				bottom_reg <= {1'b0, 17'b00000000000000000};
-            end
-            // State 1 - Init
-            else if (state == 3'd1) begin
-                // once all 30 nodes are init
-                if (index_rows == 5'd30) begin // if it exceeds the top
-                    state <= 3'd2;
-                    index_rows <= 5'd0;
-                    we <= 1'd0;
-                end
-                else begin // init curr node and prev_u M10k blocks
-                    if (index_rows < 5'd15) begin
-                        we <= 1'd1;
-                        we_prev <= 1'd1;
-                        read_addr <= index_rows;
-                        read_addr_prev <= index_rows;
-                        write_addr <= index_rows;
-                        write_addr_prev <= index_rows;
-                        d <= initial_val;
-                        d_prev <= initial_val;
-						/*
-						if (index_rows == 5'd0) begin
-							bottom_reg <= initial_val;
-						end
-						*/
-                        initial_val <= initial_val + step_size;
-                    end
-                    else begin
-                        we <= 1'd1;
-                        we_prev <= 1'd1;
-                        read_addr <= index_rows;
-                        read_addr_prev <= index_rows;
-                        write_addr <= index_rows;
-                        write_addr_prev <= index_rows;
-                        d <= initial_val;
-                        d_prev <= initial_val;
-                        initial_val <= initial_val - step_size;
-                    end
-                    
-                    index_rows <= index_rows + 5'd1; // increment the index to check rows
-                    state <= 3'd1;
-                end
-            end
-            // State 2 - Set up read address for M10k blocks
-            else if (state == 3'd2) begin
-                if (index_rows < 5'd29) begin // if not at top
-                    read_addr <= index_rows + 5'd1; // sets read address to this if node isn't the last one  
-                    we <= 0; // make sure you're reading
-                end
-                
-                read_addr_prev <= index_rows; // set prev read addr to index_rows value to read prev_u of the current node
-                we_prev <= 0; // make sure you're reading
-                
-                state <= 3'd3;
-            end
+				//bottom_reg <= {1'b0, 17'b00000000000000000};
+			end
+			// State 1 - Init
+			else if (state == 3'd1) begin
+				// once all 30 nodes are init
+				if (index_rows == 5'd30) begin // if it exceeds the top
+					state <= 3'd2;
+					index_rows <= 5'd0;
+					we <= 1'd0;
+				end
+				else begin // init curr node and prev_u M10k blocks
+					if (index_rows < 5'd15) begin
+						we <= 1'd1;
+						we_prev <= 1'd1;
+						read_addr <= index_rows;
+						read_addr_prev <= index_rows;
+						write_addr <= index_rows;
+						write_addr_prev <= index_rows;
+						d <= initial_val;
+						d_prev <= initial_val;
+						
+			if (index_rows == 5'd0) begin
+				bottom_reg <= initial_val;
+			end
+						initial_val <= initial_val + step_size;
+					end
+					else begin
+						we <= 1'd1;
+						we_prev <= 1'd1;
+						read_addr <= index_rows;
+						read_addr_prev <= index_rows;
+						write_addr <= index_rows;
+						write_addr_prev <= index_rows;
+						d <= initial_val;
+						d_prev <= initial_val;
+						initial_val <= initial_val - step_size;
+					end
+					
+					index_rows <= index_rows + 5'd1; // increment the index to check rows
+					state <= 3'd1;
+				end
+			end
+			// State 2 - Set up read address for M10k blocks
+			else if (state == 3'd2) begin
+				if (index_rows < 5'd29) begin // if not at top
+					read_addr <= index_rows + 5'd1; // sets read address to this if node isn't the last one  
+					we <= 0; // make sure you're reading
+				end
+				
+				read_addr_prev <= index_rows; // set prev read addr to index_rows value to read prev_u of the current node
+				we_prev <= 0; // make sure you're reading
+				
+				state <= 3'd3;
+			end
 			else if (state == 3'd3) begin
 				state <= 3'd4;
 			end
-            // State 3 - Set inputs
-            else if (state == 3'd4) begin
-                if (index_rows < 5'd29) begin // if not at top
-                    u_up <= q; // since each node's next state depends on its own state and the one above it
-                end
-                
-                prev_u <= q_prev; // q_prev would be data read from memory that stores prev state of curr node
-                state <= 3'd5;
-            end
-            // State 4 - Get out (next node) and write and set up next row
-            else if (state == 3'd5) begin
-                we <= 1'd1;
-                write_addr <= index_rows;
-                d <= next_u;
-                
-                we_prev <= 1'd1;
-                write_addr_prev <= index_rows;
-                d_prev <= (index_rows == 5'd0) ? bottom_reg : curr_reg;
-                
-                if (index_rows == 5'd15) begin
+			// State 4 - Set inputs
+			else if (state == 3'd4) begin
+				if (index_rows < 5'd29) begin // if not at top
+					u_up <= q; // since each node's next state depends on its own state and the one above it
+				end
+				
+				prev_u <= q_prev; // q_prev would be data read from memory that stores prev state of curr node
+				state <= 3'd5;
+			end
+			// State 5 - Get out (next node) and write and set up next row
+			else if (state == 3'd5) begin
+				we <= 1'd1;
+				write_addr <= index_rows;
+				d <= next_u;
+				
+				we_prev <= 1'd1;
+				write_addr_prev <= index_rows;
+				d_prev <= (index_rows == 5'd0) ? bottom_reg : curr_reg;
+				
+				if (index_rows == 5'd15) begin
 					intermed_val <= curr_reg;
 				end
 				if (index_rows == 5'd0) begin
@@ -195,16 +194,16 @@ module testbench();
 					index_rows <= 5'd0;
 					state <= 3'd6;
 				end
-            end
-            // State 5 - Output value
-            else if (state == 3'd6) begin
-                out_val <= intermed_val; // outputs amplitude
-                state <= 3'd2;
-            end
-        end
-    end
-// end (for loop)
-// endgenerate
+			end
+			// State 6 - Output value
+			else if (state == 3'd6) begin
+				out_val <= intermed_val; // outputs amplitude
+				state <= 3'd2;
+			end
+		end
+	end
+	//end
+//endgenerate
 	
 endmodule
 
