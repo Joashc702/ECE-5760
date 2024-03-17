@@ -48,17 +48,24 @@ module testbench();
     // increment/decrement between nodes
     wire [17:0] step_size;
 
+    // store initial amplitude values for all the nodes
+    wire signed [17:0] initial_ampl [29:0];
+
+    /*
 	// intermediate drum instantiation flag check
 	wire signed [17:0] up_check;
 	wire signed [17:0] down_check; 
 	wire signed [17:0] curr_check;
+    */
 	
 	assign rho_eff_init = {1'b0, 17'b00010000000000000};
+    /*
 	assign up_check = (index_rows == 5'd29) ? 5'b0 : u_up;      // checks if up node reaches top, otherwise increments
 	assign down_check = (index_rows == 5'd0) ? 5'b0 : down_reg; // checks if down node is at bottom, otherwise increments
 	assign curr_check = (index_rows == 5'd0) ? bottom_reg : curr_reg; // checks bottom_u for compute module
+    */
 
-    // TODO maybe use the signed_mult for handling rho being nonlinear somehow ?
+    // TODO signed_mult for handling rho being nonlinear somehow
 
 genvar i;
 generate
@@ -66,24 +73,22 @@ generate
         // curr and prev M10k block instantiations
         M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(clk_50));
         M10K_32_5 m10k_prev(.q(q_prev[i]), .d(d_prev[i]), .write_address(write_addr_prev[i]), .read_address(read_addr_prev[i]), .we(we_prev[i]), .clk(clk_50));
-
-        // TODO instantiation for new module here --> thinking output for amplitude, inputs for i(col), index_rows, total number of i, total number of index_rows, stepsize. You'd prolly do [i] for output and index_rows | and pass in 29 for total numbers, and stepsize for stepsize
+        init_pyramid pyramid_init(.out(initial_ampl[i]), .index_cols(i[4:0]), .index_rows(index_rows[i]), .num_of_cols(5'd29), .num_of_rows(5'd29), .step_size(step_size));
 
         // drum instantiation
-        // TODO might have to directly pass in curr_check, up_check, down_check, and whatever check we need for left and right so we can index based on i directly
         drum oneNode (.clk(clk_50),
                       .rho_eff(rho_eff_init),
-                      .curr_u(curr_check),
+                      .curr_u((index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i]), // curr_check
                       .prev_u(prev_u[i]),
-                      .u_left(18'd0),
-                      .u_right(18'd0),
-                      .u_up(up_check),
-                      .u_down(down_check),
+                      .u_left(18'd0), // TODO left check
+                      .u_right(18'd0), // TODO right check
+                      .u_up((index_rows[i] == 5'd29) ? 5'b0 : u_up[i]),               // up_check
+                      .u_down((index_rows[i] == 5'd0) ? 5'b0 : down_reg[i]),          // down_check
                       .next(next_u[i]));
 
         // state variables
         reg [2:0] state [29:0];
-        reg signed [17:0] initial_val; // This won't be used for week 2 and we gonna need the new module for initial values (like it says on website)
+        // reg signed [17:0] initial_val; // This won't be used for week 2 and we gonna need the new module for initial values (like it says on website)
         reg signed [17:0] intermed_val;
         reg signed [17:0] out_val;
 
@@ -97,10 +102,9 @@ generate
                 // State 0 - Reset
                 if (state[i] == 3'd0) begin
                     state[i] <= 3'd1;
-                    initial_val <= {1'b0, 17'b00000000000000000};
+                    // initial_val <= {1'b0, 17'b00000000000000000};
                     index_rows[i] <= 5'd0;
                     index_rows_prev[i] <= 5'd0;
-                    //bottom_reg <= {1'b0, 17'b00000000000000000};
                 end
                 // State 1 - Init
                 else if (state[i] == 3'd1) begin
@@ -111,32 +115,17 @@ generate
                         we[i] <= 1'd0;
                     end
                     else begin // init curr node and prev_u M10k blocks
-                        // TODO gonna have to redo this whole thing based on the new module for initial values
-                        if (index_rows < 5'd15) begin
-                            we <= 1'd1;
-                            we_prev <= 1'd1;
-                            read_addr <= index_rows;
-                            read_addr_prev <= index_rows;
-                            write_addr <= index_rows;
-                            write_addr_prev <= index_rows;
-                            d <= initial_val;
-                            d_prev <= initial_val;
-
-                            if (index_rows == 5'd0) begin
-                                bottom_reg <= initial_val;
-                            end
-                            initial_val <= initial_val + step_size;
-                        end
-                        else begin
-                            we <= 1'd1;
-                            we_prev <= 1'd1;
-                            read_addr <= index_rows;
-                            read_addr_prev <= index_rows;
-                            write_addr <= index_rows;
-                            write_addr_prev <= index_rows;
-                            d <= initial_val;
-                            d_prev <= initial_val;
-                            initial_val <= initial_val - step_size;
+                        we[i] <= 1'd1;
+						we_prev[i] <= 1'd1;
+						read_addr[i] <= index_rows[i];
+						read_addr_prev[i] <= index_rows[i];
+						write_addr[i] <= index_rows[i];
+						write_addr_prev[i] <= index_rows[i];
+						d[i] <= initial_ampl[i]; 
+						d_prev[i] <= initial_ampl[i];
+                        
+                        if (index_rows[i] == 5'd0) begin
+                            bottom_reg[i] <= initial_ampl[i];
                         end
 
                         index_rows[i] <= index_rows[i] + 5'd1; // increment the index to check rows
@@ -156,7 +145,7 @@ generate
                     state[i] <= 3'd3;
                 end
                 // State 3 - wait for M10K to see the read_addr
-                else if (state == 3'd3) begin
+                else if (state[i] == 3'd3) begin
                     state[i] <= 3'd4;
                 end
                 // State 4 - Set inputs
@@ -178,7 +167,7 @@ generate
                     write_addr_prev[i] <= index_rows[i];
                     d_prev[i] <= (index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i];
 
-                    if (index_rows[i] == 5'd15) begin // TODO uhhhh am i supposed to also check if i itself equals 15 
+                    if (index_rows[i] == 5'd15) begin // TODO do I check if i itself equals 15 
                         intermed_val <= curr_reg[i];
                     end
                     if (index_rows[i] == 5'd0) begin
@@ -198,9 +187,11 @@ generate
                     end
                 end
                 // State 6 - Output value
-                else if (state == 3'd6) begin // TODO this will probably have to handle a lot more...
-                    out_val <= intermed_val; // outputs amplitude
-                    state <= 3'd2;
+                else if (state[i] == 3'd6) begin // TODO this will probably have to handle a lot more...
+                    if (i == 0) begin
+                        out_val <= intermed_val; // outputs amplitude
+                    end
+                    state[i] <= 3'd2;
                 end
             end
         end
@@ -226,6 +217,28 @@ module drum (clk, rho_eff, curr_u, prev_u, u_left, u_right, u_up, u_down, next);
 	signed_mult rho_mult_usum(.out(rho_usum), .a(u_sum), .b(rho_eff)); 
 	assign inter_val = rho_usum + (curr_u <<< 1) - prev_u + (prev_u >>> 10);
 	assign next = inter_val - (inter_val >>> 9);
+endmodule
+
+//////////////////////////////////////////////////////////////
+////////////	Init Amplitude Calculation	    //////////////
+//////////////////////////////////////////////////////////////
+module init_pyramid(out, index_cols, index_rows, num_of_cols, num_of_rows, step_size);
+    output signed [17:0] out;
+    input [4:0] index_cols, index_rows;   // i, j
+    input [4:0] num_of_cols, num_of_rows; // i, j
+    input [17:0] step_size;
+    
+    wire [4:0] horiz_edge_check, vert_edge_check, min_dist;
+    
+    // calculate distances for cols, rows to edge of grid
+    assign horiz_edge_check = ((num_of_cols - index_cols) < index_cols) ? (num_of_cols - index_cols) : index_cols; 
+    assign vert_edge_check = ((num_of_rows - index_rows) < index_rows) ? (num_of_rows - index_rows) : index_rows;
+    
+    // find min of two distances
+    assign min_dist = (horiz_edge_check >= vert_edge_check) ? vert_edge_check : horiz_edge_check;
+    
+    // output is min distance to nearest edge * step size
+    assign out = (min_dist + 1) * step_size;
 endmodule
 
 //============================================================
