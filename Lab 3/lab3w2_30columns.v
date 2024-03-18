@@ -167,7 +167,7 @@ generate
                     write_addr_prev[i] <= index_rows[i];
                     d_prev[i] <= (index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i];
 
-                    if (index_rows[i] == 5'd15) begin // TODO do I check if i itself equals 15 
+                    if ((index_rows[i] == 5'd15) && (i == 15)) begin
                         intermed_val <= curr_reg[i];
                     end
                     if (index_rows[i] == 5'd0) begin
