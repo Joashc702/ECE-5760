@@ -52,9 +52,14 @@ module testbench();
     // store initial amplitude values for all the nodes
     wire signed [17:0] initial_ampl [29:0];
 
-	assign rho_eff_init = {1'b0, 17'b00010000000000000};
-
-    // TODO signed_mult for handling rho being nonlinear somehow
+	//assign rho_eff_init = {1'b0, 17'b00010000000000000};
+	
+	wire signed [17:0] u_G;
+	assign u_G = 18'd0;
+	//signed_mult u_mult_G(.out(u_G), .a(out_val>>>4), .b(out_val>>>4)); 
+	//assign rho_eff_init = ({1'b0, 17'b01111101011100001} < ({1'b0, 17'b01000000000000000} + u_G) ? {1'b0, 17'b01111101011100001} : ({1'b0, 17'b01000000000000000} + u_G); // 0.49 < 0.25 + ug ? 0.49 : 0.25 + ug
+    
+	// TODO signed_mult for handling rho being nonlinear somehow
 
 genvar i;
 generate
