@@ -5,20 +5,17 @@
 `timescale 1ns/1ns
 
 module testbench();
-	
 	reg clk_50, reset;
     
 	// Initialize clock
 	initial begin
 		clk_50 = 1'b0;
 	end
-	
 	// Toggle the clocks
 	always begin
 		#10
 		clk_50  = !clk_50;
 	end
-	
 	// Intialize and drive signals
 	initial begin
 		reset  = 1'b0;
@@ -33,17 +30,21 @@ module testbench();
 	reg signed [17:0] d [29:0], d_prev [29:0];  // write value
 	reg [4:0] write_addr [29:0], write_addr_prev [29:0];
 	reg [4:0] read_addr [29:0], read_addr_prev [29:0];
-	reg [29:0] we, we_prev;
+	reg we[29:0], we_prev[29:0];
     
     // Drum node variables
-	reg signed [17:0] curr_reg [29:0], prev_u [29:0];
+	reg signed [17:0] curr_reg [29:0], prev_u [29:0], curr_left [29:0], curr_right [29:0];
     reg signed [17:0] u_up [29:0], down_reg [29:0], bottom_reg [29:0];
     wire [17:0] rho_eff_init;
     wire signed [17:0] next_u [29:0];
+	reg signed [17:0] initial_val_test[29:0];
+	reg signed [17:0] out_val;
 
     // index rows
-    reg [4:0] index_rows;
-	reg [4:0] index_rows_prev;
+    reg [4:0] index_rows [29:0];
+	reg [4:0] index_rows_prev [29:0];
+	// state variables
+	reg [2:0] state [29:0];
     
     // increment/decrement between nodes
     wire [17:0] step_size;
@@ -51,19 +52,7 @@ module testbench();
     // store initial amplitude values for all the nodes
     wire signed [17:0] initial_ampl [29:0];
 
-    /*
-	// intermediate drum instantiation flag check
-	wire signed [17:0] up_check;
-	wire signed [17:0] down_check; 
-	wire signed [17:0] curr_check;
-    */
-	
 	assign rho_eff_init = {1'b0, 17'b00010000000000000};
-    /*
-	assign up_check = (index_rows == 5'd29) ? 5'b0 : u_up;      // checks if up node reaches top, otherwise increments
-	assign down_check = (index_rows == 5'd0) ? 5'b0 : down_reg; // checks if down node is at bottom, otherwise increments
-	assign curr_check = (index_rows == 5'd0) ? bottom_reg : curr_reg; // checks bottom_u for compute module
-    */
 
     // TODO signed_mult for handling rho being nonlinear somehow
 
@@ -73,24 +62,23 @@ generate
         // curr and prev M10k block instantiations
         M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(clk_50));
         M10K_32_5 m10k_prev(.q(q_prev[i]), .d(d_prev[i]), .write_address(write_addr_prev[i]), .read_address(read_addr_prev[i]), .we(we_prev[i]), .clk(clk_50));
-        init_pyramid pyramid_init(.out(initial_ampl[i]), .index_cols(i[4:0]), .index_rows(index_rows[i]), .num_of_cols(5'd29), .num_of_rows(5'd29), .step_size(step_size));
+        //init_pyramid pyramid_init(.out(initial_ampl[i]), .index_cols(i[4:0]), .index_rows(index_rows[i]), .num_of_cols(5'd29), .num_of_rows(5'd29), .step_size(step_size));
 
         // drum instantiation
         drum oneNode (.clk(clk_50),
                       .rho_eff(rho_eff_init),
                       .curr_u((index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i]), // curr_check
                       .prev_u(prev_u[i]),
-                      .u_left(18'd0), // TODO left check
-                      .u_right(18'd0), // TODO right check
+                      .u_left((i == 0) ? 0 :((index_rows[i] == 5'd0) ? bottom_reg[i - 1] : curr_reg[i-1])), // TODO left check //(i == 0) ? 0 : curr_reg[i-1]
+                      .u_right((i == 29) ? 0 :((index_rows[i] == 5'd0) ? bottom_reg[i + 1] : curr_reg[i+1])), // TODO right check // (i == 29) ? 0 : curr_reg[i+1]
                       .u_up((index_rows[i] == 5'd29) ? 5'b0 : u_up[i]),               // up_check
                       .u_down((index_rows[i] == 5'd0) ? 5'b0 : down_reg[i]),          // down_check
                       .next(next_u[i]));
 
-        // state variables
-        reg [2:0] state [29:0];
         // reg signed [17:0] initial_val; // This won't be used for week 2 and we gonna need the new module for initial values (like it says on website)
         reg signed [17:0] intermed_val;
-        reg signed [17:0] out_val;
+        
+		reg signed [17:0] initial_val;
 
         assign step_size = {1'b0, 17'b00000010000000000};   // (1/8) / 16
 
@@ -105,6 +93,7 @@ generate
                     // initial_val <= {1'b0, 17'b00000000000000000};
                     index_rows[i] <= 5'd0;
                     index_rows_prev[i] <= 5'd0;
+					initial_val <= 18'd0;
                 end
                 // State 1 - Init
                 else if (state[i] == 3'd1) begin
@@ -121,13 +110,31 @@ generate
 						read_addr_prev[i] <= index_rows[i];
 						write_addr[i] <= index_rows[i];
 						write_addr_prev[i] <= index_rows[i];
-						d[i] <= initial_ampl[i]; 
-						d_prev[i] <= initial_ampl[i];
-                        
+						d[i] <= initial_val;
+						d_prev[i] <= initial_val;
+						//new initialization
+						if (i < 15) begin
+							if (index_rows[i] < i) begin 
+								initial_val <= initial_val + step_size;
+							end
+							else if ((29 - index_rows[i]) < i) begin
+								initial_val <= initial_val - step_size;
+							end
+						end
+						else if (i >= 15) begin
+							if (index_rows[i] <= (30 - i)) begin
+								initial_val <= initial_val + step_size;
+							end
+							else if ((29 - index_rows[i]) < (30 - i)) begin
+								initial_val <= initial_val - step_size;
+							end
+						end
                         if (index_rows[i] == 5'd0) begin
-                            bottom_reg[i] <= initial_ampl[i];
+                            bottom_reg[i] <= initial_val; //change made here
                         end
-
+						if (index_rows[i] == 5'd15) begin
+							initial_val_test[i] <= initial_val;
+						end
                         index_rows[i] <= index_rows[i] + 5'd1; // increment the index to check rows
                         state[i] <= 3'd1;
                     end
@@ -136,11 +143,11 @@ generate
                 else if (state[i] == 3'd2) begin
                     if (index_rows[i] < 5'd29) begin // if not at top
                         read_addr[i] <= index_rows[i] + 5'd1; // sets read address to this if node isn't the last one  
-                        we[i] <= 0; // make sure you're reading
+                        //we[i] <= 0; // make sure you're reading
                     end
 
                     read_addr_prev[i] <= index_rows[i]; // set prev read addr to index_rows value to read prev_u of the current node
-                    we_prev[i] <= 0; // make sure you're reading
+                    //we_prev[i] <= 0; // make sure you're reading
 
                     state[i] <= 3'd3;
                 end
@@ -167,7 +174,7 @@ generate
                     write_addr_prev[i] <= index_rows[i];
                     d_prev[i] <= (index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i];
 
-                    if ((index_rows[i] == 5'd15) && (i == 15)) begin
+                    if ((index_rows[i] == 5'd15)) begin
                         intermed_val <= curr_reg[i];
                     end
                     if (index_rows[i] == 5'd0) begin
@@ -177,6 +184,8 @@ generate
                     if (index_rows[i] < 5'd29) begin
                         down_reg[i] <= (index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i];
                         curr_reg[i] <= u_up[i];
+						//curr_left[i] <= curr_reg[i-1];
+						//curr_right[i] <= curr_reg[i+1];
                         index_rows[i] <= index_rows[i] + 5'd1;
                         state[i] <= 3'd2;
                     end
@@ -188,16 +197,17 @@ generate
                 end
                 // State 6 - Output value
                 else if (state[i] == 3'd6) begin // TODO this will probably have to handle a lot more...
-                    if (i == 0) begin
-                        out_val <= intermed_val; // outputs amplitude
-                    end
+                    if (i == 15) begin
+						out_val <= intermed_val; 
+					end
+                    // outputs amplitude
+                    
                     state[i] <= 3'd2;
                 end
             end
         end
     end
 endgenerate
-	
 endmodule
 
 //////////////////////////////////////////////////////////////
@@ -210,9 +220,7 @@ module drum (clk, rho_eff, curr_u, prev_u, u_left, u_right, u_up, u_down, next);
 	//input signed [17:0] init_condition; // u
 	input signed [17:0] u_left, u_right, u_up, u_down;
 	output signed [17:0] next;
-	
 	wire signed [17:0] u_sum, rho_usum, inter_val;
-	
 	assign u_sum = u_left - curr_u + u_right - curr_u + u_up - curr_u + u_down - curr_u; // (curr_u <<< 2)
 	signed_mult rho_mult_usum(.out(rho_usum), .a(u_sum), .b(rho_eff)); 
 	assign inter_val = rho_usum + (curr_u <<< 1) - prev_u + (prev_u >>> 10);
@@ -222,7 +230,7 @@ endmodule
 //////////////////////////////////////////////////////////////
 ////////////	Init Amplitude Calculation	    //////////////
 //////////////////////////////////////////////////////////////
-module init_pyramid(out, index_cols, index_rows, num_of_cols, num_of_rows, step_size);
+/*module init_pyramid(out, index_cols, index_rows, num_of_cols, num_of_rows, step_size);
     output signed [17:0] out;
     input [4:0] index_cols, index_rows;   // i, j
     input [4:0] num_of_cols, num_of_rows; // i, j
@@ -239,8 +247,17 @@ module init_pyramid(out, index_cols, index_rows, num_of_cols, num_of_rows, step_
     
     // output is min distance to nearest edge * step size
     assign out = (min_dist + 1) * step_size;
-endmodule
-
+endmodule*/
+/*
+module init_pyramid(out, index_cols, index_rows, step_size, peak);
+	output signed [17:0] out;
+    input [4:0] index_cols, index_rows; 
+	input [17:0] step_size, peak;
+	wire [17:0] max_val_pos;
+	//assign max_val_pos = step_size * index_cols;
+	assign out = (step_size
+	assign out = ((step_size * index_cols) >= peak) ? (step_size * index_cols) : (peak);
+endmodule*/ 
 //============================================================
 // M10K module
 //============================================================
