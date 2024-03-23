@@ -83,7 +83,7 @@ module testbench();
 
 genvar i;
 generate
-	for (i = 0; i < 30; i = i+1) begin: initCols
+	for (i = 0; i < 32; i = i+1) begin: initCols
         // curr and prev M10k block instantiations
         M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(clk_50));
         M10K_32_5 m10k_prev(.q(q_prev[i]), .d(d_prev[i]), .write_address(write_addr_prev[i]), .read_address(read_addr_prev[i]), .we(we_prev[i]), .clk(clk_50));
@@ -184,14 +184,15 @@ generate
 					read_addr[i] <= 5'd2;
                     read_addr_prev[i] <= 5'd1; // set prev read addr to index_rows value to read prev_u of the current node
 					counter <= counter + 1;
-					we[i] <= 1'd1;
-					we_prev[i] <= 1'd1;
+
                     state[i] <= 3'd3;
                 end
                 // State 3 - wait for M10K to see the read_addr
                 else if (state[i] == 3'd3) begin
 					read_addr[i] <= 5'd3;
                     read_addr_prev[i] <= 5'd2; // set prev read addr to index_rows value to read prev_u of the current node
+					we[i] <= 1'd1;
+					we_prev[i] <= 1'd1;
                     state[i] <= 3'd4;
 					counter <= counter + 1;
                 end
@@ -205,10 +206,10 @@ generate
 					
 					counter <= counter + 1;
 				
-                    write_addr[i] <= (write_addr[i] == 5'd29) ? 5'd0 : write_addr[i] + 5'd1;
+                    write_addr[i] <= (write_addr[i] == 5'd29) ? 5'd0 : index_rows[i] + 5'd1;
                     d[i] <= next_u[i];
 
-                    write_addr_prev[i] <= (write_addr_prev[i] == 5'd29) ? 5'd0 : write_addr_prev[i] + 5'd1;
+                    write_addr_prev[i] <= (write_addr_prev[i] == 5'd29) ? 5'd0 : index_rows[i] + 5'd1;
                     d_prev[i] <= (index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i];
 
                     if ((index_rows[i] == 5'd15) && i == 15) begin
@@ -218,7 +219,7 @@ generate
                         bottom_reg[i] <= next_u[i];
                     end
 					
-                    down_reg[i] <= (index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i];
+                    down_reg[i] <= (index_rows[i] == 5'd0) ? 0 : curr_reg[i];
                     curr_reg[i] <= u_up[i];
                     index_rows[i] <=(index_rows[i] == 5'd29)? 5'd0 : index_rows[i] + 5'd1;
                     state[i] <= 3'd4;
