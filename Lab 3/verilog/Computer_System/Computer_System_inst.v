@@ -90,6 +90,12 @@
 		.memory_oct_rzqin                                (<connected-to-memory_oct_rzqin>),                                //                                    .oct_rzqin
 		.sdram_clk_clk                                   (<connected-to-sdram_clk_clk>),                                   //                           sdram_clk.clk
 		.system_pll_ref_clk_clk                          (<connected-to-system_pll_ref_clk_clk>),                          //                  system_pll_ref_clk.clk
-		.system_pll_ref_reset_reset                      (<connected-to-system_pll_ref_reset_reset>)                       //                system_pll_ref_reset.reset
+		.system_pll_ref_reset_reset                      (<connected-to-system_pll_ref_reset_reset>),                      //                system_pll_ref_reset.reset
+		.counter_pio_external_connection_export          (<connected-to-counter_pio_external_connection_export>),          //     counter_pio_external_connection.export
+		.incr_rows_pio_external_connection_export        (<connected-to-incr_rows_pio_external_connection_export>),        //   incr_rows_pio_external_connection.export
+		.reset_pio_external_connection_export            (<connected-to-reset_pio_external_connection_export>),            //       reset_pio_external_connection.export
+		.ampl_pio_external_connection_export             (<connected-to-ampl_pio_external_connection_export>),             //        ampl_pio_external_connection.export
+		.incr_pio_external_connection_export             (<connected-to-incr_pio_external_connection_export>),             //        incr_pio_external_connection.export
+		.rho_pio_external_connection_export              (<connected-to-rho_pio_external_connection_export>)               //         rho_pio_external_connection.export
 	);
 

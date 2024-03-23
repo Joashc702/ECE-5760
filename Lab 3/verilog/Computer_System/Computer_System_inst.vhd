@@ -91,7 +91,13 @@
 			memory_oct_rzqin                                : in    std_logic                     := 'X';             -- oct_rzqin
 			sdram_clk_clk                                   : out   std_logic;                                        -- clk
 			system_pll_ref_clk_clk                          : in    std_logic                     := 'X';             -- clk
-			system_pll_ref_reset_reset                      : in    std_logic                     := 'X'              -- reset
+			system_pll_ref_reset_reset                      : in    std_logic                     := 'X';             -- reset
+			counter_pio_external_connection_export          : out   std_logic_vector(31 downto 0);                    -- export
+			incr_rows_pio_external_connection_export        : out   std_logic_vector(31 downto 0);                    -- export
+			reset_pio_external_connection_export            : out   std_logic_vector(31 downto 0);                    -- export
+			ampl_pio_external_connection_export             : out   std_logic_vector(31 downto 0);                    -- export
+			incr_pio_external_connection_export             : out   std_logic_vector(31 downto 0);                    -- export
+			rho_pio_external_connection_export              : out   std_logic_vector(31 downto 0)                     -- export
 		);
 	end component Computer_System;
 
@@ -188,6 +194,12 @@
 			memory_oct_rzqin                                => CONNECTED_TO_memory_oct_rzqin,                                --                                    .oct_rzqin
 			sdram_clk_clk                                   => CONNECTED_TO_sdram_clk_clk,                                   --                           sdram_clk.clk
 			system_pll_ref_clk_clk                          => CONNECTED_TO_system_pll_ref_clk_clk,                          --                  system_pll_ref_clk.clk
-			system_pll_ref_reset_reset                      => CONNECTED_TO_system_pll_ref_reset_reset                       --                system_pll_ref_reset.reset
+			system_pll_ref_reset_reset                      => CONNECTED_TO_system_pll_ref_reset_reset,                      --                system_pll_ref_reset.reset
+			counter_pio_external_connection_export          => CONNECTED_TO_counter_pio_external_connection_export,          --     counter_pio_external_connection.export
+			incr_rows_pio_external_connection_export        => CONNECTED_TO_incr_rows_pio_external_connection_export,        --   incr_rows_pio_external_connection.export
+			reset_pio_external_connection_export            => CONNECTED_TO_reset_pio_external_connection_export,            --       reset_pio_external_connection.export
+			ampl_pio_external_connection_export             => CONNECTED_TO_ampl_pio_external_connection_export,             --        ampl_pio_external_connection.export
+			incr_pio_external_connection_export             => CONNECTED_TO_incr_pio_external_connection_export,             --        incr_pio_external_connection.export
+			rho_pio_external_connection_export              => CONNECTED_TO_rho_pio_external_connection_export               --         rho_pio_external_connection.export
 		);
 

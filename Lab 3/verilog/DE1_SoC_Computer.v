@@ -1,5 +1,4 @@
 
-
 module DE1_SoC_Computer (
 	////////////////////////////////////
 	// FPGA Pins
@@ -372,20 +371,9 @@ assign HEX1 = 7'b1111111;
 assign HEX0 = 7'b1111111;
 
 //=======================================================
-// Audio controller for AVALON bus-master
+// Bus controller for AVALON bus-master
 //=======================================================
 // computes DDS for sine wave and fills audio FIFO
-// reads audio FIFO and loops it back
-// MUST configure (in Qsys) Audio Config module:
-// -- Line in to ADC
-// -- uncheck both bypass options
-// The audio_input_ready signal goes high for one
-// cycle when there is new audio input data
-// --
-// 32-bit data is on 
-//   right_audio_input, left_audio_input ;
-// Every write requires 32-bit data on 
-//   right_audio_output, left_audio_output ;
 
 reg [31:0] bus_addr ; // Avalon address
 // see 
@@ -393,8 +381,8 @@ reg [31:0] bus_addr ; // Avalon address
 // for addresses
 wire [31:0] audio_base_address = 32'h00003040 ;  // Avalon address
 wire [31:0] audio_fifo_address = 32'h00003044 ;  // Avalon address +4 offset
-wire [31:0] audio_data_left_address = 32'h00003048 ;  // Avalon address +8
-wire [31:0] audio_data_right_address = 32'h0000304c ;  // Avalon address +12
+wire [31:0] audio_left_address = 32'h00003048 ;  // Avalon address +8
+wire [31:0] audio_right_address = 32'h0000304c ;  // Avalon address +12
 reg [3:0] bus_byte_enable ; // four bit byte read/write mask
 reg bus_read  ;       // high when requesting data
 reg bus_write ;      //  high when writing data
@@ -404,158 +392,45 @@ wire [31:0] bus_read_data ; // data from Avalon bus
 reg [30:0] timer ;
 reg [3:0] state ;
 wire state_clock ;
-wire reset;
-
-// SW[9] disables state machine so that
-// HPS has complete control of audio interface
-assign reset = ~KEY[0] | SW[9] ;
 
 // current free words in audio interface
 reg [7:0] fifo_space ;
 // debug check of space
 assign LEDR = fifo_space ;
 
-// audio input/output from audio module FIFO
-reg [15:0] right_audio_input, left_audio_input ;
-reg audio_input_ready ;
-wire [15:0] right_audio_output, left_audio_output ;
+// use 4-byte-wide bus-master	 
+//assign bus_byte_enable = 4'b1111;
 
-// For audio loopback, or filtering
-assign right_audio_output = SW[1]? right_filter_output : right_audio_input ;
-assign left_audio_output = SW[0]? decimated_filter_300_out : left_audio_input ;
-
-// DDS update signal for testing
+// DDS signals
 reg [31:0] dds_accum ;
 // DDS LUT
 wire [15:0] sine_out ;
-// update phase accumulator
-// sync to audio data rate (48kHz) using audio_input_ready signal
-always @(posedge CLOCK_50) begin //CLOCK_50
-	// Fout = (sample_rate)/(2^32)*{SW[9:0], 16'b0}
-	// then Fout=48000/(2^32)*(2^25) = 375 Hz
-	if (audio_input_ready) dds_accum <= dds_accum + {SW[9:0], 16'b0} ;	
-end
-// DDS sine wave ROM
 sync_rom sineTable(CLOCK_50, dds_accum[31:24], sine_out);
 
 // get some signals exposed
 // connect bus master signals to i/o for probes
 assign GPIO_0[0] = bus_write ;
 assign GPIO_0[1] = bus_read ;
-assign GPIO_0[2] = decimated_audio_ready ;
-assign GPIO_0[3] = audio_input_ready ;
+assign GPIO_0[2] = bus_ack ;
 
-// ======================================================
-// === Filters ==========================================
-// ======================================================
-wire [15:0] right_filter_output, left_filter_output ;
-wire [15:0] left_decimation_out, decimated_filter_300_out ;
+wire sync_signal;
+assign sync_signal = (state == 4'd4) ? 1'd1 : 1'd0;
+//assign GPIO_0[3] = ??? ;
 
-// Bandpass filter at 300 with BW ~100 Hz
-// 2-pole butterworth
-// filter definition are from matlab pgm at bottom of this file
-// Compare to decimated filter below
-IIR2_18bit_fixed filter_right( 
-     .audio_out (right_filter_output), 
-     .audio_in (right_audio_input),  
-     .b1 (18'sd426), 
-     .b2 (18'sd0), 
-     .b3 (-18'sd426), 
-     .a2 (18'sd130122), 
-     .a3 (-18'sd64683), 
-     .state_clk(CLOCK_50), 
-     .audio_input_ready(audio_input_ready), 
-     .reset(reset) 
-) ; //end filter 
-
-// === 6:1 decimator filters =====================
-// First stage decimation filter
-// Filter: frequency cutoff is 4.2KHz
-// chebychev with 9 db peaking 
-// low pass cutoff 4KHz for decimation
-// to 8KHz sample rate
-// This filter runs at full 48KHz
-// But only every 6th output is used by the
-// slower 8KHz filters
-// The slower data-ready signal will come from the
-// bus-master state machine
-IIR2_18bit_fixed filter_decimation1( 
-     .audio_out (left_filter_output), 
-     .audio_in (left_audio_input), 
-     .b1 (18'sd885), 
-     .b2 (18'sd1771), 
-     .b3 (18'sd885), 
-     .a2 (18'sd112357), 
-     .a3 (-18'sd56805),  
-     .state_clk(CLOCK_50), 
-     .audio_input_ready(audio_input_ready), 
-     .reset(reset) 
-) ; //end filter 
-//Filter: frequency=0.083333 2KHz butterworth
-// second stage decimation filter
-IIR2_18bit_fixed filter_decimation2( 
-     .audio_out (left_decimation_out), 
-     .audio_in (left_filter_output), 
-     .b1 (18'sd943), 
-     .b2 (18'sd1887), 
-     .b3 (18'sd943), 
-     .a2 (18'sd107019), 
-     .a3 (-18'sd45259), 
-     .state_clk(CLOCK_50), 
-     .audio_input_ready(audio_input_ready), 
-     .reset(reset) 
-) ; //end filter 
-// === 6:1 decimator filters end==================
-
-// decimated bandpass 300 Hz, BW 100 Hz filter running at 8KHz
-IIR2_18bit_fixed dec_filter_300( 
-     .audio_out (decimated_filter_300_out), 
-     .audio_in (left_decimation_out<<1),  //lose amp in decimator
-     .b1 (18'sd2477), 
-     .b2 (18'sd0), 
-     .b3 (-18'sd2477), 
-     .a2 (18'sd122726), 
-     .a3 (-18'sd60580), 
-     .state_clk(CLOCK_50), 
-     .audio_input_ready(decimated_audio_ready), 
-     .reset(reset) 
-) ; //end filter 
-
-// ===============================================
-// === Audio bus master state machine ============
-// ===============================================
-// writes, then reads the audio interface, if data
-// is ready (FIFO indicates data). Sensing the FIFO
-// effectively syncs data generation to the Audio 
-// rate.
-// 
-// The audio_input_ready signal goes high for one
-// cycle when there is new audio input data
-//
-// 32-bit audio ADC data is on:
-//   right_audio_input, left_audio_input ;
-// Every write requires 32-bit data on: 
-//   right_audio_output, left_audio_output ;
-	
-// 6:1 decimated clock = 8KHz rate
-reg decimated_audio_ready ; 
-reg [3:0] decimated_audio_clk_counter ;
-	
 always @(posedge CLOCK_50) begin //CLOCK_50
+
 	// reset state machine and read/write controls
-	if (reset) begin
+	if (~KEY[0]) begin
 		state <= 0 ;
 		bus_read <= 0 ; // set to one if a read opeation from bus
 		bus_write <= 0 ; // set to one if a write operation to bus
 		timer <= 0;
-		decimated_audio_clk_counter <= 0 ;
 	end
 	else begin
 		// timer just for deubgging
 		timer <= timer + 1;
 	end
 	
-	// === writing stereo to the audio FIFO ==========
 	// set up read FIFO available space
 	if (state==4'd0) begin
 		bus_addr <= audio_fifo_address ;
@@ -568,19 +443,27 @@ always @(posedge CLOCK_50) begin //CLOCK_50
 	// bus ACK is high when data is available
 	if (state==4'd1 && bus_ack==1) begin
 		state <= 4'd2 ; //4'd2
-		// FIFO write space is in high byte
+		// FIFO space is in high byte
 		fifo_space <= (bus_read_data>>24) ;
 		// end the read
 		bus_read <= 1'b0 ;
+		
 	end
 	
 	// When there is room in the FIFO
+	// -- compute next DDS sine sample
 	// -- start write to fifo for each channel
 	// -- first the left channel
 	if (state==4'd2 && fifo_space>8'd2) begin // 
 		state <= 4'd3;	
-		bus_write_data <= left_audio_output ;
-		bus_addr <= audio_data_left_address ;
+		// IF SW=10'h200 
+		// and Fout = (sample_rate)/(2^32)*{SW[9:0], 16'b0}
+		// then Fout=48000/(2^32)*(2^25) = 375 Hz
+		dds_accum <= dds_accum + {SW[9:0], 16'b0} ;
+		// convert 16-bit table to 32-bit format
+		bus_write_data <= (out_val <<< 14) ; // make center node
+		//drum_done <= 1; //set signal high
+		bus_addr <= audio_left_address ;
 		bus_byte_enable <= 4'b1111;
 		bus_write <= 1'b1 ;
 	end	
@@ -593,17 +476,20 @@ always @(posedge CLOCK_50) begin //CLOCK_50
 	// for left channel write
 	// You MUST do this check
 	if (state==4'd3 && bus_ack==1) begin
-		state <= 4'd4 ; // include right channel
-		//state <= 4'd0 ; // left channel only!
+		state <= 4'd4 ;
 		bus_write <= 0;
 	end
 	
 	// -- now the right channel
 	if (state==4'd4) begin // 
 		state <= 4'd5;	
-		// loop back audio input data
-		bus_write_data <= right_audio_output ;
-		bus_addr <= audio_data_right_address ;
+		bus_write_data <= (out_val <<< 14) ; // make center node
+		/*
+		if (drum_done == 1) begin
+			audio_done <= 1;
+		end*/
+		//drum_done[15] <= 1;
+		bus_addr <= audio_right_address ;
 		bus_write <= 1'b1 ;
 	end	
 	
@@ -611,97 +497,253 @@ always @(posedge CLOCK_50) begin //CLOCK_50
 	// for right channel write
 	// You MUST do this check
 	if (state==4'd5 && bus_ack==1) begin
-		// state <= 4'd0 ; // for write only function
-		state <= 4'd6 ; // for read/write  function
+		state <= 4'd0 ;
 		bus_write <= 0;
 	end
 	
-	// === reading stereo from the audio FIFO ==========
-	// set up read FIFO for available read values
-	if (state==4'd6 ) begin
-		bus_addr <= audio_fifo_address ;
-		bus_read <= 1'b1 ;
-		bus_byte_enable <= 4'b1111;
-		state <= 4'd7 ; // wait for read ACK
-	end
-	
-	// wait for read ACK and read the fifo available
-	// bus ACK is high when data is available
-	if (state==4'd7 && bus_ack==1) begin
-		state <= 4'd8 ; //4'dxx
-		// FIFO read space is in low byte
-		// which is zero when empty
-		fifo_space <= bus_read_data & 8'hff ;
-		// end the read
-		bus_read <= 1'b0 ;
-	end
-	
-	// When there is data in the read FIFO
-	// -- read it from both channels
-	// -- first the left channel
-	if (state==4'd8 && fifo_space>8'd0) begin // 
-		state <= 4'd9;	
-		bus_addr <= audio_data_left_address ;
-		bus_byte_enable <= 4'b1111;
-		bus_read <= 1'b1 ;
-	end	
-	// if no data, try again later
-	else if (state==4'd8 && fifo_space<=8'd0) begin
-		state <= 4'b0 ;
-	end
-	
-	// detect bus-transaction-complete ACK 
-	// for left channel read
-	// You MUST do this check
-	if (state==4'd9 && bus_ack==1) begin
-		state <= 4'd10 ; // include right channel
-		left_audio_input <= bus_read_data ;
-		bus_read <= 0;
-	end
-	
-	// When there is data in the read FIFO
-	// -- read it from both channels
-	// -- now right channel
-	if (state==4'd10) begin // 
-		state <= 4'd11;	
-		bus_addr <= audio_data_right_address ;
-		bus_byte_enable <= 4'b1111;
-		bus_read <= 1'b1 ;
-	end	
-	
-	// detect bus-transaction-complete ACK 
-	// for right channel read
-	// You MUST do this check
-	if (state==4'd11 && bus_ack==1) begin
-		state <= 4'd12 ; // back to beginning
-		right_audio_input <= bus_read_data ;
-		// set the data-ready strobe
-		audio_input_ready <= 1'b1;
-		// increment/set decimated rate 
-		if (decimated_audio_clk_counter==4'd5) begin
-			decimated_audio_clk_counter <= 4'd0;
-			decimated_audio_ready <= 1'b1;
-		end
-		else begin
-			decimated_audio_clk_counter <= decimated_audio_clk_counter + 4'd1;
-		end
-		// finish the read
-		bus_read <= 0;
-	end
-	
-	// wait 1 cycle data-ready strobe
-	if (state==4'd12) begin
-		state <= 4'd13 ; // back to beginning
-		//audio_input_ready <= 1'b0;
-	end
-	// end data-ready strobe
-	if (state==4'd13) begin
-		state <= 4'd0 ; // back to beginning
-		audio_input_ready <= 1'b0;
-		decimated_audio_ready <= 1'b0 ;
-	end
-	
 end // always @(posedge state_clock)
+
+// arm variables
+wire arm_reset;
+wire [31:0] arm_counter;
+wire [31:0] arm_num_rows;
+wire [31:0] arm_rho;
+wire [31:0] arm_incr;
+wire [31:0] arm_ampl_out;
+
+// M10K variables
+wire signed [17:0] q [29:0];
+wire signed [17:0] q_prev [29:0]; // read value
+
+reg signed [17:0] d [29:0];
+reg signed [17:0] d_prev [29:0];  // write value
+
+reg [4:0] write_addr [29:0];
+reg [4:0] write_addr_prev [29:0];
+reg [4:0] read_addr [29:0];
+reg [4:0] read_addr_prev [29:0];
+reg we[29:0], we_prev[29:0];
+
+// Drum node variables
+reg signed [17:0] curr_reg [29:0];
+reg signed [17:0] prev_u [29:0];
+reg signed [17:0] curr_left [29:0];
+reg signed [17:0] curr_right [29:0];
+
+reg signed [17:0] u_up [29:0];
+reg signed [17:0] down_reg [29:0];
+reg signed [17:0] bottom_reg [29:0];
+wire [17:0] rho_eff_init;
+
+wire signed [17:0] next_u [29:0];
+reg signed [17:0] initial_val_test[29:0];
+reg signed [17:0] out_val;
+
+// index rows
+reg [4:0] index_rows [29:0];
+reg [4:0] index_rows_prev [29:0];
+// state variables
+reg [2:0] drum_state [29:0];
+
+// increment/decrement between nodes
+wire [17:0] step_size;
+reg drum_done;
+reg audio_done;
+
+//assign rho_eff_init = {1'b0, 17'b00010000000000000};
+wire signed [17:0] u_G;
+wire signed [17:0] center_node_shift;
+assign center_node_shift = out_val >>> 4;
+
+signed_mult u_mult_G(.out(u_G), .a(center_node_shift), .b(center_node_shift)); 
+assign rho_eff_init = ({1'b0, 17'b01111101011100001} < ({1'b0, 17'b01000000000000000} + u_G)) ? {1'b0, 17'b01111101011100001} : ({1'b0, 17'b01000000000000000} + u_G);
+
+// TODO add >>> arm_rho for signed_mult
+
+genvar i;
+generate // generate 30 columns
+	for (i = 0; i < 30; i = i+1) begin: initCols
+        // curr and prev M10k block instantiations
+        M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
+        M10K_32_5 m10k_prev(.q(q_prev[i]), .d(d_prev[i]), .write_address(write_addr_prev[i]), .read_address(read_addr_prev[i]), .we(we_prev[i]), .clk(CLOCK_50));
+        //init_pyramid pyramid_init(.out(initial_ampl[i]), .index_cols(i[4:0]), .index_rows(index_rows[i]), .num_of_cols(5'd29), .num_of_rows(5'd29), .step_size(step_size));
+
+        // drum instantiation
+        drum oneNode (.clk(CLOCK_50),
+                      .rho_eff(rho_eff_init),
+                      .curr_u((index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i]), // curr_check
+                      .prev_u(prev_u[i]),
+                      .u_left((i == 0) ? 0 :((index_rows[i] == 5'd0) ? bottom_reg[i - 1] : curr_reg[i-1])), // TODO left check //(i == 0) ? 0 : curr_reg[i-1]
+                      .u_right((i == 29) ? 0 :((index_rows[i] == 5'd0) ? bottom_reg[i + 1] : curr_reg[i+1])), // TODO right check // (i == 29) ? 0 : curr_reg[i+1]
+                      .u_up((index_rows[i] == 5'd29) ? 5'b0 : u_up[i]),               // up_check
+                      .u_down((index_rows[i] == 5'd0) ? 5'b0 : down_reg[i]),          // down_check
+                      .next(next_u[i]));
+
+        // reg signed [17:0] initial_val; // This won't be used for week 2 and we gonna need the new module for initial values (like it says on website)
+        reg signed [17:0] intermed_val;
+        
+		  reg signed [17:0] initial_val;
+
+        assign step_size = {1'b0, 17'b00000010000000000};   // (1/8) / 16
+
+        always @(posedge CLOCK_50) begin
+            if (~KEY[0]) begin // arm_reset ||
+                drum_state[i] <= 3'd0;
+            end
+            else begin
+                // State 0 - Reset
+                if (drum_state[i] == 3'd0) begin
+                    drum_state[i] <= 3'd1;
+                    // initial_val <= {1'b0, 17'b00000000000000000};
+                    index_rows[i] <= 5'd0;
+                    index_rows_prev[i] <= 5'd0;
+						  initial_val <= 18'd0;
+						  
+						  /*
+						  TODO
+						  if (i == 0) begin
+								num_rows <= arm_num_rows[4:0];
+						  end
+						  if (i == 0) begin
+								incr <= arm_incr[17:0];
+						  end
+						  */
+                end
+                // State 1 - Init
+                else if (drum_state[i] == 3'd1) begin
+                    // once all 30 nodes are init
+                    if (index_rows[i] == 5'd30) begin // if it exceeds the top
+                        drum_state[i] <= 3'd2;
+                        index_rows[i] <= 5'd0;
+                        we[i] <= 1'd0;
+                    end
+                    else begin // init curr node and prev_u M10k blocks
+                        we[i] <= 1'd1;
+								we_prev[i] <= 1'd1;
+								read_addr[i] <= index_rows[i];
+								read_addr_prev[i] <= index_rows[i];
+								write_addr[i] <= index_rows[i];
+								write_addr_prev[i] <= index_rows[i];
+								d[i] <= initial_val;
+								d_prev[i] <= initial_val;
+								//new initialization
+								if (i < 15) begin
+									if (index_rows[i] < i) begin 
+										initial_val <= initial_val + step_size;
+									end
+									else if ((29 - index_rows[i]) < i) begin
+										initial_val <= initial_val - step_size;
+									end
+								end
+								else if (i >= 15) begin
+									if (index_rows[i] <= (30 - i)) begin
+										initial_val <= initial_val + step_size;
+									end
+									else if ((29 - index_rows[i]) < (30 - i)) begin
+										initial_val <= initial_val - step_size;
+									end
+								end
+								if (index_rows[i] == 5'd0) begin
+									 bottom_reg[i] <= initial_val; //change made here
+								end
+								if (index_rows[i] == 5'd14 && i == 14) begin
+									out_val <= initial_val; //changing this from initial_val_test[i]
+								end
+								index_rows[i] <= index_rows[i] + 5'd1; // increment the index to check rows
+								drum_state[i] <= 3'd1;
+						 end
+					 end
+                // State 2 - Set up read address for M10k blocks
+                else if (drum_state[i] == 3'd2) begin
+                    if (index_rows[i] < 5'd29) begin // if not at top
+                        read_addr[i] <= index_rows[i] + 5'd1; // sets read address to this if node isn't the last one  
+                        //we[i] <= 0; // make sure you're reading
+                    end
+
+                    read_addr_prev[i] <= index_rows[i]; // set prev read addr to index_rows value to read prev_u of the current node
+                    //we_prev[i] <= 0; // make sure you're reading
+						  
+                    drum_state[i] <= 3'd3;
+                end
+                // State 3 - wait for M10K to see the read_addr
+                else if (drum_state[i] == 3'd3) begin
+                    drum_state[i] <= 3'd4;
+                end
+                // State 4 - Set inputs
+                else if (drum_state[i] == 3'd4) begin
+                    if (index_rows[i] < 5'd29) begin // if not at top
+                        u_up[i] <= q[i]; // since each node's next state depends on its own state and the one above it
+                    end
+
+                    prev_u[i] <= q_prev[i]; // q_prev would be data read from memory that stores prev state of curr node
+                    drum_state[i] <= 3'd5;
+                end
+                // State 5 - Get out (next node) and write and set up next row
+                else if (drum_state[i] == 3'd5) begin
+                    we[i] <= 1'd1;
+                    write_addr[i] <= index_rows[i];
+                    d[i] <= next_u[i];
+
+                    we_prev[i] <= 1'd1;
+                    write_addr_prev[i] <= index_rows[i];
+                    d_prev[i] <= (index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i];
+
+                    if ((index_rows[i] == 5'd14)) begin
+                        intermed_val <= curr_reg[i];
+                    end
+                    if (index_rows[i] == 5'd0) begin
+                        bottom_reg[i] <= next_u[i];
+                    end
+
+                    if (index_rows[i] < 5'd29) begin
+                        down_reg[i] <= (index_rows[i] == 5'd0) ? bottom_reg[i] : curr_reg[i];
+                        curr_reg[i] <= u_up[i];
+						//curr_left[i] <= curr_reg[i-1];
+						//curr_right[i] <= curr_reg[i+1];
+                        index_rows[i] <= index_rows[i] + 5'd1;
+                        drum_state[i] <= 3'd2;
+                    end
+                    else begin 
+                        index_rows_prev[i] <= index_rows_prev[i] + 5'd1;
+                        index_rows[i] <= 5'd0;
+                        drum_state[i] <= 3'd6;
+								//drum_done <= 1;
+                    end
+                end
+                // State 6 - Output value
+                else if (drum_state[i] == 3'd6) begin // TODO this will probably have to handle a lot more...
+                    if (i == 14) begin
+							out_val <= intermed_val; 
+						  end
+						  
+						  
+						  if (sync_signal) begin
+							//drum_done <= 0;
+							drum_state[i]<= 3'd2;
+						  end
+						  else begin
+							drum_state[i] <= 3'd6;
+						  end
+						  /*
+						  if (audio_done == 1) begin
+							state <= 3'd2;
+							
+							//if (i == 0) begin
+							drum_done <= 0;
+							//end*/
+						
+						  
+						  /*
+						  if (drum_done[i]) begin
+						   drum_done[i] <= 3'd2;
+						  end*/
+                    // outputs amplitude
+                end
+            end
+        end
+    end
+endgenerate
+
 
 
 //=======================================================
@@ -844,180 +886,73 @@ Computer_System The_System (
 	.hps_io_hps_io_usb1_inst_CLK		(HPS_USB_CLKOUT),
 	.hps_io_hps_io_usb1_inst_STP		(HPS_USB_STP),
 	.hps_io_hps_io_usb1_inst_DIR		(HPS_USB_DIR),
-	.hps_io_hps_io_usb1_inst_NXT		(HPS_USB_NXT)
+	.hps_io_hps_io_usb1_inst_NXT		(HPS_USB_NXT),
+	
+	// added for drum
+	.counter_pio_external_connection_export(arm_counter),
+	.incr_rows_pio_external_connection_export(arm_incr_rows),
+	.reset_pio_external_connection_export(arm_reset),
+	.ampl_pio_external_connection_export(arm_ampl_out),
+	.incr_pio_external_connection_export(arm_incr),
+	.rho_pio_external_connection_export(arm_row)
 );
+
+
 endmodule
 
-///////////////////////////////////////////////////
-//// signed mult of 2.16 format 2'comp ////////////
-///////////////////////////////////////////////////
-module signed_mult (out, a, b);
+//////////////////////////////////////////////////////////////
+////////////	Mandelbrot Set Visualizer	    //////////////
+//////////////////////////////////////////////////////////////
+module drum (clk, rho_eff, curr_u, prev_u, u_left, u_right, u_up, u_down, next); 
+	input clk;
+    input [17:0] rho_eff;
+	input signed [17:0] curr_u, prev_u;
+	//input signed [17:0] init_condition; // u
+	input signed [17:0] u_left, u_right, u_up, u_down;
+	output signed [17:0] next;
+	wire signed [17:0] u_sum, rho_usum, inter_val;
+	assign u_sum = u_left - curr_u + u_right - curr_u + u_up - curr_u + u_down - curr_u; // (curr_u <<< 2)
+	signed_mult rho_mult_usum(.out(rho_usum), .a(u_sum), .b(rho_eff)); 
+	assign inter_val = rho_usum + (curr_u <<< 1) - prev_u + (prev_u >>> 10);
+	assign next = inter_val - (inter_val >>> 9);
+endmodule
 
-	output 		[17:0]	out;
+//============================================================
+// M10K module
+//============================================================
+module M10K_32_5( 
+    output reg [17:0] q,
+    input [17:0] d,
+    input [4:0] write_address, read_address,
+    input we, clk
+);
+    // force M10K ram style
+    // 307200 words of 8 bits
+    reg [17:0] mem [31:0]  /* synthesis ramstyle = "no_rw_check, M10K" */;
+	 
+    always @ (posedge clk) begin
+        if (we) begin
+            mem[write_address] <= d;
+		  end
+		  
+        q <= mem[read_address]; // q doesn't get d in this clock cycle
+    end
+endmodule
+
+//////////////////////////////////////////////////
+//// signed mult of 1.17 format 2'comp////////////
+//////////////////////////////////////////////////
+module signed_mult (out, a, b);
+	output 	signed  [17:0]	out;
 	input 	signed	[17:0] 	a;
 	input 	signed	[17:0] 	b;
-	
-	wire	signed	[17:0]	out;
+    
+	// intermediate full bit length
 	wire 	signed	[35:0]	mult_out;
-
 	assign mult_out = a * b;
-	//assign out = mult_out[33:17];
-	assign out = {mult_out[35], mult_out[32:16]};
-endmodule
-//////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////
-/// Second order IIR filter ///////////////////////////////////////
-///////////////////////////////////////////////////////////////////
-module IIR2_18bit_fixed (audio_out, audio_in, 
-			b1, b2, b3, 
-			a2, a3, 
-			state_clk, audio_input_ready, reset) ;
-// The filter is a "Direct Form II Transposed"
-// 
-//    a(1)*y(n) = b(1)*x(n) + b(2)*x(n-1) + ... + b(nb+1)*x(n-nb)
-//                          - a(2)*y(n-1) - ... - a(na+1)*y(n-na)
-// 
-//    If a(1) is not equal to 1, FILTER normalizes the filter
-//    coefficients by a(1). 
-//
-// one audio sample, 16 bit, 2's complement
-output reg signed [15:0] audio_out ;
-// one audio sample, 16 bit, 2's complement
-input wire signed [15:0] audio_in ;
-// filter coefficients
-input wire signed [17:0] b1, b2, b3, a2, a3 ;
-input wire state_clk, audio_input_ready, reset ;
-
-/// filter vars //////////////////////////////////////////////////
-wire signed [17:0] f1_mac_new, f1_coeff_x_value ;
-reg signed [17:0] f1_coeff, f1_mac_old, f1_value ;
-
-// input to filter
-reg signed [17:0] x_n ;
-// input history x(n-1), x(n-2)
-reg signed [17:0] x_n1, x_n2 ; 
-
-// output history: y_n is the new filter output, BUT it is
-// immediately stored in f1_y_n1 for the next loop through 
-// the filter state machine
-reg signed [17:0] f1_y_n1, f1_y_n2 ; 
-
-// MAC operation
-signed_mult f1_c_x_v (f1_coeff_x_value, f1_coeff, f1_value);
-assign f1_mac_new = f1_mac_old + f1_coeff_x_value ;
-
-// state variable 
-reg [3:0] state ;
-//oneshot gen to sync to audio clock
-reg last_clk ; 
-///////////////////////////////////////////////////////////////////
-
-//Run the filter state machine FAST so that it completes in one 
-//audio cycle
-always @ (posedge state_clk) 
-begin
-	if (reset)
-	begin
-		state <= 4'd15 ; //turn off the filter state machine	
-	end
-	
-	else begin
-		case (state)
-	
-			1: 
-			begin
-				// set up b1*x(n)
-				f1_mac_old <= 18'd0 ;
-				f1_coeff <= b1 ;
-				//f1_value <= {audio_in, 2'b0} ;	
-				// sign extend
-				f1_value <= {audio_in[15],audio_in[15], audio_in} ;	
-				//register input
-				//x_n <= {audio_in, 2'b0} ;	
-				x_n <= {audio_in[15],audio_in[15], audio_in} ;			
-				// next state
-				state <= 4'd2;
-			end
-	
-			2: 
-			begin
-				// set up b2*x(n-1) 
-				f1_mac_old <= f1_mac_new ;
-				f1_coeff <= b2 ;
-				f1_value <= x_n1 ;				
-				// next state
-				state <= 4'd3;
-			end
-			
-			3:
-			begin
-				// set up b3*x(n-2) 
-				f1_mac_old <= f1_mac_new ;
-				f1_coeff <= b3 ;
-				f1_value <= x_n2 ;
-				// next state
-				state <= 4'd6;
-			end
-						
-			6: 
-			begin
-				// set up -a2*y(n-1) 
-				f1_mac_old <= f1_mac_new ;
-				f1_coeff <= a2 ;
-				f1_value <= f1_y_n1 ; 
-				//next state 
-				state <= 4'd7;
-			end
-			
-			7: 
-			begin
-				// set up -a3*y(n-2) 
-				f1_mac_old <= f1_mac_new ;
-				f1_coeff <= a3 ;
-				f1_value <= f1_y_n2 ; 				
-				//next state 
-				state <= 4'd10;
-			end
-			
-			10: 
-			begin
-				// get the output 
-				// and put it in the LAST output var
-				// for the next pass thru the state machine
-				//mult by scale because of coeff scaling
-				// to prevent overflow
-				f1_y_n1 <= f1_mac_new  ; 
-				//audio_out <= f1_y_n1[17:2] ;				
-				// update output history
-				f1_y_n2 <= f1_y_n1 ;				
-				// update input history
-				x_n1 <= x_n ;
-				x_n2 <= x_n1 ;
-				//next state 
-				state <= 4'd15;
-			end	
-			
-			15:
-			begin
-				// wait for the audio_input_ready 
-				if (audio_input_ready)
-				begin
-					state <= 4'd1 ; 
-					audio_out <= f1_mac_new ; //f1_y_n1[17:2] ;	
-				end
-			end
-			
-			default:
-			begin
-				// default state is end state
-				state <= 4'd15 ;
-			end
-		endcase
-	end
-end	
-
+    
+	// select bits for 1.17 fixed point
+	assign out = {mult_out[35], mult_out[33:17]};
 endmodule
 
 //////////////////////////////////////////////////
@@ -1293,45 +1228,3 @@ begin
 end
 endmodule
 //////////////////////////////////////////////////
-// === matlab filter writer ======================
-//////////////////////////////////////////////////
-/*
-% IIR header test pgm
-% at Fs=48kHz normalized F=1 at 24kHz
-Fs_half = 24000 ;
-F = 300/Fs_half;
-BW = 100/Fs_half;
-[b,a] = butter(1,[F-(BW/2), F+(BW/2)] );
-a = -a ; % makes it easier to use an MAC
-disp(' ')
-fprintf('//Filter: frequency=%f \n',F(1))
-fprintf('//Filter: BW=%f \n',BW(1))
-sorder = 2;
-scstr = 'IIR2_18bit_fixed filter(';
-
-fprintf('%s \n',scstr); 
-fprintf('     .audio_out (your_out), \n')
-fprintf('     .audio_in (your_in), \n')
-for i=1:length(b)
-    if b(i)>=0
-        fprintf('     .b%1d (18''sd%d), \n', i,fix(2^16*b(i)) ) ;
-    else
-        fprintf('     .b%1d (-18''sd%d), \n', i, fix(-2^16*b(i)) );
-    end
-end
-
-for i=2:length(a)
-    if a(i)>=0
-        fprintf('     .a%1d (18''sd%d), \n', i, fix(2^16*a(i)) )
-    else
-        fprintf('     .a%1d (-18''sd%d), \n', i, fix(-2^16*a(i)) )
-    end
-end
-fprintf('     .state_clk(CLOCK_50), \n');
-fprintf('     .audio_input_ready(audio_input_ready), \n');
-fprintf('     .reset(reset) \n');
-fprintf(') ; //end filter \n');
-
-disp(' ')
-*/
-// === end ====================================

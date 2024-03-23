@@ -4,26 +4,25 @@ editor if you plan to continue editing the block that represents it in
 the Block Editor! File corruption is VERY likely to occur.
 */
 /*
-Copyright (C) 1991-2015 Altera Corporation. All rights reserved.
-Your use of Altera Corporation's design tools, logic functions 
+Copyright (C) 2018  Intel Corporation. All rights reserved.
+Your use of Intel Corporation's design tools, logic functions 
 and other software and tools, and its AMPP partner logic 
 functions, and any output files from any of the foregoing 
 (including device programming or simulation files), and any 
 associated documentation or information are expressly subject 
-to the terms and conditions of the Altera Program License 
-Subscription Agreement, the Altera Quartus II License Agreement,
-the Altera MegaCore Function License Agreement, or other 
-applicable license agreement, including, without limitation, 
-that your use is for the sole purpose of programming logic 
-devices manufactured by Altera and sold by Altera or its 
-authorized distributors.  Please refer to the applicable 
-agreement for further details.
+to the terms and conditions of the Intel Program License 
+Subscription Agreement, the Intel Quartus Prime License Agreement,
+the Intel FPGA IP License Agreement, or other applicable license
+agreement, including, without limitation, that your use is for
+the sole purpose of programming logic devices manufactured by
+Intel and sold by Intel or its authorized distributors.  Please
+refer to the applicable agreement for further details.
 */
 (header "symbol" (version "1.1"))
 (symbol
-	(rect 0 0 784 1440)
+	(rect 0 0 784 1680)
 	(text "Computer_System" (rect 338 -1 415 11)(font "Arial" (font_size 10)))
-	(text "inst" (rect 8 1424 20 1436)(font "Arial" ))
+	(text "inst" (rect 8 1664 20 1676)(font "Arial" ))
 	(port
 		(pt 0 72)
 		(input)
@@ -431,6 +430,48 @@ agreement for further details.
 		(line (pt 784 392)(pt 496 392)(line_width 1))
 	)
 	(port
+		(pt 0 1448)
+		(output)
+		(text "counter_pio_external_connection_export[31..0]" (rect 0 0 184 12)(font "Arial" (font_size 8)))
+		(text "counter_pio_external_connection_export[31..0]" (rect 4 1437 274 1448)(font "Arial" (font_size 8)))
+		(line (pt 0 1448)(pt 288 1448)(line_width 3))
+	)
+	(port
+		(pt 0 1488)
+		(output)
+		(text "incr_rows_pio_external_connection_export[31..0]" (rect 0 0 193 12)(font "Arial" (font_size 8)))
+		(text "incr_rows_pio_external_connection_export[31..0]" (rect 4 1477 286 1488)(font "Arial" (font_size 8)))
+		(line (pt 0 1488)(pt 288 1488)(line_width 3))
+	)
+	(port
+		(pt 0 1528)
+		(output)
+		(text "reset_pio_external_connection_export[31..0]" (rect 0 0 174 12)(font "Arial" (font_size 8)))
+		(text "reset_pio_external_connection_export[31..0]" (rect 4 1517 262 1528)(font "Arial" (font_size 8)))
+		(line (pt 0 1528)(pt 288 1528)(line_width 3))
+	)
+	(port
+		(pt 0 1568)
+		(output)
+		(text "ampl_pio_external_connection_export[31..0]" (rect 0 0 173 12)(font "Arial" (font_size 8)))
+		(text "ampl_pio_external_connection_export[31..0]" (rect 4 1557 256 1568)(font "Arial" (font_size 8)))
+		(line (pt 0 1568)(pt 288 1568)(line_width 3))
+	)
+	(port
+		(pt 0 1608)
+		(output)
+		(text "incr_pio_external_connection_export[31..0]" (rect 0 0 168 12)(font "Arial" (font_size 8)))
+		(text "incr_pio_external_connection_export[31..0]" (rect 4 1597 256 1608)(font "Arial" (font_size 8)))
+		(line (pt 0 1608)(pt 288 1608)(line_width 3))
+	)
+	(port
+		(pt 0 1648)
+		(output)
+		(text "rho_pio_external_connection_export[31..0]" (rect 0 0 167 12)(font "Arial" (font_size 8)))
+		(text "rho_pio_external_connection_export[31..0]" (rect 4 1637 250 1648)(font "Arial" (font_size 8)))
+		(line (pt 0 1648)(pt 288 1648)(line_width 3))
+	)
+	(port
 		(pt 0 256)
 		(bidir)
 		(text "av_config_SDAT" (rect 0 0 73 12)(font "Arial" (font_size 8)))
@@ -772,11 +813,23 @@ agreement for further details.
 		(text "clk" (rect 293 1363 604 2736)(font "Arial" (color 0 0 0)))
 		(text "system_pll_ref_reset" (rect 163 1379 446 2771)(font "Arial" (color 128 0 0)(font_size 9)))
 		(text "reset" (rect 293 1403 616 2816)(font "Arial" (color 0 0 0)))
-		(text " Computer_System " (rect 700 1424 1502 2858)(font "Arial" ))
+		(text "counter_pio_external_connection" (rect 98 1419 382 2851)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 1443 622 2896)(font "Arial" (color 0 0 0)))
+		(text "incr_rows_pio_external_connection" (rect 83 1459 364 2931)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 1483 622 2976)(font "Arial" (color 0 0 0)))
+		(text "reset_pio_external_connection" (rect 111 1499 396 3011)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 1523 622 3056)(font "Arial" (color 0 0 0)))
+		(text "ampl_pio_external_connection" (rect 113 1539 394 3091)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 1563 622 3136)(font "Arial" (color 0 0 0)))
+		(text "incr_pio_external_connection" (rect 120 1579 408 3171)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 1603 622 3216)(font "Arial" (color 0 0 0)))
+		(text "rho_pio_external_connection" (rect 122 1619 406 3251)(font "Arial" (color 128 0 0)(font_size 9)))
+		(text "export" (rect 293 1643 622 3296)(font "Arial" (color 0 0 0)))
+		(text " system " (rect 749 1664 1546 3338)(font "Arial" ))
 		(line (pt 288 32)(pt 496 32)(line_width 1))
-		(line (pt 496 32)(pt 496 1424)(line_width 1))
-		(line (pt 288 1424)(pt 496 1424)(line_width 1))
-		(line (pt 288 32)(pt 288 1424)(line_width 1))
+		(line (pt 496 32)(pt 496 1664)(line_width 1))
+		(line (pt 288 1664)(pt 496 1664)(line_width 1))
+		(line (pt 288 32)(pt 288 1664)(line_width 1))
 		(line (pt 289 52)(pt 289 140)(line_width 1))
 		(line (pt 290 52)(pt 290 140)(line_width 1))
 		(line (pt 495 52)(pt 495 76)(line_width 1))
@@ -799,9 +852,21 @@ agreement for further details.
 		(line (pt 290 1348)(pt 290 1372)(line_width 1))
 		(line (pt 289 1388)(pt 289 1412)(line_width 1))
 		(line (pt 290 1388)(pt 290 1412)(line_width 1))
+		(line (pt 289 1428)(pt 289 1452)(line_width 1))
+		(line (pt 290 1428)(pt 290 1452)(line_width 1))
+		(line (pt 289 1468)(pt 289 1492)(line_width 1))
+		(line (pt 290 1468)(pt 290 1492)(line_width 1))
+		(line (pt 289 1508)(pt 289 1532)(line_width 1))
+		(line (pt 290 1508)(pt 290 1532)(line_width 1))
+		(line (pt 289 1548)(pt 289 1572)(line_width 1))
+		(line (pt 290 1548)(pt 290 1572)(line_width 1))
+		(line (pt 289 1588)(pt 289 1612)(line_width 1))
+		(line (pt 290 1588)(pt 290 1612)(line_width 1))
+		(line (pt 289 1628)(pt 289 1652)(line_width 1))
+		(line (pt 290 1628)(pt 290 1652)(line_width 1))
 		(line (pt 0 0)(pt 784 0)(line_width 1))
-		(line (pt 784 0)(pt 784 1440)(line_width 1))
-		(line (pt 0 1440)(pt 784 1440)(line_width 1))
-		(line (pt 0 0)(pt 0 1440)(line_width 1))
+		(line (pt 784 0)(pt 784 1680)(line_width 1))
+		(line (pt 0 1680)(pt 784 1680)(line_width 1))
+		(line (pt 0 0)(pt 0 1680)(line_width 1))
 	)
 )

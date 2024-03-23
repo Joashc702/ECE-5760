@@ -9,14 +9,6 @@
    categories="System" />
  <parameter name="bonusData"><![CDATA[bonusData 
 {
-   element $${FILENAME}
-   {
-      datum _originalDeviceFamily
-      {
-         value = "Cyclone V";
-         type = "String";
-      }
-   }
    element ARM_A9_HPS
    {
       datum _sortIndex
@@ -81,6 +73,94 @@
          type = "int";
       }
    }
+   element ampl_pio
+   {
+      datum _sortIndex
+      {
+         value = "8";
+         type = "int";
+      }
+   }
+   element ampl_pio.s1
+   {
+      datum baseAddress
+      {
+         value = "48";
+         type = "String";
+      }
+   }
+   element counter_pio
+   {
+      datum _sortIndex
+      {
+         value = "5";
+         type = "int";
+      }
+   }
+   element incr_pio
+   {
+      datum _sortIndex
+      {
+         value = "9";
+         type = "int";
+      }
+   }
+   element incr_pio.s1
+   {
+      datum baseAddress
+      {
+         value = "64";
+         type = "String";
+      }
+   }
+   element incr_rows_pio
+   {
+      datum _sortIndex
+      {
+         value = "6";
+         type = "int";
+      }
+   }
+   element incr_rows_pio.s1
+   {
+      datum baseAddress
+      {
+         value = "16";
+         type = "String";
+      }
+   }
+   element reset_pio
+   {
+      datum _sortIndex
+      {
+         value = "7";
+         type = "int";
+      }
+   }
+   element reset_pio.s1
+   {
+      datum baseAddress
+      {
+         value = "32";
+         type = "String";
+      }
+   }
+   element rho_pio
+   {
+      datum _sortIndex
+      {
+         value = "10";
+         type = "int";
+      }
+   }
+   element rho_pio.s1
+   {
+      datum baseAddress
+      {
+         value = "80";
+         type = "String";
+      }
+   }
 }
 ]]></parameter>
  <parameter name="clockCrossingAdapter" value="HANDSHAKE" />
@@ -102,6 +182,11 @@
  <parameter name="timeStamp" value="0" />
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
+ <interface
+   name="ampl_pio_external_connection"
+   internal="ampl_pio.external_connection"
+   type="conduit"
+   dir="end" />
  <interface
    name="audio"
    internal="Audio_Subsystem.audio"
@@ -132,8 +217,33 @@
    internal="Bus_master_audio.external_interface"
    type="conduit"
    dir="end" />
+ <interface
+   name="counter_pio_external_connection"
+   internal="counter_pio.external_connection"
+   type="conduit"
+   dir="end" />
  <interface name="hps_io" internal="ARM_A9_HPS.hps_io" type="conduit" dir="end" />
+ <interface
+   name="incr_pio_external_connection"
+   internal="incr_pio.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="incr_rows_pio_external_connection"
+   internal="incr_rows_pio.external_connection"
+   type="conduit"
+   dir="end" />
  <interface name="memory" internal="ARM_A9_HPS.memory" type="conduit" dir="end" />
+ <interface
+   name="reset_pio_external_connection"
+   internal="reset_pio.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="rho_pio_external_connection"
+   internal="rho_pio.external_connection"
+   type="conduit"
+   dir="end" />
  <interface
    name="sdram_clk"
    internal="System_PLL.sdram_clk"
@@ -149,7 +259,7 @@
    internal="System_PLL.ref_reset"
    type="reset"
    dir="end" />
- <module name="ARM_A9_HPS" kind="altera_hps" version="15.0" enabled="1">
+ <module name="ARM_A9_HPS" kind="altera_hps" version="18.1" enabled="1">
   <parameter name="ABSTRACT_REAL_COMPARE_TEST" value="false" />
   <parameter name="ABS_RAM_MEM_INIT_FILENAME" value="meminit" />
   <parameter name="ACV_PHY_CLK_ADD_FR_PHASE" value="0.0" />
@@ -224,8 +334,10 @@
   <parameter name="DUPLICATE_AC" value="false" />
   <parameter name="ED_EXPORT_SEQ_DEBUG" value="false" />
   <parameter name="EMAC0_Mode" value="N/A" />
+  <parameter name="EMAC0_PTP" value="false" />
   <parameter name="EMAC0_PinMuxing" value="Unused" />
   <parameter name="EMAC1_Mode" value="RGMII" />
+  <parameter name="EMAC1_PTP" value="false" />
   <parameter name="EMAC1_PinMuxing" value="HPS I/O Set 0" />
   <parameter name="ENABLE_ABS_RAM_MEM_INIT" value="false" />
   <parameter name="ENABLE_BONDING" value="false" />
@@ -261,6 +373,7 @@
   <parameter name="F2SDRAM_Width" value="" />
   <parameter name="F2SINTERRUPT_Enable" value="true" />
   <parameter name="F2S_Width" value="2" />
+  <parameter name="FIX_READ_LATENCY" value="8" />
   <parameter name="FORCED_NON_LDC_ADDR_CMD_MEM_CK_INVERT" value="false" />
   <parameter name="FORCED_NUM_WRITE_FR_CYCLE_SHIFTS" value="0" />
   <parameter name="FORCE_DQS_TRACKING" value="AUTO" />
@@ -279,7 +392,6 @@
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_I2C1_SCL_IN" value="100" />
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_I2C2_SCL_IN" value="100" />
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_I2C3_SCL_IN" value="100" />
-  <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_SDIO_CLK_IN" value="100" />
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_SPIS0_SCLK_IN" value="100" />
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_SPIS1_SCLK_IN" value="100" />
   <parameter name="FPGA_PERIPHERAL_INPUT_CLOCK_FREQ_USB0_CLK_IN" value="100" />
@@ -497,6 +609,7 @@
   <parameter name="S2FCLK_USER0CLK_Enable" value="false" />
   <parameter name="S2FCLK_USER1CLK_Enable" value="false" />
   <parameter name="S2FCLK_USER1CLK_FREQ" value="100.0" />
+  <parameter name="S2FCLK_USER2CLK" value="5" />
   <parameter name="S2FCLK_USER2CLK_Enable" value="false" />
   <parameter name="S2FCLK_USER2CLK_FREQ" value="100.0" />
   <parameter name="S2FINTERRUPT_CAN_Enable" value="false" />
@@ -653,6 +766,7 @@
   <parameter name="periph_pll_n" value="1" />
   <parameter name="periph_pll_source" value="0" />
   <parameter name="qspi_clk_source" value="1" />
+  <parameter name="quartus_ini_hps_emif_pll" value="false" />
   <parameter
      name="quartus_ini_hps_ip_enable_all_peripheral_fpga_interfaces"
      value="false" />
@@ -678,7 +792,7 @@
  <module
    name="AV_Config"
    kind="altera_up_avalon_audio_and_video_config"
-   version="15.0"
+   version="18.0"
    enabled="1">
   <parameter name="AUTO_CLK_CLOCK_RATE" value="100000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
@@ -717,7 +831,7 @@
  <module
    name="Bus_master_audio"
    kind="altera_up_external_bus_to_avalon_bridge"
-   version="15.0"
+   version="18.0"
    enabled="1">
   <parameter name="AUTO_CLK_CLOCK_RATE" value="100000000" />
   <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
@@ -728,21 +842,114 @@
  <module
    name="System_PLL"
    kind="altera_up_avalon_sys_sdram_pll"
-   version="15.0"
+   version="18.0"
    enabled="1">
   <parameter name="AUTO_DEVICE" value="5CSEMA5F31C6" />
   <parameter name="AUTO_DEVICE_SPEEDGRADE" value="6" />
   <parameter name="CIII_boards" value="DE0" />
   <parameter name="CIV_boards" value="DE2-115" />
   <parameter name="CV_boards" value="DE1-SoC" />
+  <parameter name="MAX10_boards" value="DE10-Lite" />
   <parameter name="device_family" value="Cyclone V" />
   <parameter name="gui_outclk" value="100.0" />
   <parameter name="gui_refclk" value="50.0" />
   <parameter name="other_boards" value="None" />
  </module>
+ <module name="ampl_pio" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
+   name="counter_pio"
+   kind="altera_avalon_pio"
+   version="18.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="incr_pio" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
+   name="incr_rows_pio"
+   kind="altera_avalon_pio"
+   version="18.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="reset_pio" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="rho_pio" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
  <connection
    kind="avalon"
-   version="15.0"
+   version="18.1"
    start="Bus_master_audio.avalon_master"
    end="Audio_Subsystem.audio_slave">
   <parameter name="arbitrationPriority" value="1" />
@@ -751,7 +958,7 @@
  </connection>
  <connection
    kind="avalon"
-   version="15.0"
+   version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
    end="Audio_Subsystem.audio_slave">
   <parameter name="arbitrationPriority" value="1" />
@@ -760,7 +967,7 @@
  </connection>
  <connection
    kind="avalon"
-   version="15.0"
+   version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
    end="AV_Config.avalon_av_config_slave">
   <parameter name="arbitrationPriority" value="1" />
@@ -768,70 +975,214 @@
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="counter_pio.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="incr_rows_pio.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0010" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="reset_pio.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0020" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="ampl_pio.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0030" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="incr_pio.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0040" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="rho_pio.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0050" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
    kind="clock"
-   version="15.0"
+   version="18.1"
    start="System_PLL.sys_clk"
    end="AV_Config.clk" />
  <connection
    kind="clock"
-   version="15.0"
+   version="18.1"
    start="System_PLL.sys_clk"
    end="Bus_master_audio.clk" />
  <connection
    kind="clock"
-   version="15.0"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="counter_pio.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="incr_rows_pio.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="reset_pio.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="ampl_pio.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="incr_pio.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="rho_pio.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
    start="System_PLL.sys_clk"
    end="ARM_A9_HPS.f2h_axi_clock" />
  <connection
    kind="clock"
-   version="15.0"
+   version="18.1"
    start="System_PLL.sys_clk"
    end="ARM_A9_HPS.h2f_axi_clock" />
  <connection
    kind="clock"
-   version="15.0"
+   version="18.1"
    start="System_PLL.sys_clk"
    end="ARM_A9_HPS.h2f_lw_axi_clock" />
  <connection
    kind="clock"
-   version="15.0"
+   version="18.1"
    start="System_PLL.sys_clk"
    end="Audio_Subsystem.sys_clk" />
  <connection
    kind="interrupt"
-   version="15.0"
+   version="18.1"
    start="ARM_A9_HPS.f2h_irq0"
    end="Audio_Subsystem.audio_irq">
   <parameter name="irqNumber" value="6" />
  </connection>
  <connection
    kind="reset"
-   version="15.0"
+   version="18.1"
    start="ARM_A9_HPS.h2f_reset"
    end="AV_Config.reset" />
  <connection
    kind="reset"
-   version="15.0"
+   version="18.1"
    start="ARM_A9_HPS.h2f_reset"
    end="Bus_master_audio.reset" />
  <connection
    kind="reset"
-   version="15.0"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="counter_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="incr_rows_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="reset_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="ampl_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="incr_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="rho_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
    start="ARM_A9_HPS.h2f_reset"
    end="Audio_Subsystem.sys_reset" />
  <connection
    kind="reset"
-   version="15.0"
+   version="18.1"
    start="System_PLL.reset_source"
    end="AV_Config.reset" />
  <connection
    kind="reset"
-   version="15.0"
+   version="18.1"
    start="System_PLL.reset_source"
    end="Bus_master_audio.reset" />
  <connection
    kind="reset"
-   version="15.0"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="counter_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="incr_rows_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="reset_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="ampl_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="incr_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="rho_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
    start="System_PLL.reset_source"
    end="Audio_Subsystem.sys_reset" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
