@@ -7,7 +7,7 @@
 /// 640x480 version!
 /// change to fixed point 
 /// compile with:
-/// 
+/// gcc Lab3W3.c -o drum -lm -O3 -lpthread 
 ///////////////////////////////////////
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,24 +28,31 @@ int fd;
 
 volatile unsigned int* counter_pio_ptr = NULL;
 #define COUNTER_PIO 0x00
-volatile unsigned int* incr_rows_pio_ptr = NULL;
+volatile unsigned int* num_rows_pio_ptr = NULL;
 #define ROWS_INIT_PIO 0x10
 volatile unsigned char* reset_pio_ptr = NULL;
 #define RESET_PIO 0x20
 volatile unsigned int* ampl_pio_ptr = NULL;
 #define AMPL_INIT_PIO 0x30
-volatile unsigned int* incr_pio_ptr = NULL;
-#define INCR_PIO 0x40
+volatile unsigned int* row_incr_pio_ptr = NULL;
+#define ROW_INCR_PIO 0x40
 volatile unsigned int* rho_pio_ptr = NULL;
 #define RHO_GAIN_PIO 0x50
+volatile unsigned int* num_cols_pio_ptr = NULL;
+#define COLS_INIT_PIO 0x60
+volatile unsigned int* col_incr_pio_ptr = NULL;
+#define COL_INCR_PIO 0x70
 
 typedef signed int fix;
-#define float2fix(a) (fix)(a * 8388608.0)
+#define float2fix(a) (fix)(a * 131072.0)
 
 pthread_mutex_t lock;
 
+// TODO test user input, add initial value pio at bottom, timing (counter) math, dynamically change num of rows
+
 // Global variables for demonstration purposes
 int temp_num_rows = 1;
+int temp_num_cols = 1;
 float temp_init_ampl = 1.0;
 float temp_init_rho = 1.0;
 
@@ -56,7 +63,7 @@ void *scan_drum(void *arg) {
 	while (1) {
 		// picking things to change
 		printf("Display time for num of cycles(0), Change height/num of rows (1), Change init amplitude (2), Change rho gain (3): ");
-        scanf("%d", &user_int);
+    scanf("%d", &user_int);
 
 		switch(user_int) {
 			case 0: // display time for the number of cycles
@@ -65,29 +72,46 @@ void *scan_drum(void *arg) {
 
 			case 1: // change the height/number of rows in the drum
 				printf("Enter number of rows: ");
-                scanf("%d", &temp_num_rows);
-				*(incr_rows_pio_ptr) = temp_num_rows;
+        scanf("%d", &temp_num_rows);
+				*(num_rows_pio_ptr) = temp_num_rows;
+        float incr_ampl_row = temp_init_ampl / ((int) (temp_num_rows/2.0));
+        *(row_incr_pio_ptr) = float2fix(incr_ampl_row);
 				*(reset_pio_ptr) = 1;
-                *(reset_pio_ptr) = 0;
+        *(reset_pio_ptr) = 0;
 				break;
 
 			case 2: // change initial amplitude
 				printf("Enter initial amplitude: ");
-                scanf("%d", &temp_init_ampl);
-				float incr_ampl = temp_init_ampl / 10;
-				printf("Increment Amplitude: %f\n", incr_ampl);
-				*(incr_pio_ptr) = float2fix(incr_ampl);
+        scanf("%d", &temp_init_ampl);
+				float incr_ampl_row = temp_init_ampl / (temp_num_rows/2);
+        float incr_ampl_col = temp_init_ampl/ (temp_num_cols/2);
+				printf("Increment Amplitude: %f\n", incr_ampl_row);
+				*(row_incr_pio_ptr) = float2fix(incr_ampl_row);
+   	    *(col_incr_pio_ptr) = float2fix(incr_ampl_col);
 				*(reset_pio_ptr) = 1;
-                *(reset_pio_ptr) = 0;
+        *(reset_pio_ptr) = 0;
 				break;
 
 			case 3: // change rho gain
 				printf("Enter rho gain: ");
-                scanf("%d", &temp_init_rho);
+        scanf("%d", &temp_init_rho);
 				*(rho_pio_ptr) = temp_init_rho;
 				*(reset_pio_ptr) = 1;
-                *(reset_pio_ptr) = 0;
+        *(reset_pio_ptr) = 0;
 				break;
+        
+      case 4: // change the height/number of rows in the drum
+				printf("Enter number of cols: ");
+        scanf("%d", &temp_num_cols);
+        float incr_ampl_col = temp_init_ampl/ (temp_num_cols/2);
+        *(col_incr_pio_ptr) = float2fix(incr_ampl_col);
+				*(reset_pio_ptr) = 1;
+        *(reset_pio_ptr) = 0;
+				break;
+        
+      default:
+        printf("Invalid option.\n");
+        break;
 		}
 	}
 }
@@ -108,15 +132,21 @@ int main(void) {
   		return(1);
   	}
     counter_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + COUNTER_PIO);
-    incr_rows_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + ROWS_INIT_PIO);
-	reset_pio_ptr = (unsigned char *)(h2p_lw_virtual_base + RESET_PIO);
-	ampl_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + AMPL_INIT_PIO);
-	incr_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + INCR_PIO);
-	rho_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + RHO_GAIN_PIO);
+    num_rows_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + ROWS_INIT_PIO);
+  	reset_pio_ptr = (unsigned char *)(h2p_lw_virtual_base + RESET_PIO);
+  	ampl_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + AMPL_INIT_PIO);
+  	row_incr_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + ROW_INCR_PIO);
+  	rho_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + RHO_GAIN_PIO);
+    num_cols_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + COLS_INIT_PIO);
+    col_incr_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + COL_INCR_PIO);
     
     // default values from reset
-    *(incr_rows_pio_ptr) = float2fix(temp_num_rows);
+    *(row_incr_pio_ptr) = float2fix(temp_num_rows);
 
-    // Start threads
-    pthread_t scan_drum;
+    // Start thread and wait for it to finish
+    pthread_t drum_scan;
+    pthread_create(&drum_scan, NULL, scan_drum, NULL);
+    pthread_join(drum_scan, NULL);
+    
+    return 0;
 }
