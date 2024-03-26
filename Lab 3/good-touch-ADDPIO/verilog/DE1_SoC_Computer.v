@@ -640,7 +640,7 @@ generate // generate 30 columns
 								write_addr_prev[i] <= index_rows[i];
 								d[i] <= initial_val;
 								d_prev[i] <= initial_val;
-								
+								/*
 								//new initialization
 								if (i < 64) begin
 									if (index_rows[i] < i) begin 
@@ -667,6 +667,10 @@ generate // generate 30 columns
 								
                         index_rows[i] <= index_rows[i] + 10'd1; // increment the index to check rows
                         drum_state[i] <= 3'd1;
+								//busy wait in here until the i is met on the arm side and walk up the ladder and then double check if the column being written is i
+								*/
+								//if (num_rows < 
+								//add the done signal for all the columns finishing 
                     end
                 end
                 // State 2 - Set up read address for M10k blocks
