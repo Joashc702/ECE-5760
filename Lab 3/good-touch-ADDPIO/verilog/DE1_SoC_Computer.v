@@ -506,18 +506,19 @@ end // always @(posedge state_clock)
 
 // arm variables
 wire arm_reset;
+wire done_signal;
 wire [31:0] arm_counter;
 wire [31:0] arm_num_rows;
 wire [31:0] arm_rho;
 wire [31:0] arm_incr_rows;
 wire [31:0] arm_ampl_out;
 wire [31:0] arm_num_cols;
-wire [31:0] arm_incr_cols;
+wire [31:0] arm_half_rows;
 
 wire [9:0] num_rows;
-assign num_rows = 10'd512;
+assign num_rows = arm_num_rows[9:0];
 wire [9:0] half_rows;
-//assign half_rows = 9'd172;
+assign half_rows = arm_half_rows[9:0];
 
 // M10K variables
 wire signed [17:0] q [127:0];
@@ -552,7 +553,7 @@ wire [17:0] step_size_row;
 reg drum_done;
 reg audio_done;
 
-reg [31:0] counter;
+reg [31:0] counter [127:0];
 reg [31:0] counter_reg;
 
 //assign rho_eff_init = {1'b0, 17'b00010000000000000};
@@ -562,8 +563,16 @@ assign center_node_shift = out_val >>> 4;
 
 // TODO hardcoded colstepsize, rowstepsize, numrows, numcols, halfrows, assign counter to arm, 
 
-signed_mult u_mult_G(.out(u_G), .a(center_node_shift), .b(center_node_shift)); 
-assign rho_eff_init = ({1'b0, 17'b01111101011100001} < ({1'b0, 17'b01000000000000000} + u_G)) ? {1'b0, 17'b01111101011100001} : ({1'b0, 17'b01000000000000000} + u_G);
+//signed_mult u_mult_G(.out(u_G), .a(center_node_shift), .b(center_node_shift)); 
+//assign rho_eff_init = ({1'b0, 17'b01111101011100001} < ({1'b0, 17'b01000000000000000} + u_G)) ? {1'b0, 17'b01111101011100001} : ({1'b0, 17'b01000000000000000} + u_G);
+
+assign rho_eff_init = arm_rho;
+
+wire [9:0] num_rows_temp;
+//assign num_rows_temp = arm_num_rows[9:0]; /*synthesis keep*/
+
+assign arm_counter = counter_reg;
+assign arm_ampl_out = {{14{out_val[17]}}, out_val[17:0]};
 
 genvar i;
 generate // generate 30 columns
@@ -572,7 +581,6 @@ generate // generate 30 columns
         M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
         M10K_32_5 m10k_prev(.q(q_prev[i]), .d(d_prev[i]), .write_address(write_addr_prev[i]), .read_address(read_addr_prev[i]), .we(we_prev[i]), .clk(CLOCK_50));
         //init_pyramid pyramid_init(.out(initial_ampl[i]), .index_cols(i[4:0]), .index_rows(index_rows[i]), .num_of_cols(5'd29), .num_of_rows(5'd29), .step_size(step_size));
-
         // drum instantiation
         drum oneNode (.clk(clk_50),
                       .rho_eff(rho_eff_init),
@@ -580,7 +588,7 @@ generate // generate 30 columns
                       .prev_u(prev_u[i]),
                       .u_left((i == 0) ? 0 :((index_rows[i] == 10'd0) ? bottom_reg[i - 1] : curr_reg[i-1])), // TODO left check //(i == 0) ? 0 : curr_reg[i-1]
                       .u_right((i == 127) ? 0 :((index_rows[i] == 10'd0) ? bottom_reg[i + 1] : curr_reg[i+1])), // TODO right check // (i == 29) ? 0 : curr_reg[i+1]
-                      .u_up((index_rows[i] == 10'd511) ? 10'b0 : u_up[i]),               // up_check
+                      .u_up((index_rows[i] == (num_rows - 1)) ? 10'b0 : u_up[i]),               // up_check
                       .u_down((index_rows[i] == 10'd0) ? 10'b0 : down_reg[i]),          // down_check
                       .next(next_u[i]));
 
@@ -589,7 +597,7 @@ generate // generate 30 columns
         assign step_size = {1'b0, 17'b00000010000000000};   // (1/8) / 16
 
         always @(posedge CLOCK_50) begin
-            if (~KEY[0]) begin // TODO arm_reset || 
+            if (~KEY[0] || arm_reset) begin
                 drum_state[i] <= 3'd0;
             end
             else begin
@@ -598,22 +606,12 @@ generate // generate 30 columns
                     drum_state[i] <= 3'd1;
                     index_rows[i] <= 10'd0;
 							initial_val <= 18'd0;
-							counter <= 32'd0;
-							counter_reg <= 32'd0;
+							//counter <= 32'd0;
+							//counter_reg <= 32'd0;
 							u_up[i] <= 18'd0;
 							bottom_reg[i] <= 18'd0;
 							down_reg[i] <= 18'd0;
 							curr_reg[i] <= 18'd0;
-						  
-						  // TODO
-						  /*
-						  if (i == 0) begin
-								
-						  end
-						  if (i == 0) begin
-								
-						  end
-						  */
                 end
                 // State 1 - Init
                 else if (drum_state[i] == 3'd1) begin
@@ -621,7 +619,7 @@ generate // generate 30 columns
                     if (index_rows[i] == num_rows) begin // if it exceeds the top
                         drum_state[i] <= 3'd2;
                         index_rows[i] <= 10'd0;
-								counter <= 32'd0;
+								counter[i] <= 32'd0;
 								we[i] <= 1'd0;
 								write_addr[i] <= 10'd0;
 
@@ -640,7 +638,7 @@ generate // generate 30 columns
 								write_addr_prev[i] <= index_rows[i];
 								d[i] <= initial_val;
 								d_prev[i] <= initial_val;
-								/*
+								
 								//new initialization
 								if (i < 64) begin
 									if (index_rows[i] < i) begin 
@@ -661,21 +659,24 @@ generate // generate 30 columns
 								if (index_rows[i] == 10'd0) begin
 									 bottom_reg[i] <= initial_val; //change made here
 								end
-								if (index_rows[i] == 10'd256 && i == 64) begin
+								if (index_rows[i] == half_rows && i == 64) begin
 									out_val <= initial_val;
 								end
 								
                         index_rows[i] <= index_rows[i] + 10'd1; // increment the index to check rows
                         drum_state[i] <= 3'd1;
 								//busy wait in here until the i is met on the arm side and walk up the ladder and then double check if the column being written is i
-								*/
+								
 								//if (num_rows < 
 								//add the done signal for all the columns finishing 
+								//if (done_signal) begin
+									//index_rows[i] <= num_rows;
+								//end
                     end
                 end
                 // State 2 - Set up read address for M10k blocks
                 else if (drum_state[i] == 3'd2) begin				
-							counter <= counter + 32'd1;
+							counter[i] <= counter[i] + 32'd1;
 							read_addr[i] <= 10'd2;
 							read_addr_prev[i] <= 10'd1; // set prev read addr to index_rows value to read prev_u of the current node
 							drum_state[i] <= 3'd3;
@@ -688,7 +689,7 @@ generate // generate 30 columns
 							we_prev[i] <= 1'd1;
 							read_addr[i] <= 10'd3;
 							read_addr_prev[i] <= 10'd2;
-							counter <= counter + 32'd1;
+							counter[i] <= counter[i] + 32'd1;
 							drum_state[i] <= 3'd4;
                 end
 					 // STATE 4
@@ -697,7 +698,7 @@ generate // generate 30 columns
 							read_addr_prev[i] <= (read_addr_prev[i] == (num_rows - 10'd1)) ? 10'd0 : read_addr_prev[i] + 10'd1; // set prev read addr to index_rows value to read prev_u of the current node			
 							u_up[i] <= q[i]; // since each node's next state depends on its own state and the one above it
 							prev_u[i] <= q_prev[i]; // q_prev would be data read from memory that stores prev state of curr node
-							counter <= counter + 32'd1;
+							counter[i] <= counter[i] + 32'd1;
 						
 							write_addr[i] <= (write_addr[i] == (num_rows - 10'd1)) ? 10'd0 : index_rows[i];
 							write_addr_prev[i] <= (write_addr_prev[i] == (num_rows - 10'd1)) ? 10'd0 : index_rows[i];
@@ -705,9 +706,9 @@ generate // generate 30 columns
 							d[i] <= next_u[i];
 							d_prev[i] <= (index_rows[i] == 10'd0) ? bottom_reg[i] : curr_reg[i];
 
-							if ((index_rows[i] == 10'd256) && i == 64) begin
+							if ((index_rows[i] == half_rows) && i == 64) begin
 								intermed_val <= curr_reg[i];
-								counter_reg <= counter;
+								counter_reg <= counter[i];
 							end
 							if (index_rows[i] == 10'd0) begin
                         bottom_reg[i] <= next_u[i];
@@ -720,6 +721,7 @@ generate // generate 30 columns
                 end
 					 // STATE 5
 					 else if (drum_state[i] == 3'd5) begin
+						  counter[i] <= 32'd0;
 					     if (i == 64) begin // get output val from center of drum
 								out_val <= intermed_val; 
 						  end
@@ -887,7 +889,8 @@ Computer_System The_System (
 	.incr_ampl_pio_external_connection_export(arm_incr_rows),
 	.rho_pio_external_connection_export(arm_row),
 	.num_cols_pio_external_connection_export(arm_num_cols),
-	.col_ampl_pio_external_connection_export(arm_incr_cols)
+	.col_ampl_pio_external_connection_export(arm_half_rows),
+	.done_pio_external_connection_export(done_signal)
 );
 
 

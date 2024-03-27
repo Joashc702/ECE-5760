@@ -1,6 +1,6 @@
 	component Computer_System is
 		port (
-			ampl_pio_external_connection_export             : out   std_logic_vector(31 downto 0);                    -- export
+			ampl_pio_external_connection_export             : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			audio_ADCDAT                                    : in    std_logic                     := 'X';             -- ADCDAT
 			audio_ADCLRCK                                   : in    std_logic                     := 'X';             -- ADCLRCK
 			audio_BCLK                                      : in    std_logic                     := 'X';             -- BCLK
@@ -18,6 +18,7 @@
 			bus_master_audio_external_interface_write_data  : in    std_logic_vector(31 downto 0) := (others => 'X'); -- write_data
 			bus_master_audio_external_interface_acknowledge : out   std_logic;                                        -- acknowledge
 			bus_master_audio_external_interface_read_data   : out   std_logic_vector(31 downto 0);                    -- read_data
+			col_ampl_pio_external_connection_export         : out   std_logic_vector(31 downto 0);                    -- export
 			counter_pio_external_connection_export          : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			hps_io_hps_io_emac1_inst_TX_CLK                 : out   std_logic;                                        -- hps_io_emac1_inst_TX_CLK
 			hps_io_hps_io_emac1_inst_TXD0                   : out   std_logic;                                        -- hps_io_emac1_inst_TXD0
@@ -92,14 +93,14 @@
 			memory_mem_odt                                  : out   std_logic;                                        -- mem_odt
 			memory_mem_dm                                   : out   std_logic_vector(3 downto 0);                     -- mem_dm
 			memory_oct_rzqin                                : in    std_logic                     := 'X';             -- oct_rzqin
+			num_cols_pio_external_connection_export         : out   std_logic_vector(31 downto 0);                    -- export
 			num_rows_pio_external_connection_export         : out   std_logic_vector(31 downto 0);                    -- export
 			reset_pio_external_connection_export            : out   std_logic;                                        -- export
 			rho_pio_external_connection_export              : out   std_logic_vector(31 downto 0);                    -- export
 			sdram_clk_clk                                   : out   std_logic;                                        -- clk
 			system_pll_ref_clk_clk                          : in    std_logic                     := 'X';             -- clk
 			system_pll_ref_reset_reset                      : in    std_logic                     := 'X';             -- reset
-			num_cols_pio_external_connection_export         : out   std_logic_vector(31 downto 0);                    -- export
-			col_ampl_pio_external_connection_export         : out   std_logic_vector(31 downto 0)                     -- export
+			done_pio_external_connection_export             : out   std_logic                                         -- export
 		);
 	end component Computer_System;
 
@@ -123,6 +124,7 @@
 			bus_master_audio_external_interface_write_data  => CONNECTED_TO_bus_master_audio_external_interface_write_data,  --                                    .write_data
 			bus_master_audio_external_interface_acknowledge => CONNECTED_TO_bus_master_audio_external_interface_acknowledge, --                                    .acknowledge
 			bus_master_audio_external_interface_read_data   => CONNECTED_TO_bus_master_audio_external_interface_read_data,   --                                    .read_data
+			col_ampl_pio_external_connection_export         => CONNECTED_TO_col_ampl_pio_external_connection_export,         --    col_ampl_pio_external_connection.export
 			counter_pio_external_connection_export          => CONNECTED_TO_counter_pio_external_connection_export,          --     counter_pio_external_connection.export
 			hps_io_hps_io_emac1_inst_TX_CLK                 => CONNECTED_TO_hps_io_hps_io_emac1_inst_TX_CLK,                 --                              hps_io.hps_io_emac1_inst_TX_CLK
 			hps_io_hps_io_emac1_inst_TXD0                   => CONNECTED_TO_hps_io_hps_io_emac1_inst_TXD0,                   --                                    .hps_io_emac1_inst_TXD0
@@ -197,13 +199,13 @@
 			memory_mem_odt                                  => CONNECTED_TO_memory_mem_odt,                                  --                                    .mem_odt
 			memory_mem_dm                                   => CONNECTED_TO_memory_mem_dm,                                   --                                    .mem_dm
 			memory_oct_rzqin                                => CONNECTED_TO_memory_oct_rzqin,                                --                                    .oct_rzqin
+			num_cols_pio_external_connection_export         => CONNECTED_TO_num_cols_pio_external_connection_export,         --    num_cols_pio_external_connection.export
 			num_rows_pio_external_connection_export         => CONNECTED_TO_num_rows_pio_external_connection_export,         --    num_rows_pio_external_connection.export
 			reset_pio_external_connection_export            => CONNECTED_TO_reset_pio_external_connection_export,            --       reset_pio_external_connection.export
 			rho_pio_external_connection_export              => CONNECTED_TO_rho_pio_external_connection_export,              --         rho_pio_external_connection.export
 			sdram_clk_clk                                   => CONNECTED_TO_sdram_clk_clk,                                   --                           sdram_clk.clk
 			system_pll_ref_clk_clk                          => CONNECTED_TO_system_pll_ref_clk_clk,                          --                  system_pll_ref_clk.clk
 			system_pll_ref_reset_reset                      => CONNECTED_TO_system_pll_ref_reset_reset,                      --                system_pll_ref_reset.reset
-			num_cols_pio_external_connection_export         => CONNECTED_TO_num_cols_pio_external_connection_export,         --    num_cols_pio_external_connection.export
-			col_ampl_pio_external_connection_export         => CONNECTED_TO_col_ampl_pio_external_connection_export          --    col_ampl_pio_external_connection.export
+			done_pio_external_connection_export             => CONNECTED_TO_done_pio_external_connection_export              --        done_pio_external_connection.export
 		);
 

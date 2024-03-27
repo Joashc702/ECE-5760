@@ -18,6 +18,7 @@ module Computer_System (
 	bus_master_audio_external_interface_write_data,
 	bus_master_audio_external_interface_acknowledge,
 	bus_master_audio_external_interface_read_data,
+	col_ampl_pio_external_connection_export,
 	counter_pio_external_connection_export,
 	hps_io_hps_io_emac1_inst_TX_CLK,
 	hps_io_hps_io_emac1_inst_TXD0,
@@ -92,16 +93,16 @@ module Computer_System (
 	memory_mem_odt,
 	memory_mem_dm,
 	memory_oct_rzqin,
+	num_cols_pio_external_connection_export,
 	num_rows_pio_external_connection_export,
 	reset_pio_external_connection_export,
 	rho_pio_external_connection_export,
 	sdram_clk_clk,
 	system_pll_ref_clk_clk,
 	system_pll_ref_reset_reset,
-	num_cols_pio_external_connection_export,
-	col_ampl_pio_external_connection_export);	
+	done_pio_external_connection_export);	
 
-	output	[31:0]	ampl_pio_external_connection_export;
+	input	[31:0]	ampl_pio_external_connection_export;
 	input		audio_ADCDAT;
 	input		audio_ADCLRCK;
 	input		audio_BCLK;
@@ -119,6 +120,7 @@ module Computer_System (
 	input	[31:0]	bus_master_audio_external_interface_write_data;
 	output		bus_master_audio_external_interface_acknowledge;
 	output	[31:0]	bus_master_audio_external_interface_read_data;
+	output	[31:0]	col_ampl_pio_external_connection_export;
 	input	[31:0]	counter_pio_external_connection_export;
 	output		hps_io_hps_io_emac1_inst_TX_CLK;
 	output		hps_io_hps_io_emac1_inst_TXD0;
@@ -193,12 +195,12 @@ module Computer_System (
 	output		memory_mem_odt;
 	output	[3:0]	memory_mem_dm;
 	input		memory_oct_rzqin;
+	output	[31:0]	num_cols_pio_external_connection_export;
 	output	[31:0]	num_rows_pio_external_connection_export;
 	output		reset_pio_external_connection_export;
 	output	[31:0]	rho_pio_external_connection_export;
 	output		sdram_clk_clk;
 	input		system_pll_ref_clk_clk;
 	input		system_pll_ref_reset_reset;
-	output	[31:0]	num_cols_pio_external_connection_export;
-	output	[31:0]	col_ampl_pio_external_connection_export;
+	output		done_pio_external_connection_export;
 endmodule

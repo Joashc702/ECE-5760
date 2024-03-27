@@ -4,7 +4,7 @@
 
 `timescale 1 ps / 1 ps
 module Computer_System (
-		output wire [31:0] ampl_pio_external_connection_export,             //        ampl_pio_external_connection.export
+		input  wire [31:0] ampl_pio_external_connection_export,             //        ampl_pio_external_connection.export
 		input  wire        audio_ADCDAT,                                    //                               audio.ADCDAT
 		input  wire        audio_ADCLRCK,                                   //                                    .ADCLRCK
 		input  wire        audio_BCLK,                                      //                                    .BCLK
@@ -24,6 +24,7 @@ module Computer_System (
 		output wire [31:0] bus_master_audio_external_interface_read_data,   //                                    .read_data
 		output wire [31:0] col_ampl_pio_external_connection_export,         //    col_ampl_pio_external_connection.export
 		input  wire [31:0] counter_pio_external_connection_export,          //     counter_pio_external_connection.export
+		output wire        done_pio_external_connection_export,             //        done_pio_external_connection.export
 		output wire        hps_io_hps_io_emac1_inst_TX_CLK,                 //                              hps_io.hps_io_emac1_inst_TX_CLK
 		output wire        hps_io_hps_io_emac1_inst_TXD0,                   //                                    .hps_io_emac1_inst_TXD0
 		output wire        hps_io_hps_io_emac1_inst_TXD1,                   //                                    .hps_io_emac1_inst_TXD1
@@ -106,7 +107,7 @@ module Computer_System (
 		input  wire        system_pll_ref_reset_reset                       //                system_pll_ref_reset.reset
 	);
 
-	wire         system_pll_sys_clk_clk;                                         // System_PLL:sys_clk_clk -> [ARM_A9_HPS:f2h_axi_clk, ARM_A9_HPS:h2f_axi_clk, ARM_A9_HPS:h2f_lw_axi_clk, AV_Config:clk, Audio_Subsystem:sys_clk_clk, Bus_master_audio:clk, ampl_pio:clk, col_ampl_pio:clk, counter_pio:clk, incr_ampl_pio:clk, mm_interconnect_0:System_PLL_sys_clk_clk, num_cols_pio:clk, num_rows_pio:clk, reset_pio:clk, rho_pio:clk, rst_controller:clk, rst_controller_002:clk]
+	wire         system_pll_sys_clk_clk;                                         // System_PLL:sys_clk_clk -> [ARM_A9_HPS:f2h_axi_clk, ARM_A9_HPS:h2f_axi_clk, ARM_A9_HPS:h2f_lw_axi_clk, AV_Config:clk, Audio_Subsystem:sys_clk_clk, Bus_master_audio:clk, ampl_pio:clk, col_ampl_pio:clk, counter_pio:clk, done_pio:clk, incr_ampl_pio:clk, mm_interconnect_0:System_PLL_sys_clk_clk, num_cols_pio:clk, num_rows_pio:clk, reset_pio:clk, rho_pio:clk, rst_controller:clk, rst_controller_002:clk]
 	wire  [31:0] bus_master_audio_avalon_master_readdata;                        // mm_interconnect_0:Bus_master_audio_avalon_master_readdata -> Bus_master_audio:avalon_readdata
 	wire         bus_master_audio_avalon_master_waitrequest;                     // mm_interconnect_0:Bus_master_audio_avalon_master_waitrequest -> Bus_master_audio:avalon_waitrequest
 	wire   [3:0] bus_master_audio_avalon_master_byteenable;                      // Bus_master_audio:avalon_byteenable -> mm_interconnect_0:Bus_master_audio_avalon_master_byteenable
@@ -175,11 +176,8 @@ module Computer_System (
 	wire   [1:0] mm_interconnect_0_reset_pio_s1_address;                         // mm_interconnect_0:reset_pio_s1_address -> reset_pio:address
 	wire         mm_interconnect_0_reset_pio_s1_write;                           // mm_interconnect_0:reset_pio_s1_write -> reset_pio:write_n
 	wire  [31:0] mm_interconnect_0_reset_pio_s1_writedata;                       // mm_interconnect_0:reset_pio_s1_writedata -> reset_pio:writedata
-	wire         mm_interconnect_0_ampl_pio_s1_chipselect;                       // mm_interconnect_0:ampl_pio_s1_chipselect -> ampl_pio:chipselect
 	wire  [31:0] mm_interconnect_0_ampl_pio_s1_readdata;                         // ampl_pio:readdata -> mm_interconnect_0:ampl_pio_s1_readdata
 	wire   [1:0] mm_interconnect_0_ampl_pio_s1_address;                          // mm_interconnect_0:ampl_pio_s1_address -> ampl_pio:address
-	wire         mm_interconnect_0_ampl_pio_s1_write;                            // mm_interconnect_0:ampl_pio_s1_write -> ampl_pio:write_n
-	wire  [31:0] mm_interconnect_0_ampl_pio_s1_writedata;                        // mm_interconnect_0:ampl_pio_s1_writedata -> ampl_pio:writedata
 	wire         mm_interconnect_0_incr_ampl_pio_s1_chipselect;                  // mm_interconnect_0:incr_ampl_pio_s1_chipselect -> incr_ampl_pio:chipselect
 	wire  [31:0] mm_interconnect_0_incr_ampl_pio_s1_readdata;                    // incr_ampl_pio:readdata -> mm_interconnect_0:incr_ampl_pio_s1_readdata
 	wire   [1:0] mm_interconnect_0_incr_ampl_pio_s1_address;                     // mm_interconnect_0:incr_ampl_pio_s1_address -> incr_ampl_pio:address
@@ -200,10 +198,15 @@ module Computer_System (
 	wire   [1:0] mm_interconnect_0_col_ampl_pio_s1_address;                      // mm_interconnect_0:col_ampl_pio_s1_address -> col_ampl_pio:address
 	wire         mm_interconnect_0_col_ampl_pio_s1_write;                        // mm_interconnect_0:col_ampl_pio_s1_write -> col_ampl_pio:write_n
 	wire  [31:0] mm_interconnect_0_col_ampl_pio_s1_writedata;                    // mm_interconnect_0:col_ampl_pio_s1_writedata -> col_ampl_pio:writedata
+	wire         mm_interconnect_0_done_pio_s1_chipselect;                       // mm_interconnect_0:done_pio_s1_chipselect -> done_pio:chipselect
+	wire  [31:0] mm_interconnect_0_done_pio_s1_readdata;                         // done_pio:readdata -> mm_interconnect_0:done_pio_s1_readdata
+	wire   [1:0] mm_interconnect_0_done_pio_s1_address;                          // mm_interconnect_0:done_pio_s1_address -> done_pio:address
+	wire         mm_interconnect_0_done_pio_s1_write;                            // mm_interconnect_0:done_pio_s1_write -> done_pio:write_n
+	wire  [31:0] mm_interconnect_0_done_pio_s1_writedata;                        // mm_interconnect_0:done_pio_s1_writedata -> done_pio:writedata
 	wire         irq_mapper_receiver0_irq;                                       // Audio_Subsystem:audio_irq_irq -> irq_mapper:receiver0_irq
 	wire  [31:0] arm_a9_hps_f2h_irq0_irq;                                        // irq_mapper:sender_irq -> ARM_A9_HPS:f2h_irq_p0
 	wire  [31:0] arm_a9_hps_f2h_irq1_irq;                                        // irq_mapper_001:sender_irq -> ARM_A9_HPS:f2h_irq_p1
-	wire         rst_controller_reset_out_reset;                                 // rst_controller:reset_out -> [AV_Config:reset, Bus_master_audio:reset, ampl_pio:reset_n, col_ampl_pio:reset_n, counter_pio:reset_n, incr_ampl_pio:reset_n, mm_interconnect_0:Audio_Subsystem_sys_reset_reset_bridge_in_reset_reset, mm_interconnect_0:Bus_master_audio_reset_reset_bridge_in_reset_reset, num_cols_pio:reset_n, num_rows_pio:reset_n, reset_pio:reset_n, rho_pio:reset_n]
+	wire         rst_controller_reset_out_reset;                                 // rst_controller:reset_out -> [AV_Config:reset, Bus_master_audio:reset, ampl_pio:reset_n, col_ampl_pio:reset_n, counter_pio:reset_n, done_pio:reset_n, incr_ampl_pio:reset_n, mm_interconnect_0:Audio_Subsystem_sys_reset_reset_bridge_in_reset_reset, mm_interconnect_0:Bus_master_audio_reset_reset_bridge_in_reset_reset, num_cols_pio:reset_n, num_rows_pio:reset_n, reset_pio:reset_n, rho_pio:reset_n]
 	wire         arm_a9_hps_h2f_reset_reset;                                     // ARM_A9_HPS:h2f_rst_n -> [rst_controller:reset_in0, rst_controller_001:reset_in0, rst_controller_002:reset_in0]
 	wire         system_pll_reset_source_reset;                                  // System_PLL:reset_source_reset -> [rst_controller:reset_in1, rst_controller_001:reset_in1]
 	wire         rst_controller_001_reset_out_reset;                             // rst_controller_001:reset_out -> Audio_Subsystem:sys_reset_reset_n
@@ -466,17 +469,14 @@ module Computer_System (
 	);
 
 	Computer_System_ampl_pio ampl_pio (
-		.clk        (system_pll_sys_clk_clk),                   //                 clk.clk
-		.reset_n    (~rst_controller_reset_out_reset),          //               reset.reset_n
-		.address    (mm_interconnect_0_ampl_pio_s1_address),    //                  s1.address
-		.write_n    (~mm_interconnect_0_ampl_pio_s1_write),     //                    .write_n
-		.writedata  (mm_interconnect_0_ampl_pio_s1_writedata),  //                    .writedata
-		.chipselect (mm_interconnect_0_ampl_pio_s1_chipselect), //                    .chipselect
-		.readdata   (mm_interconnect_0_ampl_pio_s1_readdata),   //                    .readdata
-		.out_port   (ampl_pio_external_connection_export)       // external_connection.export
+		.clk      (system_pll_sys_clk_clk),                 //                 clk.clk
+		.reset_n  (~rst_controller_reset_out_reset),        //               reset.reset_n
+		.address  (mm_interconnect_0_ampl_pio_s1_address),  //                  s1.address
+		.readdata (mm_interconnect_0_ampl_pio_s1_readdata), //                    .readdata
+		.in_port  (ampl_pio_external_connection_export)     // external_connection.export
 	);
 
-	Computer_System_ampl_pio col_ampl_pio (
+	Computer_System_col_ampl_pio col_ampl_pio (
 		.clk        (system_pll_sys_clk_clk),                       //                 clk.clk
 		.reset_n    (~rst_controller_reset_out_reset),              //               reset.reset_n
 		.address    (mm_interconnect_0_col_ampl_pio_s1_address),    //                  s1.address
@@ -487,7 +487,7 @@ module Computer_System (
 		.out_port   (col_ampl_pio_external_connection_export)       // external_connection.export
 	);
 
-	Computer_System_counter_pio counter_pio (
+	Computer_System_ampl_pio counter_pio (
 		.clk      (system_pll_sys_clk_clk),                    //                 clk.clk
 		.reset_n  (~rst_controller_reset_out_reset),           //               reset.reset_n
 		.address  (mm_interconnect_0_counter_pio_s1_address),  //                  s1.address
@@ -495,7 +495,18 @@ module Computer_System (
 		.in_port  (counter_pio_external_connection_export)     // external_connection.export
 	);
 
-	Computer_System_ampl_pio incr_ampl_pio (
+	Computer_System_done_pio done_pio (
+		.clk        (system_pll_sys_clk_clk),                   //                 clk.clk
+		.reset_n    (~rst_controller_reset_out_reset),          //               reset.reset_n
+		.address    (mm_interconnect_0_done_pio_s1_address),    //                  s1.address
+		.write_n    (~mm_interconnect_0_done_pio_s1_write),     //                    .write_n
+		.writedata  (mm_interconnect_0_done_pio_s1_writedata),  //                    .writedata
+		.chipselect (mm_interconnect_0_done_pio_s1_chipselect), //                    .chipselect
+		.readdata   (mm_interconnect_0_done_pio_s1_readdata),   //                    .readdata
+		.out_port   (done_pio_external_connection_export)       // external_connection.export
+	);
+
+	Computer_System_col_ampl_pio incr_ampl_pio (
 		.clk        (system_pll_sys_clk_clk),                        //                 clk.clk
 		.reset_n    (~rst_controller_reset_out_reset),               //               reset.reset_n
 		.address    (mm_interconnect_0_incr_ampl_pio_s1_address),    //                  s1.address
@@ -506,7 +517,7 @@ module Computer_System (
 		.out_port   (incr_ampl_pio_external_connection_export)       // external_connection.export
 	);
 
-	Computer_System_ampl_pio num_cols_pio (
+	Computer_System_col_ampl_pio num_cols_pio (
 		.clk        (system_pll_sys_clk_clk),                       //                 clk.clk
 		.reset_n    (~rst_controller_reset_out_reset),              //               reset.reset_n
 		.address    (mm_interconnect_0_num_cols_pio_s1_address),    //                  s1.address
@@ -517,7 +528,7 @@ module Computer_System (
 		.out_port   (num_cols_pio_external_connection_export)       // external_connection.export
 	);
 
-	Computer_System_ampl_pio num_rows_pio (
+	Computer_System_col_ampl_pio num_rows_pio (
 		.clk        (system_pll_sys_clk_clk),                       //                 clk.clk
 		.reset_n    (~rst_controller_reset_out_reset),              //               reset.reset_n
 		.address    (mm_interconnect_0_num_rows_pio_s1_address),    //                  s1.address
@@ -528,7 +539,7 @@ module Computer_System (
 		.out_port   (num_rows_pio_external_connection_export)       // external_connection.export
 	);
 
-	Computer_System_reset_pio reset_pio (
+	Computer_System_done_pio reset_pio (
 		.clk        (system_pll_sys_clk_clk),                    //                 clk.clk
 		.reset_n    (~rst_controller_reset_out_reset),           //               reset.reset_n
 		.address    (mm_interconnect_0_reset_pio_s1_address),    //                  s1.address
@@ -539,7 +550,7 @@ module Computer_System (
 		.out_port   (reset_pio_external_connection_export)       // external_connection.export
 	);
 
-	Computer_System_ampl_pio rho_pio (
+	Computer_System_col_ampl_pio rho_pio (
 		.clk        (system_pll_sys_clk_clk),                  //                 clk.clk
 		.reset_n    (~rst_controller_reset_out_reset),         //               reset.reset_n
 		.address    (mm_interconnect_0_rho_pio_s1_address),    //                  s1.address
@@ -599,10 +610,7 @@ module Computer_System (
 		.Bus_master_audio_avalon_master_write                                     (bus_master_audio_avalon_master_write),                           //                                                                   .write
 		.Bus_master_audio_avalon_master_writedata                                 (bus_master_audio_avalon_master_writedata),                       //                                                                   .writedata
 		.ampl_pio_s1_address                                                      (mm_interconnect_0_ampl_pio_s1_address),                          //                                                        ampl_pio_s1.address
-		.ampl_pio_s1_write                                                        (mm_interconnect_0_ampl_pio_s1_write),                            //                                                                   .write
 		.ampl_pio_s1_readdata                                                     (mm_interconnect_0_ampl_pio_s1_readdata),                         //                                                                   .readdata
-		.ampl_pio_s1_writedata                                                    (mm_interconnect_0_ampl_pio_s1_writedata),                        //                                                                   .writedata
-		.ampl_pio_s1_chipselect                                                   (mm_interconnect_0_ampl_pio_s1_chipselect),                       //                                                                   .chipselect
 		.Audio_Subsystem_audio_slave_address                                      (mm_interconnect_0_audio_subsystem_audio_slave_address),          //                                        Audio_Subsystem_audio_slave.address
 		.Audio_Subsystem_audio_slave_write                                        (mm_interconnect_0_audio_subsystem_audio_slave_write),            //                                                                   .write
 		.Audio_Subsystem_audio_slave_read                                         (mm_interconnect_0_audio_subsystem_audio_slave_read),             //                                                                   .read
@@ -623,6 +631,11 @@ module Computer_System (
 		.col_ampl_pio_s1_chipselect                                               (mm_interconnect_0_col_ampl_pio_s1_chipselect),                   //                                                                   .chipselect
 		.counter_pio_s1_address                                                   (mm_interconnect_0_counter_pio_s1_address),                       //                                                     counter_pio_s1.address
 		.counter_pio_s1_readdata                                                  (mm_interconnect_0_counter_pio_s1_readdata),                      //                                                                   .readdata
+		.done_pio_s1_address                                                      (mm_interconnect_0_done_pio_s1_address),                          //                                                        done_pio_s1.address
+		.done_pio_s1_write                                                        (mm_interconnect_0_done_pio_s1_write),                            //                                                                   .write
+		.done_pio_s1_readdata                                                     (mm_interconnect_0_done_pio_s1_readdata),                         //                                                                   .readdata
+		.done_pio_s1_writedata                                                    (mm_interconnect_0_done_pio_s1_writedata),                        //                                                                   .writedata
+		.done_pio_s1_chipselect                                                   (mm_interconnect_0_done_pio_s1_chipselect),                       //                                                                   .chipselect
 		.incr_ampl_pio_s1_address                                                 (mm_interconnect_0_incr_ampl_pio_s1_address),                     //                                                   incr_ampl_pio_s1.address
 		.incr_ampl_pio_s1_write                                                   (mm_interconnect_0_incr_ampl_pio_s1_write),                       //                                                                   .write
 		.incr_ampl_pio_s1_readdata                                                (mm_interconnect_0_incr_ampl_pio_s1_readdata),                    //                                                                   .readdata

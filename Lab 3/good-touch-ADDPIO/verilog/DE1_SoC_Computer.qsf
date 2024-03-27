@@ -974,4 +974,8 @@ set_global_assignment -name TIMEQUEST_MULTICORNER_ANALYSIS ON
 set_global_assignment -name NUM_PARALLEL_PROCESSORS ALL
 set_global_assignment -name VERILOG_FILE hex_decoder.v
 set_global_assignment -name FITTER_EFFORT "AUTO FIT"
+set_global_assignment -name ENABLE_SIGNALTAP ON
+set_global_assignment -name USE_SIGNALTAP_FILE rows_temp.stp
+set_global_assignment -name SIGNALTAP_FILE rows_temp.stp
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name SLD_FILE db/rows_temp_auto_stripped.stp

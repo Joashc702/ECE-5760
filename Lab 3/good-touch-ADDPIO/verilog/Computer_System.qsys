@@ -113,6 +113,22 @@
          type = "int";
       }
    }
+   element done_pio
+   {
+      datum _sortIndex
+      {
+         value = "13";
+         type = "int";
+      }
+   }
+   element done_pio.s1
+   {
+      datum baseAddress
+      {
+         value = "128";
+         type = "String";
+      }
+   }
    element incr_ampl_pio
    {
       datum _sortIndex
@@ -257,6 +273,11 @@
  <interface
    name="counter_pio_external_connection"
    internal="counter_pio.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="done_pio_external_connection"
+   internal="done_pio.external_connection"
    type="conduit"
    dir="end" />
  <interface name="hps_io" internal="ARM_A9_HPS.hps_io" type="conduit" dir="end" />
@@ -902,7 +923,7 @@
   <parameter name="bitModifyingOutReg" value="false" />
   <parameter name="captureEdge" value="false" />
   <parameter name="clockRate" value="100000000" />
-  <parameter name="direction" value="Output" />
+  <parameter name="direction" value="Input" />
   <parameter name="edgeType" value="RISING" />
   <parameter name="generateIRQ" value="false" />
   <parameter name="irqType" value="LEVEL" />
@@ -946,6 +967,20 @@
   <parameter name="simDoTestBenchWiring" value="false" />
   <parameter name="simDrivenValue" value="0" />
   <parameter name="width" value="32" />
+ </module>
+ <module name="done_pio" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="1" />
  </module>
  <module
    name="incr_ampl_pio"
@@ -1129,6 +1164,15 @@
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="done_pio.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0080" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
@@ -1178,6 +1222,11 @@
    version="18.1"
    start="System_PLL.sys_clk"
    end="col_ampl_pio.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="done_pio.clk" />
  <connection
    kind="clock"
    version="18.1"
@@ -1259,6 +1308,11 @@
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
+   end="done_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
    end="Audio_Subsystem.sys_reset" />
  <connection
    kind="reset"
@@ -1310,6 +1364,11 @@
    version="18.1"
    start="System_PLL.reset_source"
    end="col_ampl_pio.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="done_pio.reset" />
  <connection
    kind="reset"
    version="18.1"

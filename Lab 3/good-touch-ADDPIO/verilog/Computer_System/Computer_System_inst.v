@@ -17,6 +17,7 @@
 		.bus_master_audio_external_interface_write_data  (<connected-to-bus_master_audio_external_interface_write_data>),  //                                    .write_data
 		.bus_master_audio_external_interface_acknowledge (<connected-to-bus_master_audio_external_interface_acknowledge>), //                                    .acknowledge
 		.bus_master_audio_external_interface_read_data   (<connected-to-bus_master_audio_external_interface_read_data>),   //                                    .read_data
+		.col_ampl_pio_external_connection_export         (<connected-to-col_ampl_pio_external_connection_export>),         //    col_ampl_pio_external_connection.export
 		.counter_pio_external_connection_export          (<connected-to-counter_pio_external_connection_export>),          //     counter_pio_external_connection.export
 		.hps_io_hps_io_emac1_inst_TX_CLK                 (<connected-to-hps_io_hps_io_emac1_inst_TX_CLK>),                 //                              hps_io.hps_io_emac1_inst_TX_CLK
 		.hps_io_hps_io_emac1_inst_TXD0                   (<connected-to-hps_io_hps_io_emac1_inst_TXD0>),                   //                                    .hps_io_emac1_inst_TXD0
@@ -91,13 +92,13 @@
 		.memory_mem_odt                                  (<connected-to-memory_mem_odt>),                                  //                                    .mem_odt
 		.memory_mem_dm                                   (<connected-to-memory_mem_dm>),                                   //                                    .mem_dm
 		.memory_oct_rzqin                                (<connected-to-memory_oct_rzqin>),                                //                                    .oct_rzqin
+		.num_cols_pio_external_connection_export         (<connected-to-num_cols_pio_external_connection_export>),         //    num_cols_pio_external_connection.export
 		.num_rows_pio_external_connection_export         (<connected-to-num_rows_pio_external_connection_export>),         //    num_rows_pio_external_connection.export
 		.reset_pio_external_connection_export            (<connected-to-reset_pio_external_connection_export>),            //       reset_pio_external_connection.export
 		.rho_pio_external_connection_export              (<connected-to-rho_pio_external_connection_export>),              //         rho_pio_external_connection.export
 		.sdram_clk_clk                                   (<connected-to-sdram_clk_clk>),                                   //                           sdram_clk.clk
 		.system_pll_ref_clk_clk                          (<connected-to-system_pll_ref_clk_clk>),                          //                  system_pll_ref_clk.clk
 		.system_pll_ref_reset_reset                      (<connected-to-system_pll_ref_reset_reset>),                      //                system_pll_ref_reset.reset
-		.num_cols_pio_external_connection_export         (<connected-to-num_cols_pio_external_connection_export>),         //    num_cols_pio_external_connection.export
-		.col_ampl_pio_external_connection_export         (<connected-to-col_ampl_pio_external_connection_export>)          //    col_ampl_pio_external_connection.export
+		.done_pio_external_connection_export             (<connected-to-done_pio_external_connection_export>)              //        done_pio_external_connection.export
 	);
 
