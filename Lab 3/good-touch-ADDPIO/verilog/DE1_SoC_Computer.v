@@ -1,5 +1,3 @@
-
-
 module DE1_SoC_Computer (
 	////////////////////////////////////
 	// FPGA Pins
@@ -516,36 +514,41 @@ wire [31:0] arm_num_cols;
 wire [31:0] arm_half_rows;
 
 wire [9:0] num_rows;
+
+parameter [7:0] num_cols = 29; //it is actually the number of columns minus 1 (index starts at 0 which is why)
+parameter [6:0] half_num_cols = 15;//half of the number of columns
+
+
 assign num_rows = arm_num_rows[9:0];
 wire [9:0] half_rows;
 assign half_rows = arm_half_rows[9:0];
 
 // M10K variables
-wire signed [17:0] q [127:0];
-wire signed [17:0] q_prev [127:0]; // read value
-reg signed [17:0] d [127:0];
-reg signed [17:0] d_prev [127:0]; // write value
-reg [9:0] write_addr [127:0];
-reg [9:0] write_addr_prev [127:0];
-reg [9:0] read_addr [127:0];
-reg [9:0] read_addr_prev [127:0];
-reg we[127:0], we_prev [127:0];
+wire signed [17:0] q [num_cols:0];
+wire signed [17:0] q_prev [num_cols:0]; // read value
+reg signed [17:0] d [num_cols:0];
+reg signed [17:0] d_prev [num_cols:0]; // write value
+reg [9:0] write_addr [num_cols:0];
+reg [9:0] write_addr_prev [num_cols:0];
+reg [9:0] read_addr [num_cols:0];
+reg [9:0] read_addr_prev [num_cols:0];
+reg we[num_cols:0], we_prev [num_cols:0];
 
 // Drum node variables
-reg signed [17:0] curr_reg [127:0];
-reg signed [17:0] prev_u[127:0];
-reg signed [17:0] u_up [127:0];
-reg signed [17:0] down_reg [127:0];
-reg signed [17:0] bottom_reg [127:0];
+reg signed [17:0] curr_reg [num_cols:0];
+reg signed [17:0] prev_u[num_cols:0];
+reg signed [17:0] u_up [num_cols:0];
+reg signed [17:0] down_reg [num_cols:0];
+reg signed [17:0] bottom_reg [num_cols:0];
 wire [17:0] rho_eff_init;
-wire signed [17:0] next_u [127:0];
-reg signed [17:0] initial_val_test [127:0];
+wire signed [17:0] next_u [num_cols:0];
+reg signed [17:0] initial_val_test [num_cols:0];
 reg signed [17:0] out_val;
 
 // index rows
-reg [9:0] index_rows [127:0];
+reg [9:0] index_rows [num_cols:0];
 	// state variables
-reg [2:0] drum_state [127:0];
+reg [2:0] drum_state [num_cols:0];
 
 // increment/decrement between nodes
 wire [17:0] step_size;
@@ -553,7 +556,7 @@ wire [17:0] step_size_row;
 reg drum_done;
 reg audio_done;
 
-reg [31:0] counter [127:0];
+reg [31:0] counter [num_cols:0];
 reg [31:0] counter_reg;
 
 //assign rho_eff_init = {1'b0, 17'b00010000000000000};
@@ -561,12 +564,9 @@ wire signed [17:0] u_G;
 wire signed [17:0] center_node_shift;
 assign center_node_shift = out_val >>> 4;
 
-// TODO hardcoded colstepsize, rowstepsize, numrows, numcols, halfrows, assign counter to arm, 
-
-//signed_mult u_mult_G(.out(u_G), .a(center_node_shift), .b(center_node_shift)); 
-//assign rho_eff_init = ({1'b0, 17'b01111101011100001} < ({1'b0, 17'b01000000000000000} + u_G)) ? {1'b0, 17'b01111101011100001} : ({1'b0, 17'b01000000000000000} + u_G);
-
 assign rho_eff_init = arm_rho;
+
+reg [17:0] array_step [num_cols:0];
 
 wire [9:0] num_rows_temp;
 //assign num_rows_temp = arm_num_rows[9:0]; /*synthesis keep*/
@@ -574,9 +574,11 @@ wire [9:0] num_rows_temp;
 assign arm_counter = counter_reg;
 assign arm_ampl_out = {{14{out_val[17]}}, out_val[17:0]};
 
+assign step_size = arm_incr_rows[17:0];
+
 genvar i;
 generate // generate 30 columns
-	for (i = 0; i < 128; i = i+1) begin: initCols
+	for (i = 0; i < (num_cols+1); i = i+1) begin: initCols
         // curr and prev M10k block instantiations
         M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
         M10K_32_5 m10k_prev(.q(q_prev[i]), .d(d_prev[i]), .write_address(write_addr_prev[i]), .read_address(read_addr_prev[i]), .we(we_prev[i]), .clk(CLOCK_50));
@@ -587,14 +589,24 @@ generate // generate 30 columns
                       .curr_u((index_rows[i] == 10'd0) ? bottom_reg[i] : curr_reg[i]), // curr_check
                       .prev_u(prev_u[i]),
                       .u_left((i == 0) ? 0 :((index_rows[i] == 10'd0) ? bottom_reg[i - 1] : curr_reg[i-1])), // TODO left check //(i == 0) ? 0 : curr_reg[i-1]
-                      .u_right((i == 127) ? 0 :((index_rows[i] == 10'd0) ? bottom_reg[i + 1] : curr_reg[i+1])), // TODO right check // (i == 29) ? 0 : curr_reg[i+1]
+                      .u_right((i == num_cols) ? 0 :((index_rows[i] == 10'd0) ? bottom_reg[i + 1] : curr_reg[i+1])), // TODO right check // (i == 29) ? 0 : curr_reg[i+1]
                       .u_up((index_rows[i] == (num_rows - 1)) ? 10'b0 : u_up[i]),               // up_check
                       .u_down((index_rows[i] == 10'd0) ? 10'b0 : down_reg[i]),          // down_check
                       .next(next_u[i]));
 
         reg signed [17:0] intermed_val;
 		  reg signed [17:0] initial_val;
-        assign step_size = {1'b0, 17'b00000010000000000};   // (1/8) / 16
+		  reg unsigned [8:0] itr; 
+        //assign step_size = {1'b0, 17'b00000010000000000};   // (1/8) / 16
+		  
+		  always @(posedge CLOCK_50) begin
+				if (i == 10'd0) begin
+					array_step[i] <= 18'd0; 
+				end
+				if(i > 1 && i < 87) begin
+					array_step[i] <= array_step[i - 1] + step_size; 
+				end	
+		  end
 
         always @(posedge CLOCK_50) begin
             if (~KEY[0] || arm_reset) begin
@@ -612,6 +624,7 @@ generate // generate 30 columns
 							bottom_reg[i] <= 18'd0;
 							down_reg[i] <= 18'd0;
 							curr_reg[i] <= 18'd0;
+							itr <= 9'd0;
                 end
                 // State 1 - Init
                 else if (drum_state[i] == 3'd1) begin
@@ -639,8 +652,31 @@ generate // generate 30 columns
 								d[i] <= initial_val;
 								d_prev[i] <= initial_val;
 								
+								if (i < half_num_cols) begin
+									if (index_rows[i] < i) begin 
+										initial_val <= array_step[i] + step_size;
+									end
+									else if (((num_rows - 1) - index_rows[i]) < i) begin
+										initial_val <= array_step[i] - step_size;
+									end
+								end
+								else if (i >= half_num_cols) begin
+									if (index_rows[i] <= ((num_cols+1) - i)) begin
+										initial_val <= array_step[(num_cols+1)-i] + step_size;
+									end
+									else if (((num_rows - 1) - index_rows[i]) < ((num_cols+1) - i)) begin
+										initial_val <= array_step[(num_cols+1)-i] - step_size;
+									end
+								end
+								
+								index_rows[i] <= index_rows[i] + 10'd1; // increment the index to check rows
+                        drum_state[i] <= 3'd1;
+								
+								// IDONTKNOWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW
+								
+								/*
 								//new initialization
-								if (i < 64) begin
+								if (i < half_num_cols) begin
 									if (index_rows[i] < i) begin 
 										initial_val <= initial_val + step_size;
 									end
@@ -648,23 +684,21 @@ generate // generate 30 columns
 										initial_val <= initial_val - step_size;
 									end
 								end
-								else if (i >= 64) begin
-									if (index_rows[i] <= (128 - i)) begin
+								else if (i >= half_num_cols) begin
+									if (index_rows[i] <= ((num_cols+1) - i)) begin
 										initial_val <= initial_val + step_size;
 									end
-									else if (((num_rows - 1) - index_rows[i]) < (128 - i)) begin
+									else if (((num_rows - 1) - index_rows[i]) < ((num_cols+1) - i)) begin
 										initial_val <= initial_val - step_size;
 									end
 								end
 								if (index_rows[i] == 10'd0) begin
 									 bottom_reg[i] <= initial_val; //change made here
 								end
-								if (index_rows[i] == half_rows && i == 64) begin
+								if (index_rows[i] == half_rows && i == half_num_cols) begin
 									out_val <= initial_val;
-								end
+								end*/
 								
-                        index_rows[i] <= index_rows[i] + 10'd1; // increment the index to check rows
-                        drum_state[i] <= 3'd1;
 								//busy wait in here until the i is met on the arm side and walk up the ladder and then double check if the column being written is i
 								
 								//if (num_rows < 
@@ -706,7 +740,7 @@ generate // generate 30 columns
 							d[i] <= next_u[i];
 							d_prev[i] <= (index_rows[i] == 10'd0) ? bottom_reg[i] : curr_reg[i];
 
-							if ((index_rows[i] == half_rows) && i == 64) begin
+							if ((index_rows[i] == half_rows) && i == half_num_cols) begin
 								intermed_val <= curr_reg[i];
 								counter_reg <= counter[i];
 							end
@@ -722,7 +756,7 @@ generate // generate 30 columns
 					 // STATE 5
 					 else if (drum_state[i] == 3'd5) begin
 						  counter[i] <= 32'd0;
-					     if (i == 64) begin // get output val from center of drum
+					     if (i == half_num_cols) begin // get output val from center of drum
 								out_val <= intermed_val; 
 						  end
 						  
