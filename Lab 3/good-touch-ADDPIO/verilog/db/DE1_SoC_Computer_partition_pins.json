@@ -4,11 +4,19 @@
 			"name" : "Top",
 			"pins" : [
 				{
+					"name" : "LEDR[0]",
+					"strict" : false
+				},
+				{
 					"name" : "LEDR[1]",
 					"strict" : false
 				},
 				{
 					"name" : "LEDR[2]",
+					"strict" : false
+				},
+				{
+					"name" : "FPGA_I2C_SCLK",
 					"strict" : false
 				},
 				{
@@ -32,31 +40,15 @@
 					"strict" : false
 				},
 				{
-					"name" : "FPGA_I2C_SCLK",
-					"strict" : false
-				},
-				{
-					"name" : "LEDR[0]",
-					"strict" : false
-				},
-				{
 					"name" : "AUD_DACDAT",
 					"strict" : false
 				},
 				{
-					"name" : "FPGA_I2C_SDAT",
-					"strict" : false
-				},
-				{
-					"name" : "GPIO_0[0]",
-					"strict" : false
-				},
-				{
-					"name" : "GPIO_0[1]",
-					"strict" : false
-				},
-				{
 					"name" : "GPIO_0[2]",
+					"strict" : false
+				},
+				{
+					"name" : "FPGA_I2C_SDAT",
 					"strict" : false
 				},
 				{
@@ -69,6 +61,14 @@
 				},
 				{
 					"name" : "AUD_DACLRCK",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0[0]",
+					"strict" : false
+				},
+				{
+					"name" : "GPIO_0[1]",
 					"strict" : false
 				},
 				{
