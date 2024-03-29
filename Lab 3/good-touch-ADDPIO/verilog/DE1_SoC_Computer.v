@@ -515,8 +515,8 @@ wire [31:0] arm_half_rows;
 
 wire [9:0] num_rows;
 
-parameter [7:0] num_cols = 29; //it is actually the number of columns minus 1 (index starts at 0 which is why)
-parameter [6:0] half_num_cols = 15;//half of the number of columns
+parameter [7:0] num_cols = 173; //it is actually the number of columns minus 1 (index starts at 0 which is why)
+parameter [6:0] half_num_cols = 87;//half of the number of columns
 
 
 assign num_rows = arm_num_rows[9:0];
@@ -562,15 +562,17 @@ reg [31:0] counter [num_cols:0];
 reg [31:0] counter_reg;
 
 //assign rho_eff_init = {1'b0, 17'b00010000000000000};
-wire signed [17:0] u_G;
+wire unsigned [17:0] u_G;
 wire signed [17:0] center_node_shift;
-assign center_node_shift = out_val >>> 4;
+wire signed [17:0] center_node_shift_inter;
+assign center_node_shift_inter = out_val >>> 3;
+assign center_node_shift = center_node_shift_inter >>> SW[1:0];
 
 signed_mult u_mult_G(.out(u_G), .a(center_node_shift), .b(center_node_shift)); 
 
-//assign rho_eff_init = ({1'b0, 17'b01111101011100001} < ({1'b0, 17'b01000000000000000} + u_G)) ? {1'b0, 17'b01111101011100001} : ({1'b0, 17'b01000000000000000} + u_G);
+assign rho_eff_init = ({1'b0, 17'b01111101011100001} < ({1'b0, 17'b01000000000000000} + u_G)) ? {1'b0, 17'b01111101011100001} : ({1'b0, 17'b01000000000000000} + u_G);
 
-assign rho_eff_init = arm_rho[17:0];
+//assign rho_eff_init = arm_rho[17:0];
 assign arm_ampl_out = {{14{out_val[17]}}, out_val[17:0]};
 
 reg [6:0] col_itr;
@@ -582,8 +584,8 @@ reg [17:0] array_step[num_cols:0];
 assign arm_counter = counter_reg;
 
 
-assign step_size = arm_incr_rows[17:0];
-//assign step_size = {1'b0, 17'b00000001000000000};
+//assign step_size = arm_incr_rows[17:0];
+assign step_size = {1'b0, 17'b00000000000011111};
 
 always @(posedge CLOCK_50) begin
 	if (~KEY[0] || arm_reset) begin
