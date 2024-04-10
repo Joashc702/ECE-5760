@@ -519,11 +519,12 @@ parameter [7:0] num_cols = 173; //it is actually the number of columns minus 1 (
 parameter [6:0] half_num_cols = 87;//half of the number of columns
 
 
-assign num_rows = arm_num_rows[9:0];
+//assign num_rows = arm_num_rows[9:0];
+assign num_rows = 10'd512;
 
 wire [9:0] half_rows;
-assign half_rows = arm_half_rows[9:0];
-
+//assign half_rows = arm_half_rows[9:0];
+assign half_rows = 10'd256;
 
 // M10K variables
 wire signed [17:0] q [num_cols:0];
@@ -562,11 +563,9 @@ reg [31:0] counter [num_cols:0];
 reg [31:0] counter_reg;
 
 //assign rho_eff_init = {1'b0, 17'b00010000000000000};
-wire unsigned [17:0] u_G;
+wire signed [17:0] u_G;
 wire signed [17:0] center_node_shift;
-wire signed [17:0] center_node_shift_inter;
-assign center_node_shift_inter = out_val >>> 3;
-assign center_node_shift = center_node_shift_inter >>> SW[1:0];
+assign center_node_shift = out_val >>> 4;
 
 signed_mult u_mult_G(.out(u_G), .a(center_node_shift), .b(center_node_shift)); 
 
@@ -576,7 +575,7 @@ assign rho_eff_init = ({1'b0, 17'b01111101011100001} < ({1'b0, 17'b0100000000000
 assign arm_ampl_out = {{14{out_val[17]}}, out_val[17:0]};
 
 reg [6:0] col_itr;
-reg [17:0] array_step[num_cols:0];
+reg [17:0] array_step[half_num_cols:0];
 
 //wire [9:0] num_rows_temp;
 //assign num_rows_temp = arm_num_rows[9:0]; /*synthesis keep*/
@@ -585,7 +584,7 @@ assign arm_counter = counter_reg;
 
 
 //assign step_size = arm_incr_rows[17:0];
-assign step_size = {1'b0, 17'b00000000000011111};
+assign step_size = {1'b0, 17'b00000001000000000};
 
 always @(posedge CLOCK_50) begin
 	if (~KEY[0] || arm_reset) begin
@@ -622,16 +621,18 @@ generate // generate columns
 		  reg signed [17:0] initial_val;
 		  
 		  always @(posedge CLOCK_50) begin
-				if (~KEY[0] || arm_reset) begin
-					array_step[i] <= 18'd0; 
-				end
-				else begin 
-					if (i == 10'd0) begin
+			  if(i <= half_num_cols) begin
+					if (~KEY[0] || arm_reset) begin
 						array_step[i] <= 18'd0; 
 					end
-					if(i >= 1 && i <= half_num_cols) begin
-						array_step[i] <= array_step[i - 1] + step_size; 
-					end	
+					else begin 
+						if (i == 10'd0) begin
+							array_step[i] <= 18'd0; 
+						end
+						if(i >= 1 && i <= half_num_cols) begin
+							array_step[i] <= array_step[i - 1] + step_size; 
+						end	
+					end
 				end
 		  end
 
