@@ -7,4 +7,5 @@ Lab 2: \
   top-level module Verilog: DE1_SoC_Computer_cleaned.v \
 
 Lab 3:
-  
+  main C code: Lab3W3.c \
+  top-level module Verilog: /good-touch-ADDPIO/verilog/DE1_SoC_Computer.v \
