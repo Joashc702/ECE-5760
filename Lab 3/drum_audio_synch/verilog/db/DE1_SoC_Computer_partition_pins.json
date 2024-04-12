@@ -48,6 +48,10 @@
 					"strict" : false
 				},
 				{
+					"name" : "GPIO_0[2]",
+					"strict" : false
+				},
+				{
 					"name" : "GPIO_0[0]",
 					"strict" : false
 				},
@@ -65,10 +69,6 @@
 				},
 				{
 					"name" : "AUD_DACLRCK",
-					"strict" : false
-				},
-				{
-					"name" : "GPIO_0[2]",
 					"strict" : false
 				},
 				{
