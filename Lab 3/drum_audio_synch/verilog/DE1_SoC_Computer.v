@@ -935,16 +935,21 @@ endmodule
 ////////////	Mandelbrot Set Visualizer	    //////////////
 //////////////////////////////////////////////////////////////
 module drum (clk, rho_eff, curr_u, prev_u, u_left, u_right, u_up, u_down, next); 
+	// module inputs and outputs
 	input clk;
-    input [17:0] rho_eff;
+    	input [17:0] rho_eff;
 	input signed [17:0] curr_u, prev_u;
 	input signed [17:0] u_left, u_right, u_up, u_down;
 	output signed [17:0] next;
-	
+
+	// intermediate signals
 	wire signed [17:0] u_sum, rho_usum, inter_val;
-	
+
+	// net displacement from all neighbors
 	assign u_sum = u_left - curr_u + u_right - curr_u + u_up - curr_u + u_down - curr_u; // (curr_u <<< 2)
+	// multiply summed differences by rho_eff
 	signed_mult rho_mult_usum(.out(rho_usum), .a(u_sum), .b(rho_eff)); 
+	// fleshed out computation of discretized version of wave equation for a particular node u_i,j at the next timestep n+1
 	assign inter_val = rho_usum + (curr_u <<< 1) - prev_u + (prev_u >>> 10);
 	assign next = inter_val - (inter_val >>> 9);
 endmodule
