@@ -8,4 +8,4 @@ Lab 2: \
 
 Lab 3:
   main C code: Lab3W3.c \
-  top-level module Verilog: /good-touch-ADDPIO/verilog/DE1_SoC_Computer.v 
+  top-level module Verilog: /drum_audio_synch/verilog/DE1_SoC_Computer.v 

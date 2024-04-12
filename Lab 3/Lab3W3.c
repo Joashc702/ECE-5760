@@ -27,7 +27,8 @@
 void *h2p_lw_virtual_base;
 int fd;
 
-volatile unsigned int* counter_pio_ptr = NULL;
+// pointers to PIOs defined from FPGA
+volatile unsigned int* counter_pio_ptr = NULL; 
 #define COUNTER_PIO 0x00
 volatile unsigned int* num_rows_pio_ptr = NULL;
 #define ROWS_INIT_PIO 0x10
@@ -39,26 +40,25 @@ volatile unsigned int* row_incr_pio_ptr = NULL;
 #define ROW_INCR_PIO 0x40
 volatile unsigned int* rho_pio_ptr = NULL;
 #define RHO_GAIN_PIO 0x50
-volatile unsigned int* num_cols_pio_ptr = NULL;
-#define COLS_INIT_PIO 0x60
 volatile unsigned int* half_rows_pio_ptr = NULL;
 #define COL_INCR_PIO 0x70
+
+// NOT USED
+volatile unsigned int* num_cols_pio_ptr = NULL;
+#define COLS_INIT_PIO 0x60
 volatile unsigned char* done_signal_pio_ptr = NULL;
 #define DONE_INCR_PIO 0x80
-
 int ampl_changed = 0;
-typedef signed int fix;
-#define float2fix(a) (fix)(a * 131072.0) //
+
+typedef signed int fix; // type definition for fixed-point numbers
+// macros to convert btwn floating and fixed point
+#define float2fix(a) (fix)(a * 131072.0) 
 #define fix2float(a) ((float)((a) / 131072.0)) // 1 / 2^17
+// get minimum of two values
 #define MIN(X,Y) ((X<Y) ? (X) : (Y))
 
+// mutex for thread safety
 pthread_mutex_t lock;
-
-////////////////
-// TODO:
-// figure out how to read back amplitude --> gtension to switches if needed
-// step size - time permitting
-/////////////////
 
 // Global variables for demonstration purposes
 float temp_time = 0.0;
@@ -71,71 +71,76 @@ int half_cols = 64;
 int row = 1;
 int col = 1;
 
-// scanning thread
+// handles user interaction and updates the drum simulation params
 void *scan_drum(void *arg) {
-	int user_int;
+	int user_int; // track user input values
 
 	while (1) {
-		// picking things to change
+		// use menu to select the param to change
 		printf("Display time for num of cycles(0), Change height/num of rows (1), Change init amplitude (2), Change rho gain (3): ");
-    scanf("%d", &user_int);
-    float incr_ampl_row = 0.0;
-    float incr_ampl_col = 0.0;
-		switch(user_int) {
-			case 0: // display time for the number of cycles
-        temp_time = 2*1000000 * (1.0 / 50000000.0);
-        
+	        scanf("%d", &user_int); // read user input
+	        float incr_ampl_row = 0.0; // step size for rows
+		
+		switch(user_int) { 
+			case 0: // display time for the number of cycles based on counter value and clock frequency
+        			temp_time = 2*1000000 * (1.0 / 50000000.0);
 				printf("Time (microsec) = %f\n", (*(counter_pio_ptr) * temp_time));
 				break;
 
 			case 1: // change the height/number of rows in the drum
 				printf("Enter number of rows: ");
-        //printf("%d\n", *(num_rows_pio_ptr));
-        scanf("%d", &temp_num_rows);
-				*(num_rows_pio_ptr) = float2fix(temp_num_rows);
-        *(half_rows_pio_ptr) = float2fix((int)(temp_num_rows/2));
-        //incr_ampl_row = temp_init_ampl / ((temp_num_rows/2));
+			        //printf("%d\n", *(num_rows_pio_ptr));
+			        scanf("%d", &temp_num_rows); // read number of rows inputs from user
+				*(num_rows_pio_ptr) = float2fix(temp_num_rows); // update number of rows
+			        *(half_rows_pio_ptr) = float2fix((int)(temp_num_rows/2)); // update number of half rows
+			        //incr_ampl_row = temp_init_ampl / ((temp_num_rows/2));
 				//*(row_incr_pio_ptr) = float2fix(incr_ampl_row);
-        *(row_incr_pio_ptr) = float2fix(1/256.0);
-       	*(rho_pio_ptr) = float2fix(1/16.0);
+			        *(row_incr_pio_ptr) = float2fix(1/256.0); // set step size for row
+			       	*(rho_pio_ptr) = float2fix(1/16.0); // set rho gain value 
+
+				// trigger reset
 				*(reset_pio_ptr) = 1;
-        //usleep(1000); // make sure FPGA can receive the reset signal
-        *(reset_pio_ptr) = 0;
-        //printf("%d\n", *(half_rows_pio_ptr));
-        ampl_changed = 1;
+			        *(reset_pio_ptr) = 0;
+				
+        			// ampl_changed = 1;
 				break;
 
 			case 2: // change initial amplitude
 				printf("Enter initial amplitude: ");
-        scanf("%f", &temp_init_ampl);
-        //printf("%d", temp_num_rows);
-				incr_ampl_row = temp_init_ampl / (temp_num_rows/2);
+			        scanf("%f", &temp_init_ampl); // read init amplitude from user 
+			        //printf("%d", temp_num_rows);
+				incr_ampl_row = temp_init_ampl / (temp_num_rows/2); // calc incr amplitude value
 				//printf("Increment Amplitude: %f\n", incr_ampl_row);
-				*(row_incr_pio_ptr) = float2fix(incr_ampl_row);
+				*(row_incr_pio_ptr) = float2fix(incr_ampl_row); // update step size of row
+
+				// trigger reset
 				*(reset_pio_ptr) = 1;
-        *(reset_pio_ptr) = 0;
-        ampl_changed = 1;
+			        *(reset_pio_ptr) = 0;
+				
+			        // ampl_changed = 1;
 				break;
 
 			case 3: // change rho gain
 				printf("Enter rho gain (Enter value btwn 8 and 32): ");
-        scanf("%.6f", &g_tension); // 0.03125 (1/32) - 0.125 (1/8)
-        
-        float track_rho;
-        track_rho = float2fix(MIN(0.49, 0.25 + pow(fix2float(*ampl_pio_ptr) * (1.0 / g_tension), 2.0)));
-        //printf("%f\n", fix2float(track_rho));
-        //printf("%f\n", fix2float(*ampl_pio_ptr));
-        //printf("%f\n", pow(fix2float(*ampl_pio_ptr) * (1.0 / g_tension), 2));
-       // printf("%f\n", fix2float(*ampl_pio_ptr) * (1.0 / g_tension));
+				scanf("%.6f", &g_tension); // 0.03125 (1/32) - 0.125 (1/8) - user inputs rho gain
+				
+				float track_rho; // calc rho based on amplitude and g_tension
+				track_rho = float2fix(MIN(0.49, 0.25 + pow(fix2float(*ampl_pio_ptr) * (1.0 / g_tension), 2.0)));
+				//printf("%f\n", fix2float(track_rho));
+				//printf("%f\n", fix2float(*ampl_pio_ptr));
+				//printf("%f\n", pow(fix2float(*ampl_pio_ptr) * (1.0 / g_tension), 2));
+			        //printf("%f\n", fix2float(*ampl_pio_ptr) * (1.0 / g_tension));
 
-				*(rho_pio_ptr) = track_rho;
+				*(rho_pio_ptr) = track_rho; // update rho gain
+
+				// trigger reset
 				*(reset_pio_ptr) = 1;
-        *(reset_pio_ptr) = 0;
+       				*(reset_pio_ptr) = 0;
 				break;
 
-      default:
-        printf("Invalid option.\n");
-        break;
+		      default: // default state for invalid option handling
+				printf("Invalid option.\n");
+				break;
 		}
    }
 	}
@@ -156,13 +161,15 @@ int main(void) {
   		close( fd );
   		return(1);
   	}
+
+    // pointers are assigned by adding defined offset defined above based on memory locations from Platform Designer
     counter_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + COUNTER_PIO);
     num_rows_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + ROWS_INIT_PIO);
-  	reset_pio_ptr = (unsigned char *)(h2p_lw_virtual_base + RESET_PIO);
-  	ampl_pio_ptr = (signed int *)(h2p_lw_virtual_base + AMPL_INIT_PIO);
-  	row_incr_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + ROW_INCR_PIO);
-  	rho_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + RHO_GAIN_PIO);
-    num_cols_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + COLS_INIT_PIO);
+    reset_pio_ptr = (unsigned char *)(h2p_lw_virtual_base + RESET_PIO);
+    ampl_pio_ptr = (signed int *)(h2p_lw_virtual_base + AMPL_INIT_PIO);
+    row_incr_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + ROW_INCR_PIO);
+    rho_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + RHO_GAIN_PIO);
+    // num_cols_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + COLS_INIT_PIO);
     half_rows_pio_ptr = (unsigned int *)(h2p_lw_virtual_base + COL_INCR_PIO);
     
     // default values from reset

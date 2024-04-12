@@ -1,3 +1,8 @@
+// Joash Shankar, Ming He, Nikhil Pillai
+// ECE 5760 Lab 3 Spring 2024
+// Multiprocessor Drum Synthesis
+// Lab 3 Week 3 Top-level module Verilog code
+
 module DE1_SoC_Computer (
 	////////////////////////////////////
 	// FPGA Pins
@@ -549,7 +554,7 @@ reg signed [17:0] out_val;
 
 // index rows
 reg [9:0] index_rows [num_cols:0];
-	// state variables
+// state variables
 reg [2:0] drum_state [num_cols:0];
 
 // increment/decrement between nodes
@@ -558,34 +563,36 @@ wire [17:0] step_size_row;
 reg drum_done;
 reg audio_done;
 
+// keep track of counting time for num of cycles
 reg [31:0] counter [num_cols:0];
 reg [31:0] counter_reg;
 
-assign rho_eff_init = {1'b0, 17'b00010000000000000};
-wire signed [17:0] u_G;
+//assign rho_eff_init = {1'b0, 17'b00010000000000000};
+wire signed [17:0] u_G; // g tension value responsible for pitch-glide heard
 wire signed [17:0] center_node_shift;
-assign center_node_shift = out_val >>> 4;
+assign center_node_shift = out_val >>> 4; // u_center * g_tension
 
+// square the center node
 signed_mult u_mult_G(.out(u_G), .a(center_node_shift), .b(center_node_shift)); 
 
-//assign rho_eff_init = ({1'b0, 17'b01111101011100001} < ({1'b0, 17'b01000000000000000} + u_G)) ? {1'b0, 17'b01111101011100001} : ({1'b0, 17'b01000000000000000} + u_G);
+// 0.49 < (0.25+u_G)... take min value
+assign rho_eff_init = ({1'b0, 17'b01111101011100001} < ({1'b0, 17'b01000000000000000} + u_G)) ? {1'b0, 17'b01111101011100001} : ({1'b0, 17'b01000000000000000} + u_G);
 
 //assign rho_eff_init = arm_rho[17:0];
-assign arm_ampl_out = {{14{out_val[17]}}, out_val[17:0]};
+assign arm_ampl_out = {{14{out_val[17]}}, out_val[17:0]}; // sign extends out_val 
 
 reg [6:0] col_itr;
-reg [17:0] array_step[half_num_cols:0];
+reg [17:0] array_step[half_num_cols:0]; // build up an array that stores the step size (used to compute the amplitude for each node)
 
 //wire [9:0] num_rows_temp;
 //assign num_rows_temp = arm_num_rows[9:0]; /*synthesis keep*/
 
 assign arm_counter = counter_reg;
 
-
 //assign step_size = arm_incr_rows[17:0];
-assign step_size = {1'b0, 17'b00001000000000000};
+	assign step_size = {1'b0, 17'b00000000001111111}; // set step size for row
 
-always @(posedge CLOCK_50) begin
+	always @(posedge CLOCK_50) begin // process updates every clock cycle
 	if (~KEY[0] || arm_reset) begin
 		col_itr<= 7'd0;
 	end
@@ -598,14 +605,14 @@ always @(posedge CLOCK_50) begin
 		end
 	end
 end
-genvar i;
+genvar I; // generation variable
 generate // generate columns
-	for (i = 0; i < (num_cols+1); i = i+1) begin: initCols
+	for (i = 0; i < (num_cols+1); i = i+1) begin: initCols // loop from 0 to number of columns
         // curr and prev M10k block instantiations
         M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
         M10K_32_5 m10k_prev(.q(q_prev[i]), .d(d_prev[i]), .write_address(write_addr_prev[i]), .read_address(read_addr_prev[i]), .we(we_prev[i]), .clk(CLOCK_50));
-        //init_pyramid pyramid_init(.out(initial_ampl[i]), .index_cols(i[4:0]), .index_rows(index_rows[i]), .num_of_cols(5'd29), .num_of_rows(5'd29), .step_size(step_size));
-        // drum instantiation
+
+	// drum instantiation
         drum oneNode (.clk(CLOCK_50),
                       .rho_eff(rho_eff_init),
                       .curr_u((index_rows[i] == 10'd0) ? bottom_reg[i] : curr_reg[i]), // curr_check
@@ -614,9 +621,10 @@ generate // generate columns
                       .u_right((i == num_cols) ? 0 :((index_rows[i] == 10'd0) ? bottom_reg[i + 1] : curr_reg[i+1])), // TODO right check // (i == 29) ? 0 : curr_reg[i+1]
                       .u_up((index_rows[i] == (num_rows - 1)) ? 10'b0 : u_up[i]),               // up_check
                       .u_down((index_rows[i] == 10'd0) ? 10'b0 : down_reg[i]),          // down_check
-                      .next(next_u[i]));
+		      .next(next_u[I]));
 
-        reg signed [17:0] intermed_val;
+		  // hold intermediate and initial values for calculations
+        	  reg signed [17:0] intermed_val;
 		  reg signed [17:0] initial_val;
 		  
 		  always @(posedge CLOCK_50) begin
@@ -635,23 +643,23 @@ generate // generate columns
 				end
 		  end
 
-        always @(posedge CLOCK_50) begin
-            if (~KEY[0] || arm_reset) begin
+	always @(posedge CLOCK_50) begin // handle SM for each drum node
+	    if (~KEY[0] || arm_reset) begin // reset conditions
                 drum_state[i] <= 3'd0;
-				intermed_val <= 18'd0;
+		intermed_val <= 18'd0;
             end
             else begin
                 // State 0 - Reset
                 if (drum_state[i] == 3'd0) begin
                     drum_state[i] <= 3'd1;
                     index_rows[i] <= 10'd0;
-					initial_val <= 18'd0;
-					//counter <= 32'd0;
-					//counter_reg <= 32'd0;
-					u_up[i] <= 18'd0;
-					bottom_reg[i] <= 18'd0;
-					down_reg[i] <= 18'd0;
-					curr_reg[i] <= 18'd0;
+		    initial_val <= 18'd0;
+		    //counter <= 32'd0;
+		    //counter_reg <= 32'd0;
+		    u_up[i] <= 18'd0;
+		    bottom_reg[i] <= 18'd0;
+		    down_reg[i] <= 18'd0;
+		    curr_reg[i] <= 18'd0;
                 end
                 // State 1 - Init
                 else if (drum_state[i] == 3'd1) begin
@@ -659,108 +667,109 @@ generate // generate columns
                     if (index_rows[i] == num_rows) begin // if it exceeds the top
                         drum_state[i] <= 3'd2;
                         index_rows[i] <= 10'd0;
-								counter[i] <= 32'd0;
-								we[i] <= 1'd0;
-								write_addr[i] <= 10'd0;
+			counter[i] <= 32'd0;
+			we[i] <= 1'd0;
+			write_addr[i] <= 10'd0;
 
-								we_prev[i] <= 1'd0;
-								write_addr_prev[i] <= 10'd0;
-								
-								read_addr[i] <= 10'd1;
-								read_addr_prev[i] <= 10'd0; // set prev read addr to index_rows value to read prev_u of the current node
+			we_prev[i] <= 1'd0;
+			write_addr_prev[i] <= 10'd0;
+			
+			read_addr[i] <= 10'd1;
+			read_addr_prev[i] <= 10'd0; // set prev read addr to index_rows value to read prev_u of the current node
                     end
                     else begin // init curr node and prev_u M10k blocks
-						if(col_itr >= half_num_cols) begin
-							we[i] <= 1'd1;
-							we_prev[i] <= 1'd1;
+			if(col_itr >= half_num_cols) begin
+				we[i] <= 1'd1;
+				we_prev[i] <= 1'd1;
 
-							write_addr[i] <= index_rows[i];
-							write_addr_prev[i] <= index_rows[i];
-							d[i] <= initial_val;
-							d_prev[i] <= initial_val;
+				write_addr[i] <= index_rows[i];
+				write_addr_prev[i] <= index_rows[i];
+				d[i] <= initial_val;
+				d_prev[i] <= initial_val;
 
-							if (i <= half_num_cols) begin
-								if (index_rows[i] <= half_rows) begin 
-									initial_val <= array_step[i] + initial_val;
-								end
-								else if (index_rows[i] < num_rows) begin
-									initial_val <= initial_val - array_step[i];
-								end
-							end
-							else if (i > half_num_cols) begin
-								if (index_rows[i] <= half_rows) begin 
-									initial_val <= initial_val + array_step[num_cols - i] ;
-								end
-								else if (index_rows[i] < num_rows) begin
-									initial_val <= initial_val - array_step[num_cols - i];
-								end
-							end
-							index_rows[i] <= index_rows[i] + 5'd1;
-						end
-                        drum_state[i] <= 3'd1;
-								
+				if (i <= half_num_cols) begin
+					if (index_rows[i] <= half_rows) begin 
+						initial_val <= array_step[i] + initial_val; // incr based on step
+					end
+					else if (index_rows[i] < num_rows) begin
+						initial_val <= initial_val - array_step[i]; // decr based on step
+					end
+				end
+				else if (i > half_num_cols) begin
+					if (index_rows[i] <= half_rows) begin 
+						initial_val <= initial_val + array_step[num_cols - i] ; // symmetric for 2nd half
+					end
+					else if (index_rows[i] < num_rows) begin
+						initial_val <= initial_val - array_step[num_cols - i]; // symmetric for 2nd half
+					end
+				end
+				index_rows[i] <= index_rows[i] + 5'd1;
+			end
+                        drum_state[i] <= 3'd1;				
                     end
                 end
                 // State 2 - Set up read address for M10k blocks
                 else if (drum_state[i] == 3'd2) begin				
-							counter[i] <= counter[i] + 32'd1;
-							read_addr[i] <= 10'd2;
-							read_addr_prev[i] <= 10'd1; // set prev read addr to index_rows value to read prev_u of the current node
-							drum_state[i] <= 3'd3;
+			counter[i] <= counter[i] + 32'd1;
+			read_addr[i] <= 10'd2;
+			read_addr_prev[i] <= 10'd1; // set prev read addr to index_rows value to read prev_u of the current node
+			drum_state[i] <= 3'd3;
                 end 
                 // State 3 - wait for M10K to see the read_addr
                 else if (drum_state[i] == 3'd3) begin
-							u_up[i] <= q[i]; // since each node's next state depends on its own state and the one above it
-							prev_u[i] <= q_prev[i]; // q_prev would be data read from memory that stores prev state of curr node
-							we[i] <= 1'd1;
-							we_prev[i] <= 1'd1;
-							read_addr[i] <= 10'd3;
-							read_addr_prev[i] <= 10'd2;
-							counter[i] <= counter[i] + 32'd1;
-							drum_state[i] <= 3'd4;
+			u_up[i] <= q[i]; // since each node's next state depends on its own state and the one above it
+			prev_u[i] <= q_prev[i]; // q_prev would be data read from memory that stores prev state of curr node
+			we[i] <= 1'd1;
+			we_prev[i] <= 1'd1;
+			read_addr[i] <= 10'd3;
+			read_addr_prev[i] <= 10'd2;
+			counter[i] <= counter[i] + 32'd1;
+			drum_state[i] <= 3'd4;
                 end
-				// STATE 4
+		// STATE 4 - handle R/W operations for memory blocks
                 else if (drum_state[i] == 3'd4) begin
-							read_addr[i] <= (read_addr[i] == (num_rows - 10'd1)) ? 10'd0 : read_addr[i] + 10'd1;
-							read_addr_prev[i] <= (read_addr_prev[i] == (num_rows - 10'd1)) ? 10'd0 : read_addr_prev[i] + 10'd1; // set prev read addr to index_rows value to read prev_u of the current node			
-							u_up[i] <= q[i]; // since each node's next state depends on its own state and the one above it
-							prev_u[i] <= q_prev[i]; // q_prev would be data read from memory that stores prev state of curr node
-							counter[i] <= counter[i] + 32'd1;
-						
-							write_addr[i] <= (write_addr[i] == (num_rows - 10'd1)) ? 10'd0 : index_rows[i];
-							write_addr_prev[i] <= (write_addr_prev[i] == (num_rows - 10'd1)) ? 10'd0 : index_rows[i];
+			read_addr[i] <= (read_addr[i] == (num_rows - 10'd1)) ? 10'd0 : read_addr[i] + 10'd1;
+			read_addr_prev[i] <= (read_addr_prev[i] == (num_rows - 10'd1)) ? 10'd0 : read_addr_prev[i] + 10'd1; // set prev read addr to index_rows value to read prev_u of the current node			
+			u_up[i] <= q[i]; // since each node's next state depends on its own state and the one above it
+			prev_u[i] <= q_prev[i]; // q_prev would be data read from memory that stores prev state of curr node
+			counter[i] <= counter[i] + 32'd1;
 
-							d[i] <= next_u[i];
-							d_prev[i] <= (index_rows[i] == 10'd0) ? bottom_reg[i] : curr_reg[i];
+			// circular buffer for write addr
+			write_addr[i] <= (write_addr[i] == (num_rows - 10'd1)) ? 10'd0 : index_rows[i];
+			write_addr_prev[i] <= (write_addr_prev[i] == (num_rows - 10'd1)) ? 10'd0 : index_rows[I];
 
-							if ((index_rows[i] == half_rows) && i == half_num_cols) begin
-								intermed_val <= curr_reg[i];
-								counter_reg <= counter[i];
-							end
-							if (index_rows[i] == 10'd0) begin
-                        bottom_reg[i] <= next_u[i];
-                     end
+			// set data
+			d[i] <= next_u[i];
+			d_prev[i] <= (index_rows[i] == 10'd0) ? bottom_reg[i] : curr_reg[i];
+	
+			if ((index_rows[i] == half_rows) && i == half_num_cols) begin // capture value at drum center
+				intermed_val <= curr_reg[i];
+				counter_reg <= counter[i];
+			end
+			if (index_rows[i] == 10'd0) begin
+				bottom_reg[i] <= next_u[i]; // update bottom register
+	                end
 							
-                     down_reg[i] <= (index_rows[i] == 10'd0) ? 18'd0 : curr_reg[i];
-                     curr_reg[i] <= u_up[i];
-                     index_rows[i] <= (index_rows[i] == (num_rows - 10'd1))? 10'd0 : index_rows[i] + 10'd1;
-							drum_state[i] <= (index_rows[i] == (num_rows - 10'd1))? 3'd5 : 3'd4;
+			down_reg[i] <= (index_rows[i] == 10'd0) ? 18'd0 : curr_reg[i]; // update down register based on boundary condition
+			curr_reg[i] <= u_up[i]; // update current register
+			index_rows[i] <= (index_rows[i] == (num_rows - 10'd1))? 10'd0 : index_rows[i] + 10'd1; // circular buffer for index rows
+			drum_state[i] <= (index_rows[i] == (num_rows - 10'd1))? 3'd5 : 3'd4; // transition to state 5 or stay in 4
                 end
-					 // STATE 5
-					 else if (drum_state[i] == 3'd5) begin
-						  counter[i] <= 32'd0;
-					     if (i == half_num_cols) begin // get output val from center of drum
-								out_val <= intermed_val; 
-						  end
-						  
-						  // audio done signal check
-						  if (sync_signal) begin
-								drum_state[i] <= 3'd4;
-						  end
-						  else begin
-								drum_state[i] <= 3'd5;
-						  end
-					 end 
+		 // STATE 5 - Capture output value and handle synch signal for audio
+		 else if (drum_state[i] == 3'd5) begin
+			  counter[i] <= 32'd0;
+		     	  if (i == half_num_cols) begin // get output val from center of drum
+				out_val <= intermed_val; 
+			  end
+			  
+			  // audio done signal check
+			  if (sync_signal) begin
+				drum_state[i] <= 3'd4;
+			  end
+			  else begin
+				drum_state[i] <= 3'd5;
+			  end
+		 end 
             end
         end
     end
@@ -927,16 +936,21 @@ endmodule
 ////////////	Mandelbrot Set Visualizer	    //////////////
 //////////////////////////////////////////////////////////////
 module drum (clk, rho_eff, curr_u, prev_u, u_left, u_right, u_up, u_down, next); 
+	// module inputs and outputs
 	input clk;
-    input [17:0] rho_eff;
+    	input [17:0] rho_eff;
 	input signed [17:0] curr_u, prev_u;
 	input signed [17:0] u_left, u_right, u_up, u_down;
 	output signed [17:0] next;
-	
+
+	// intermediate signals
 	wire signed [17:0] u_sum, rho_usum, inter_val;
-	
+
+	// net displacement from all neighbors
 	assign u_sum = u_left - curr_u + u_right - curr_u + u_up - curr_u + u_down - curr_u; // (curr_u <<< 2)
+	// multiply summed differences by rho_eff
 	signed_mult rho_mult_usum(.out(rho_usum), .a(u_sum), .b(rho_eff)); 
+	// fleshed out computation of discretized version of wave equation for a particular node u_i,j at the next timestep n+1
 	assign inter_val = rho_usum + (curr_u <<< 1) - prev_u + (prev_u >>> 10);
 	assign next = inter_val - (inter_val >>> 9);
 endmodule
