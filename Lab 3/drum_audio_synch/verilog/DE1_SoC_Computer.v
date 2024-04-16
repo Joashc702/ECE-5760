@@ -605,7 +605,7 @@ assign arm_counter = counter_reg;
 		end
 	end
 end
-genvar I; // generation variable
+genvar i; // generation variable
 generate // generate columns
 	for (i = 0; i < (num_cols+1); i = i+1) begin: initCols // loop from 0 to number of columns
         // curr and prev M10k block instantiations
