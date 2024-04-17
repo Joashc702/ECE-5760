@@ -77,7 +77,14 @@ module Computer_System (
 	system_pll_ref_clk_clk,
 	system_pll_ref_reset_reset,
 	vga_pio_locked_export,
-	vga_pio_outclk0_clk);	
+	vga_pio_outclk0_clk,
+	onchip_sram_s1_address,
+	onchip_sram_s1_clken,
+	onchip_sram_s1_chipselect,
+	onchip_sram_s1_write,
+	onchip_sram_s1_readdata,
+	onchip_sram_s1_writedata,
+	onchip_sram_s1_byteenable);	
 
 	output		hps_io_hps_io_emac1_inst_TX_CLK;
 	output		hps_io_hps_io_emac1_inst_TXD0;
@@ -157,4 +164,11 @@ module Computer_System (
 	input		system_pll_ref_reset_reset;
 	output		vga_pio_locked_export;
 	output		vga_pio_outclk0_clk;
+	input	[8:0]	onchip_sram_s1_address;
+	input		onchip_sram_s1_clken;
+	input		onchip_sram_s1_chipselect;
+	input		onchip_sram_s1_write;
+	output	[31:0]	onchip_sram_s1_readdata;
+	input	[31:0]	onchip_sram_s1_writedata;
+	input	[3:0]	onchip_sram_s1_byteenable;
 endmodule

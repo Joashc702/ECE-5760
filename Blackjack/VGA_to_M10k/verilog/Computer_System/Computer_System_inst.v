@@ -76,6 +76,13 @@
 		.system_pll_ref_clk_clk          (<connected-to-system_pll_ref_clk_clk>),          //   system_pll_ref_clk.clk
 		.system_pll_ref_reset_reset      (<connected-to-system_pll_ref_reset_reset>),      // system_pll_ref_reset.reset
 		.vga_pio_locked_export           (<connected-to-vga_pio_locked_export>),           //       vga_pio_locked.export
-		.vga_pio_outclk0_clk             (<connected-to-vga_pio_outclk0_clk>)              //      vga_pio_outclk0.clk
+		.vga_pio_outclk0_clk             (<connected-to-vga_pio_outclk0_clk>),             //      vga_pio_outclk0.clk
+		.onchip_sram_s1_address          (<connected-to-onchip_sram_s1_address>),          //       onchip_sram_s1.address
+		.onchip_sram_s1_clken            (<connected-to-onchip_sram_s1_clken>),            //                     .clken
+		.onchip_sram_s1_chipselect       (<connected-to-onchip_sram_s1_chipselect>),       //                     .chipselect
+		.onchip_sram_s1_write            (<connected-to-onchip_sram_s1_write>),            //                     .write
+		.onchip_sram_s1_readdata         (<connected-to-onchip_sram_s1_readdata>),         //                     .readdata
+		.onchip_sram_s1_writedata        (<connected-to-onchip_sram_s1_writedata>),        //                     .writedata
+		.onchip_sram_s1_byteenable       (<connected-to-onchip_sram_s1_byteenable>)        //                     .byteenable
 	);
 

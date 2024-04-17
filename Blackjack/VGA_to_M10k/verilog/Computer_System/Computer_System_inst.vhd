@@ -77,7 +77,14 @@
 			system_pll_ref_clk_clk          : in    std_logic                     := 'X';             -- clk
 			system_pll_ref_reset_reset      : in    std_logic                     := 'X';             -- reset
 			vga_pio_locked_export           : out   std_logic;                                        -- export
-			vga_pio_outclk0_clk             : out   std_logic                                         -- clk
+			vga_pio_outclk0_clk             : out   std_logic;                                        -- clk
+			onchip_sram_s1_address          : in    std_logic_vector(8 downto 0)  := (others => 'X'); -- address
+			onchip_sram_s1_clken            : in    std_logic                     := 'X';             -- clken
+			onchip_sram_s1_chipselect       : in    std_logic                     := 'X';             -- chipselect
+			onchip_sram_s1_write            : in    std_logic                     := 'X';             -- write
+			onchip_sram_s1_readdata         : out   std_logic_vector(31 downto 0);                    -- readdata
+			onchip_sram_s1_writedata        : in    std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
+			onchip_sram_s1_byteenable       : in    std_logic_vector(3 downto 0)  := (others => 'X')  -- byteenable
 		);
 	end component Computer_System;
 
@@ -160,6 +167,13 @@
 			system_pll_ref_clk_clk          => CONNECTED_TO_system_pll_ref_clk_clk,          --   system_pll_ref_clk.clk
 			system_pll_ref_reset_reset      => CONNECTED_TO_system_pll_ref_reset_reset,      -- system_pll_ref_reset.reset
 			vga_pio_locked_export           => CONNECTED_TO_vga_pio_locked_export,           --       vga_pio_locked.export
-			vga_pio_outclk0_clk             => CONNECTED_TO_vga_pio_outclk0_clk              --      vga_pio_outclk0.clk
+			vga_pio_outclk0_clk             => CONNECTED_TO_vga_pio_outclk0_clk,             --      vga_pio_outclk0.clk
+			onchip_sram_s1_address          => CONNECTED_TO_onchip_sram_s1_address,          --       onchip_sram_s1.address
+			onchip_sram_s1_clken            => CONNECTED_TO_onchip_sram_s1_clken,            --                     .clken
+			onchip_sram_s1_chipselect       => CONNECTED_TO_onchip_sram_s1_chipselect,       --                     .chipselect
+			onchip_sram_s1_write            => CONNECTED_TO_onchip_sram_s1_write,            --                     .write
+			onchip_sram_s1_readdata         => CONNECTED_TO_onchip_sram_s1_readdata,         --                     .readdata
+			onchip_sram_s1_writedata        => CONNECTED_TO_onchip_sram_s1_writedata,        --                     .writedata
+			onchip_sram_s1_byteenable       => CONNECTED_TO_onchip_sram_s1_byteenable        --                     .byteenable
 		);
 

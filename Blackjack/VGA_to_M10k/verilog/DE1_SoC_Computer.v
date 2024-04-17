@@ -397,260 +397,8 @@ wire 		[18:0] 	read_address_2 ;
 wire 					M10k_pll /*synthesis keep */;
 wire 					M10k_pll_locked ;
 
-// Memory writing control registers
-reg 		[7:0] 	arbiter_state ;
-wire 		[9:0] 	x_coord ;
-wire 		[9:0] 	y_coord ;
-wire 		[9:0] 	x_coord_2 ;
-wire 		[9:0] 	y_coord_2;
-
-// initial values for x and y 
-reg [9:0] init_x [1:0];
-reg [9:0] init_y [1:0];
-
-// Wires for connecting VGA driver to memory
-wire 		[9:0]		next_x ;
-wire 		[9:0] 	next_y ;
-
-// wires for ci, cr, and max_iter
-reg signed [26:0] ci, cr, ci_2, cr_2;
-wire [11:0] counter [15:0];
-wire [11:0] counter_2;
-wire [11:0] max_iterations;
-assign max_iterations = 12'd1000;
-
-wire calc_done [15:0];
-wire calc_done_2;
-
-wire [26:0] unit_step_size_cr, step_size_cr, step_size_ci;
-
-assign unit_step_size_cr = {4'b0000, 23'b00000001001100110011001} >> pio_zoom_cr_external_connection_export[5:0]; 
-assign step_size_cr = ({4'b0000, 23'b00000010011001100110010}) >> pio_zoom_cr_external_connection_export[5:0];
-assign step_size_ci = {4'b0000, 23'b00000001000100010001000} >> pio_zoom_ci_external_connection_export[5:0];
-
-//KEY debouncing -> seems not necessary
-//key_debouncing state_3(.clk(M10k_pll), .button_in(KEY[3]), .button_state(button_state_3));
-//key_debouncing state_2(.clk(M10k_pll), .button_in(KEY[2]), .button_state(button_state_2));
-//key_debouncing state_1(.clk(M10k_pll), .button_in(KEY[1]), .button_state(button_state_1));
-//wire [1:0] button_state_0;
-//key_debouncing state_0(.clk(M10k_pll), .button_in(KEY[0]), .button_state(button_state_0));
-
-// wire for time counter
-wire [31:0] counter_external_connection_export;
-wire flag_counter;
-
-reg [3:0] itr_counter; // counter loops 16 iterators and keeps the max time to send to HPS
-reg [31:0] time_inter_data, max_time; // timer to keep the intermediate time data
-reg [15:0] record_flag; 
-
-wire time_flag [15:0];
-wire time_flag_2;
-
-wire [31:0] time_counter [15:0];
-wire [31:0] time_counter_2;
-reg [31:0] t_counter, t_counter_2;
-
-assign counter_external_connection_export = max_time; 
-
-always@(posedge M10k_pll) begin	
-	// four buttons to move the graph
-	if(pio_reset_external_connection_export[0] || ~KEY[0]) begin
-		itr_counter <= 0;
-		max_time <= 0;
-	end
-	else begin
-//	if(time_flag[0] && time_flag[1] && time_flag[2] && time_flag[3] && time_flag[4] && time_flag[5] && time_flag[6] && time_flag[7] &&
-//		time_flag[8] && time_flag[9] && time_flag[10] && time_flag[11] && time_flag[12] && time_flag[13] && time_flag[14] && time_flag[15] ) begin
-		if(time_flag[0]) begin
-			record_flag <= record_flag | 16'd1;
-		end
-		if(time_flag[1]) begin
-			record_flag <= record_flag | (16'd1 << 1);
-		end
-		if(time_flag[2]) begin
-			record_flag <= record_flag | (16'd1 << 2);
-		end
-		if(time_flag[3]) begin
-			record_flag <= record_flag | (16'd1 << 3);
-		end
-		if(time_flag[4]) begin
-			record_flag <= record_flag | (16'd1 << 4);
-		end
-		if(time_flag[5]) begin
-			record_flag <= record_flag | (16'd1 << 5);
-		end
-		if(time_flag[6]) begin
-			record_flag <= record_flag | (16'd1 << 6);
-		end
-		if(time_flag[7]) begin
-			record_flag <= record_flag | (16'd1 << 7);
-		end
-		if(time_flag[8]) begin
-			record_flag <= record_flag | (16'd1 << 8);
-		end
-		if(time_flag[9]) begin
-			record_flag <= record_flag | (16'd1 << 9);
-		end
-		if(time_flag[10]) begin
-			record_flag <= record_flag | (16'd1 << 10);
-		end
-		if(time_flag[11]) begin
-			record_flag <= record_flag | (16'd1 << 11);
-		end
-		if(time_flag[12]) begin
-			record_flag <= record_flag | (16'd1 << 12);
-		end
-		if(time_flag[13]) begin
-			record_flag <= record_flag | (16'd1 << 13);
-		end
-		if(time_flag[14]) begin
-			record_flag <= record_flag | (16'd1 << 14);
-		end
-		if(time_flag[15]) begin
-			record_flag <= record_flag | (16'd1 << 15);
-		end
-				
-		itr_counter <= itr_counter + 1;
-		case(itr_counter)
-        4'd0: time_inter_data = time_counter[0];
-        4'd1: time_inter_data = time_counter[1];
-        4'd2: time_inter_data = time_counter[2];
-        4'd3: time_inter_data = time_counter[3];
-        4'd4: time_inter_data = time_counter[4];
-        4'd5: time_inter_data = time_counter[5];
-        4'd6: time_inter_data = time_counter[6];
-        4'd7: time_inter_data = time_counter[7];
-        4'd8: time_inter_data = time_counter[8];
-        4'd9: time_inter_data = time_counter[9];
-        4'd10: time_inter_data = time_counter[10];
-        4'd11: time_inter_data = time_counter[11];
-        4'd12: time_inter_data = time_counter[12];
-        4'd13: time_inter_data = time_counter[13];
-        4'd14: time_inter_data = time_counter[14];
-        4'd15: time_inter_data = time_counter[15];
-		  default time_inter_data = 32'd0 ;
-      endcase
-	max_time <= (max_time <= time_inter_data) ? time_inter_data : max_time;
-	if (itr_counter > 15) begin
-		itr_counter <= 0;
-	end
-	if(&record_flag) begin
-		max_time <= 0;
-		record_flag <= 0;
-	end
-	end
-end
-
-//assign step_size_x = ({4'b0000, 23'b00000001001100110011001} << 1) >> SW[5:0];
-//assign step_every_other_x = ({4'b0000, 23'b00000010011001100110010}) >> SW[5:0];
-//assign step_size_x = {4'b0000, 23'b00000001001100110011001}; //3/640
-//assign step_size_y = {4'b0000, 23'b00000001000100010001000} >> SW[5:0];
-//assign LEDR[0] = (~KEY[3]) ? 1'd1 : 1'd0;
-//assign LEDR[1] = (~KEY[0]) ? 1'd1 : 1'd0;
-
-// wires for ci/cr increment/zoom and pio reset
-wire [31:0] pio_ci_init_external_connection_export;
-wire [31:0] pio_cr_init_external_connection_export;
-wire [31:0] pio_zoom_ci_external_connection_export;
-wire [31:0] pio_zoom_cr_external_connection_export;
-wire [7:0] pio_reset_external_connection_export;
-
-// wire for max iterations
-wire [15:0] pio_max_iter_external_connection_export;
- 
-wire [18:0] calc_address;
-assign calc_address = ((19'd_40*next_y) + (next_x >> 4));
-
-wire [7:0] color_in_VGA_inter [15:0];
-//assign color_in_VGA = next_x[0] ? M10k_out_2 : M10k_out;
-
-wire [7:0] color_in_VGA;
-
-/*
-reg [18:0] mem_block_index ; 
-always@(*)
-begin
-    case(next_x[3:0])
-        6'd0: mem_block_index=M10K_out[0];
-        6'd1: mem_block_index=1;
-        6'd2: mem_block_index=32'd2925946;
-        6'd3: mem_block_index=32'd3284755;
-        6'd4: mem_block_index=32'd3686513;
-        6'd5: mem_block_index=32'd3905735;
-        6'd6: mem_block_index=32'd4384445;
-        6'd7: mem_block_index=32'd4921316;
-        6'd8: mem_block_index=32'd5524401;
-        6'd9: mem_block_index=32'd5852787;
-        6'd10: mem_block_index=32'd6569510;
-        6'd11: mem_block_index=32'd7373921;
-        6'd12: mem_block_index=32'd7812366;
-        6'd13: mem_block_index=32'd8768891;
-        6'd14: mem_block_index=32'd9842633;
-        6'd15: mem_block_index=32'd11047908;
-        default mem_block_index =32'd0 ;
-    endcase
-end
-*/
-
-genvar i;
-generate
-	for (i=0; i<16; i=i+1) begin: instBlocks
-		mandelbrot MBROT (.clock(M10k_pll),
-								.reset(pio_reset_external_connection_export[0] || ~KEY[0]),				
-								.x_coord_init(10'd_0+i),
-								.y_coord_init(10'd_0),
-//								.step_size_cr(step_size_cr),
-                        .step_size_cr(unit_step_size_cr << 4),
-								.step_size_ci(step_size_ci),
-								.c_i_init(pio_ci_init_external_connection_export[26:0]),
-								.c_r_init(pio_cr_init_external_connection_export[26:0] + (i * unit_step_size_cr)),
-								.max_iter(pio_max_iter_external_connection_export),
-								.out(counter[i]),
-								.write_en (write_enable[i]),
-								.write_addr(write_address[i]),
-								.done(calc_done[i]),
-								.time_flag(time_flag[i]),
-								.time_counter(time_counter[i]));		
-		
-		M10K_1000_8 pixel_data( .q(M10k_out[i]), // contains pixel color (8 bit) for display
-										.d(write_data[i]),
-										.write_address(write_address[i]),
-										.read_address(calc_address),
-										.we(write_enable[i]),
-										.clk(M10k_pll));
-		
-		// assign color_in_VGA_inter[i] = next_x[0] ? M10k_out[0] : M10k_out[1];
-		
-		color_write color_iter(.clk(M10k_pll), 
-										.counter(counter[i]), 
-										.max_iterations(pio_max_iter_external_connection_export), 
-										.write_data_out(write_data[i]));						
-										
-	end
-endgenerate
-
-//assign color_in_VGA = next_x[0] ? M10k_out[1] : M10k_out[0];
-//assign color_in_VGA = color_in_VGA_inter[0];
 assign color_in_VGA = M10k_out[next_x[3:0]];
-/*
-// Instantiate memory
-M10K_1000_8 pixel_data( .q(M10k_out), // contains pixel color (8 bit) for display
-								.d(write_data),
-								.write_address(write_address),
-								.read_address(calc_address),
-								.we(write_enable),
-								.clk(M10k_pll)
-);
 
-
-M10K_1000_8 pixel_data_2( .q(M10k_out_2), // contains pixel color (8 bit) for display
-								.d(write_data_2),
-								.write_address(write_address_2),
-								.read_address(calc_address),
-								.we(write_enable_2),
-								.clk(M10k_pll)
-);
-*/
 
 // Instantiate VGA driver					
 vga_driver DUT   (	.clock(vga_pll), 
@@ -668,50 +416,49 @@ vga_driver DUT   (	.clock(vga_pll),
 							.blank(VGA_BLANK_N)
 );
 
+// SRAM variables
+wire [31:0] sram_readdata;
+reg [31:0] data_buffer, sram_writedata;
+reg [8:0] sram_address; // (52*6)*4
+reg sram_write;
+wire sram_clken = 1'b1;
+wire sram_chipselect = 1'b1;
+reg [3:0] sram_state = 4'd0;
 
-/*
-// Instantiation of Mandelbrot
-    mandelbrot MBROT (.clock(M10k_pll),
-            .reset(pio_reset_external_connection_export[0] || ~KEY[0]),				
-			   .x_coord_init(10'd_0),
-			   .y_coord_init(10'd_0),
-				.step_size_cr(step_size_cr),
-				.step_size_ci(step_size_ci),
-            .c_i_init(pio_ci_init_external_connection_export[26:0]),
-				.c_r_init(pio_cr_init_external_connection_export[26:0]),
-				//.c_i_init({4'b0001, 23'd0}),
-				//.c_r_init({-4'b0010, 23'd0}),
-				.max_iter(max_iterations),
-				.out(counter),
-				.write_en (write_enable),
-				.write_addr(write_address),
-				.done(calc_done),
-				.time_flag(time_flag),
-				.time_counter(time_counter)	);
-    
-	mandelbrot MBROT_2 (.clock(M10k_pll),
-            .reset(pio_reset_external_connection_export[0] || ~KEY[0]),
-			   .x_coord_init(10'd_1),
-			   .y_coord_init(10'd_0),			
-				.step_size_cr(step_size_cr),
-				.step_size_ci(step_size_ci),
-            .c_i_init(pio_ci_init_external_connection_export[26:0]),
-				.c_r_init(pio_cr_init_external_connection_export[26:0] + unit_step_size_cr),
-				//.c_i_init({4'b0001, 23'd0}),
-			   //.c_r_init({4'sb1110, 23'b00000001001100110011001}),
-				//.c_r_init({-4'b0010, 23'd0} + ({4'b0000, 23'b00000001001100110011001} >> SW[5:0])),
-				.max_iter(max_iterations),
-				.out(counter_2),
-				.write_en(write_enable_2),
-				.write_addr(write_address_2),
-				.done(calc_done_2),
-				.time_flag(time_flag_2),
-				.time_counter(time_counter_2)	);
+// SRAM SM -> sharing data btwn FPGA and ARM
+always @(posedge CLOCK_50) begin
+	if (sram_state == 4'd0) begin 
+		sram_address <= 9'd0; // FPGA manipulates memory at addr 0
+		sram_write <= 1'b0;
+		sram_state <= 4'd1;
+	end
+	if (sram_state == 4'd1) begin // buffer state
+		sram_state <= 4'd2;
+	end
+	if (sram_state == 4'd2) begin
+		data_buffer <= sram_readdata;
+		sram_write <= 1'b0;
+		sram_state <= 4'd3;
+	end
+	if (sram_state == 4'd3) begin
+		if (data_buffer > 32'd0) begin // FPGA memory manipulation
+			sram_write <= 1'b1;
+			sram_address <= 9'd1;
+			sram_writedata <= (data_buffer + 32'd1);
+			sram_state <= 4'd4;
+		end
+		else begin
+			sram_state <= 4'd0;
+		end
+	end
+	if (sram_state == 4'd4) begin // signal back to HPS
+		sram_write <= 1'b1;
+		sram_address <= 9'd0; // indicate written
+		sram_writedata <= 32'd0;
+		sram_state <= 4'd0;
+	end
+end
 
-// Instantiation of color write data
-color_write color_iterOne(.clk(M10k_pll), .counter(counter), .max_iterations(max_iterations), .write_data_out(write_data));
-color_write color_iterTwo(.clk(M10k_pll), .counter(counter_2), .max_iterations(max_iterations), .write_data_out(write_data_2));
-*/
 	
 //=======================================================
 //  Structural coding
@@ -722,6 +469,14 @@ Computer_System The_System (
 	////////////////////////////////////
 	// FPGA Side
 	////////////////////////////////////
+	.onchip_sram_s1_address(sram_address),          
+	.onchip_sram_s1_clken(sram_clken),
+	.onchip_sram_s1_chipselect(sram_chipselect),  
+	.onchip_sram_s1_write(sram_write),  
+	.onchip_sram_s1_readdata(sram_readdata),     
+	.onchip_sram_s1_writedata(sram_writedata),
+	.onchip_sram_s1_byteenable(4'b1111),
+	
 	.vga_pio_locked_export			(vga_pll_lock),           //       vga_pio_locked.export
 	.vga_pio_outclk0_clk				(vga_pll),              //      vga_pio_outclk0.clk
 	.m10k_pll_locked_export			(M10k_pll_locked),          //      m10k_pll_locked.export

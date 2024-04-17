@@ -74,6 +74,13 @@
 			memory_mem_odt                  : out   std_logic;                                        -- mem_odt
 			memory_mem_dm                   : out   std_logic_vector(3 downto 0);                     -- mem_dm
 			memory_oct_rzqin                : in    std_logic                     := 'X';             -- oct_rzqin
+			onchip_sram_s1_address          : in    std_logic_vector(8 downto 0)  := (others => 'X'); -- address
+			onchip_sram_s1_clken            : in    std_logic                     := 'X';             -- clken
+			onchip_sram_s1_chipselect       : in    std_logic                     := 'X';             -- chipselect
+			onchip_sram_s1_write            : in    std_logic                     := 'X';             -- write
+			onchip_sram_s1_readdata         : out   std_logic_vector(31 downto 0);                    -- readdata
+			onchip_sram_s1_writedata        : in    std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
+			onchip_sram_s1_byteenable       : in    std_logic_vector(3 downto 0)  := (others => 'X'); -- byteenable
 			system_pll_ref_clk_clk          : in    std_logic                     := 'X';             -- clk
 			system_pll_ref_reset_reset      : in    std_logic                     := 'X';             -- reset
 			vga_pio_locked_export           : out   std_logic;                                        -- export
