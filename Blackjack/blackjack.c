@@ -1,8 +1,43 @@
+///////////////////////////////////////
+/// Blackjack
+/// compile with
+/// gcc blackjack.c -o bj -o0 -std=c99
+///////////////////////////////////////
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
-#include <stdbool.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <math.h>
+#include <sys/types.h>
 #include <string.h>
+#include <stdbool.h>
+// interprocess comm
+#include <sys/ipc.h> 
+#include <sys/shm.h> 
+#include <sys/mman.h>
+#include <time.h>
+// network stuff
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h> 
+
+#include "address_map_arm_brl4.h"
+
+void *h2p_lw_virtual_base;
+
+// RAM fp buffer
+volatile unsigned int * fp_ram_ptr = NULL;
+void *fp_ram_virtual_base;
+// file id
+int fd;
+
+// fixed point
+typedef signed int fix;
+#define float2fix30(a) ((int)((a)*1073741824)) // 2^30
+
+// sram pointer with base addr
+//volatile unsigned int* sram_ptr = NULL;
+//#define SRAM_ARR 0x00
 
 #define DECK_SIZE 156 // 3 decks of cards, 52 for each
 #define FACE_VALUES 13
@@ -43,6 +78,7 @@ void clearInputBuffer() {
     while ((c = getchar()) != '\n' && c != EOF) { }
 }
 
+/*
 int main() {
     srand(time(NULL)); // Seed random number generator
 
@@ -85,10 +121,9 @@ int main() {
     if (playerChips != NULL) {
         free(playerChips); // Cleanup at the end
     }
-
     return 0;
 }
-
+*/
 
 void fillDeck() {
     for (int i = 0; i < DECK_SIZE; i++) {
@@ -265,10 +300,15 @@ void playBlackjack(int* playerChips, int numberOfPlayers) {
     int dealerTemp = 0;
     int dealerBJ = 0;
     dealerTotal += dealCard(&dealerTotal, &deckPosition, &dealerAceCount, 1);
-    dealerTotal += dealCard(&dealerTotal, &deckPosition, &dealerAceCount, 1);
     printf("Dealer's shown card: ");
     printCard(&deck[deckPosition - 1]);
     printf("\n");
+    
+    for (int i = 0; i < DECK_SIZE-(numberOfPlayers*2+1); i++) { // filling memory
+      *(fp_ram_ptr + i) = deck[i].value;
+    }
+
+    dealerTotal += dealCard(&dealerTotal, &deckPosition, &dealerAceCount, 1);
 
     if(dealerAceCount > 0 && dealerTotal == 21){
         printf("Dealer hits BlackJack!\n");
@@ -306,7 +346,6 @@ void playBlackjack(int* playerChips, int numberOfPlayers) {
                 else{
                     break;
                 }
-
             }
         }
 
@@ -340,8 +379,6 @@ void playBlackjack(int* playerChips, int numberOfPlayers) {
         }
     }
 
-
-
     // Cleanup
     free(playerTotals);
     free(playerAceCounts);
@@ -349,4 +386,98 @@ void playBlackjack(int* playerChips, int numberOfPlayers) {
     free(blackjack);
 }
 
+int main(void) {
+    // === get FPGA addresses ==================
+      // Open /dev/mem
+  	if( ( fd = open( "/dev/mem", ( O_RDWR | O_SYNC ) ) ) == -1 ) 	{
+  		printf( "ERROR: could not open \"/dev/mem\"...\n" );
+  		return( 1 );
+  	}
+      
+    // get virtual addr that maps to physical
+  	h2p_lw_virtual_base = mmap( NULL, HW_REGS_SPAN, ( PROT_READ | PROT_WRITE ), MAP_SHARED, fd, HW_REGS_BASE );	
+  	if( h2p_lw_virtual_base == MAP_FAILED ) {
+  		printf( "ERROR: mmap1() failed...\n" );
+  		close( fd );
+  		return(1);
+  	}
+    
+    // pointers are assigned by adding defined offset defined above based on memory locations from Platform Designer
+    
+    
+    // default values for reset
+    
+    
+  	// get RAM float param addr
+  	fp_ram_virtual_base = mmap(NULL, FPGA_ONCHIP_SPAN, (PROT_READ | PROT_WRITE), MAP_SHARED, fd, FPGA_ONCHIP_BASE); // shared memory btwn HPS and FPGA location
+  	
+  	if (fp_ram_virtual_base == MAP_FAILED) {
+  		printf( "ERROR: mmap3() failed...\n" );
+    		close( fd );
+    		return(1);
+  	}
+	
+	  // get addr that maps to RAM buffer
+    fp_ram_ptr = (unsigned int *)(fp_ram_virtual_base);
 
+    srand(time(NULL)); // Seed random number generator
+
+    int numberOfPlayers = 0;
+    int* playerChips = NULL;
+    char choice = 'r'; // Default to 'r'
+
+    do {
+        if (choice == 'r') {
+            if (playerChips != NULL) {
+                free(playerChips); // Free previous allocation if any
+            }
+
+            printf("Enter the number of players: ");
+            scanf("%d", &numberOfPlayers);
+            clearInputBuffer();
+            // Dynamically allocate memory for each player's chips
+            playerChips = malloc(numberOfPlayers * sizeof(int));
+            if (!playerChips) {
+                printf("Failed to allocate memory for player chips.\n");
+                return 1; // Exit if allocation fails
+            }
+
+            // Initialize player chips at the start of each new game setup
+            initializePlayerChips(playerChips, numberOfPlayers);
+        }
+
+        // Play the game
+        playBlackjack(playerChips, numberOfPlayers);
+
+        // Ask if users want to play again, keep playing with the same setup, or restart
+        printf("\nDo you want to play again with the same players (y), restart with new players (r), or quit (q)? ");
+        scanf(" %c", &choice);
+        clearInputBuffer();
+
+    } while (choice == 'y' || choice == 'r'); // Continue if users want to play again or restart
+
+    printf("Thanks for playing!\n");
+
+    if (playerChips != NULL) {
+        free(playerChips); // Cleanup at the end
+    }
+    
+    ////////////
+    
+    /*
+    while(1) {
+      int in0;
+      int addr;
+      
+      // set up parameters
+      *(fp_ram_ptr) = in0;
+      while(*(fp_ram_ptr) != 0) {}
+      
+      for (addr=0; addr<2; addr++) {
+        
+      }
+    }
+    */
+
+    return 0;
+}

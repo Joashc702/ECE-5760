@@ -14,7 +14,7 @@ preplace inst Computer_System.ARM_A9_HPS.nand0 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.gpio1 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.timer0 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.arm_a9_0 -pg 1
-preplace inst Computer_System.vga_pio -pg 1 -lvl 6 -y 190
+preplace inst Computer_System.vga_pio -pg 1 -lvl 6 -y 300
 preplace inst Computer_System.ARM_A9_HPS.timer -pg 1
 preplace inst Computer_System.ARM_A9_HPS.dcan1 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.usb1 -pg 1
@@ -43,12 +43,13 @@ preplace inst Computer_System.ARM_A9_HPS.spim0 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.sdrctl -pg 1
 preplace inst Computer_System.ARM_A9_HPS.spim1 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.i2c0 -pg 1
-preplace inst Computer_System.m10k_pll -pg 1 -lvl 6 -y 100
+preplace inst Computer_System.m10k_pll -pg 1 -lvl 6 -y 60
 preplace inst Computer_System.ARM_A9_HPS.i2c1 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.wd_timer0 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.L2 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.eosc1 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.fpga_interfaces -pg 1
+preplace inst Computer_System.clock_bridge_0 -pg 1 -lvl 2 -y 1990
 preplace inst Computer_System.ARM_A9_HPS.sdmmc -pg 1
 preplace inst Computer_System.ARM_A9_HPS.i2c2 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.wd_timer1 -pg 1
@@ -56,16 +57,20 @@ preplace inst Computer_System.ARM_A9_HPS.eosc2 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.axi_sdram -pg 1
 preplace inst Computer_System.ARM_A9_HPS.i2c3 -pg 1
 preplace inst Computer_System.ARM_A9_HPS.hps_io -pg 1
+preplace inst Computer_System.Onchip_SRAM -pg 1 -lvl 6 -y 150
 preplace inst Computer_System.ARM_A9_HPS.uart0 -pg 1
-preplace netloc FAN_OUT<net_container>Computer_System</net_container>(MASTER)System_PLL.sys_clk,(SLAVE)ARM_A9_HPS.f2h_axi_clock,(SLAVE)ARM_A9_HPS.h2f_axi_clock,(SLAVE)ARM_A9_HPS.h2f_lw_axi_clock,(SLAVE)m10k_pll.refclk,(SLAVE)vga_pio.refclk) 1 1 5 NJ 2020 NJ 2020 NJ 2020 1500 270 2120
-preplace netloc EXPORT<net_container>Computer_System</net_container>(MASTER)vga_pio.outclk0,(MASTER)Computer_System.vga_pio_outclk0) 1 6 2 NJ 220 NJ
-preplace netloc EXPORT<net_container>Computer_System</net_container>(SLAVE)Computer_System.memory,(SLAVE)ARM_A9_HPS.memory) 1 0 5 NJ 190 NJ 190 NJ 190 NJ 190 NJ
-preplace netloc EXPORT<net_container>Computer_System</net_container>(SLAVE)Computer_System.m10k_pll_locked,(SLAVE)m10k_pll.locked) 1 0 6 NJ 250 NJ 250 NJ 250 NJ 250 NJ 250 NJ
+preplace netloc EXPORT<net_container>Computer_System</net_container>(MASTER)Computer_System.vga_pio_outclk0,(MASTER)vga_pio.outclk0) 1 6 2 NJ 330 NJ
+preplace netloc EXPORT<net_container>Computer_System</net_container>(SLAVE)Computer_System.onchip_sram_s1,(SLAVE)Onchip_SRAM.s1) 1 0 6 NJ 270 NJ 270 NJ 270 NJ 270 NJ 270 NJ
+preplace netloc EXPORT<net_container>Computer_System</net_container>(SLAVE)ARM_A9_HPS.memory,(SLAVE)Computer_System.memory) 1 0 5 NJ 190 NJ 190 NJ 190 NJ 190 NJ
 preplace netloc EXPORT<net_container>Computer_System</net_container>(SLAVE)Computer_System.system_pll_ref_reset,(SLAVE)System_PLL.ref_reset) 1 0 1 NJ
-preplace netloc INTERCONNECT<net_container>Computer_System</net_container>(SLAVE)m10k_pll.reset,(MASTER)System_PLL.reset_source,(MASTER)ARM_A9_HPS.h2f_reset,(SLAVE)vga_pio.reset) 1 1 5 NJ 1980 NJ 1980 NJ 1980 NJ 1980 2140
+preplace netloc INTERCONNECT<net_container>Computer_System</net_container>(MASTER)System_PLL.reset_source,(SLAVE)m10k_pll.reset,(MASTER)ARM_A9_HPS.h2f_reset,(SLAVE)Onchip_SRAM.reset2,(SLAVE)vga_pio.reset,(SLAVE)Onchip_SRAM.reset1) 1 1 5 NJ 1980 NJ 1980 NJ 1980 NJ 1980 2160
+preplace netloc FAN_OUT<net_container>Computer_System</net_container>(SLAVE)ARM_A9_HPS.h2f_axi_clock,(SLAVE)clock_bridge_0.in_clk,(SLAVE)vga_pio.refclk,(SLAVE)m10k_pll.refclk,(MASTER)System_PLL.sys_clk,(SLAVE)Onchip_SRAM.clk2,(SLAVE)ARM_A9_HPS.h2f_lw_axi_clock,(SLAVE)ARM_A9_HPS.f2h_axi_clock) 1 1 5 360 2040 NJ 2040 NJ 2040 1500 290 2180
 preplace netloc EXPORT<net_container>Computer_System</net_container>(SLAVE)Computer_System.vga_pio_locked,(SLAVE)vga_pio.locked) 1 0 6 NJ 40 NJ 40 NJ 40 NJ 40 NJ 40 NJ
+preplace netloc POINT_TO_POINT<net_container>Computer_System</net_container>(SLAVE)Onchip_SRAM.clk1,(MASTER)clock_bridge_0.out_clk) 1 2 4 NJ 2000 NJ 2000 NJ 2000 2200
+preplace netloc EXPORT<net_container>Computer_System</net_container>(SLAVE)m10k_pll.locked,(SLAVE)Computer_System.m10k_pll_locked) 1 0 6 NJ 250 NJ 250 NJ 250 NJ 250 NJ 250 NJ
 preplace netloc EXPORT<net_container>Computer_System</net_container>(SLAVE)ARM_A9_HPS.hps_io,(SLAVE)Computer_System.hps_io) 1 0 5 NJ 130 NJ 130 NJ 130 NJ 130 NJ
 preplace netloc EXPORT<net_container>Computer_System</net_container>(SLAVE)System_PLL.ref_clk,(SLAVE)Computer_System.system_pll_ref_clk) 1 0 1 NJ
-preplace netloc EXPORT<net_container>Computer_System</net_container>(MASTER)Computer_System.m10k_pll_outclk0,(MASTER)m10k_pll.outclk0) 1 6 2 NJ 130 NJ
+preplace netloc EXPORT<net_container>Computer_System</net_container>(MASTER)m10k_pll.outclk0,(MASTER)Computer_System.m10k_pll_outclk0) 1 6 2 NJ 90 NJ
+preplace netloc POINT_TO_POINT<net_container>Computer_System</net_container>(SLAVE)Onchip_SRAM.s2,(MASTER)ARM_A9_HPS.h2f_axi_master) 1 5 1 2120
 levelinfo -pg 1 0 130 2990
 levelinfo -hier Computer_System 140 210 620 1040 1480 1890 2370 2840 2860

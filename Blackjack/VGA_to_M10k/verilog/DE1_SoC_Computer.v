@@ -397,8 +397,14 @@ wire 		[18:0] 	read_address_2 ;
 wire 					M10k_pll /*synthesis keep */;
 wire 					M10k_pll_locked ;
 
+// pios for dealer and player
+wire [7:0] dealer_top_pio;
+wire [7:0] player_init_hand_pio;
+
 assign color_in_VGA = M10k_out[next_x[3:0]];
 
+// TODO after init_done: dealer pio needs to be assigned to dealer hands right away, player needs to go to player hands
+// TODO replace the init with values from SRAM memory
 
 // Instantiate VGA driver					
 vga_driver DUT   (	.clock(vga_pll), 
@@ -593,15 +599,9 @@ Computer_System The_System (
 	// counting render time
 	.counter_external_connection_export(counter_external_connection_export),
 	
-	// wires for ci/cr increment/zoom and pio reset
-	.pio_ci_init_external_connection_export(pio_ci_init_external_connection_export),
-	.pio_cr_init_external_connection_export(pio_cr_init_external_connection_export),
-	.pio_zoom_ci_external_connection_export(pio_zoom_ci_external_connection_export),
-	.pio_zoom_cr_external_connection_export(pio_zoom_cr_external_connection_export),
-	.pio_reset_external_connection_export(pio_reset_external_connection_export),
-	
-	// wire for max iterations
-	.pio_max_iter_external_connection_export(pio_max_iter_external_connection_export)
+	// wires for init dealer/player pios
+	.dealer_top_external_connection_export(dealer_top_pio),
+	.player_init_hand_external_connection_export(player_init_hand_pio)
 );
 endmodule // end top level
 
