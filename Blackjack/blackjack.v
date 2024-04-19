@@ -24,7 +24,7 @@ module testbench();
 	parameter [9:0] num_simul = 5;//half of the number of columns
     wire [7:0] output_random [num_simul-1:0];
 	//wire [63:0] seed_samples [5:0];
-	wire init_done;
+	//wire init_done;
 	
 	reg [2:0] read_write_offset;
 	reg [7:0] write_addr_inter;
@@ -37,7 +37,7 @@ module testbench();
 	reg [9:0] read_addr [num_simul-1:0];
 	reg we[num_simul-1:0];
 	
-	reg [2:0] drum_state [num_simul-1:0];
+	reg [3:0] drum_state [num_simul-1:0];
 	reg [9:0] index_rows [num_simul-1:0];
 	
 	
@@ -46,9 +46,9 @@ module testbench();
 	generate // generate 30 columns
 		for (i = 0; i < num_simul; i = i+1) begin: initCols  
 			rand127 random_num(.rand_out(output_random[i]), .seed_in(64'h54555555 ^ i), .clock_in(clk_50), .reset_in(reset));
-			reg [3:0] array_hit_card [11:0]; 
-			reg [48:0] hit_card_reg;
-			reg [3:0] drawn_card_val [11:0];
+			reg [3:0] array_hit_card [11:0]; // track index of card
+			reg [255:0] hit_card_reg;
+			reg [3:0] drawn_card_val [11:0]; // track the value of card being drawn
 			reg [3:0] dealer_card;
 			wire picked; 
 			reg player_result;
@@ -66,44 +66,119 @@ module testbench();
 										.picked(picked));
 			always @ (posedge clk_50) begin
 				if (reset) begin // reset conditions
-					drum_state[i] <= 3'd0;
+					drum_state[i] <= 4'd0;
 					index_rows[i] <= 10'd0;
 					we[i] <= 1'd1;
+					init_done <= 1'd0;
+					init_samp_counter <= 4'd0;
+					
 				end
 				else begin
 					// STATE 0: Initialization
 					if (drum_state[i] == 3'd0) begin // check if initialization has occurred
 						if (init_done) begin
-							drum_state[i] <= 3'd1;
+							drum_state[i] <= 4'd1;
 							index_rows[i] <= 10'd0;
 							player_hands <= 5'd0;
 							dealer_hands <= 5'd0;
+							hit_card_reg <= 48'd0;
 							card_itr <= 4'd0;
 							we[i] <= 1'd0;
 						end
 						else begin
-							if (index_rows[i] <= 10'd49) begin
-								if (init_samp_counter > 4'd10) begin
+							if (index_rows[i] <= 10'd512) begin
+								/*
+								if (init_samp_counter >= 4'd10) begin
 									init_samp_counter <= 4'd0;
-								end
+								end*/
 								write_addr[i] <= index_rows[i];
 								d[i] <= init_samp_counter;
-								init_samp_counter <= init_samp_counter + 4'd1;
+								init_samp_counter <= (init_samp_counter >= 4'd10) ? 4'd0 : init_samp_counter + 4'd1;
 								index_rows[i] <= index_rows[i] + 4'd1;
 							end else begin
 								init_done <= 1'd1;
 							end
-							drum_state[i] <= 3'd0;
+							drum_state[i] <= 4'd0;
 						end
 					end
 					// STATE 1: Dealer's card
-					else if (drum_state[i] == 3'd1) begin //initiate dealers cards
-						drum_state[i] <= 3'd2;
+					else if (drum_state[i] == 4'd1) begin //initiate dealers cards
+						drum_state[i] <= 4'd2;
 						read_addr[i] <= output_random[i];
 						array_hit_card[card_itr] <= output_random[i];	
-						card_itr <= card_itr + 4'd1;						
+						//card_itr <= card_itr + 4'd1;						
 					end
-					// STATE 2: Buffer the memory output and ready for the next read operation
+					else if (drum_state[i] == 4'd2) begin
+						drum_state[i] <= 4'd3;
+					end
+					else if (drum_state[i] == 4'd3) begin
+						//array_hit_card[card_itr] <= output_random[i];	
+						drawn_card_val[card_itr] <= q[i];
+						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
+						card_itr <= card_itr + 4'd1;
+						drum_state[i] <= 4'd4;
+					end		
+					else if (drum_state[i] == 4'd4) begin
+						if (~picked) begin
+							read_addr[i] <= output_random[i];
+							array_hit_card[card_itr] <= output_random[i];
+							drum_state[i] <= 4'd5;
+						end else begin
+							drum_state[i] <= 4'd4;
+						end
+					end 
+					else if (drum_state[i] == 4'd5) begin
+						drum_state[i] <= 4'd6;
+					end
+					else if (drum_state[i] == 4'd6) begin
+						if ((player_hands == 5'd12 && drawn_card_val[0] >= 5'd4 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd13 && player_hands < 5'd17 && drawn_card_val[0] >= 5'd2 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd17)) begin
+							drum_state[i] <= 4'd7; 
+						end
+						else begin
+							drum_state[i] <= 4'd4;	//HIT	
+							hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
+							drawn_card_val[card_itr] <= q[i];
+							card_itr <= card_itr + 4'd1;
+							player_hands <= player_hands + q[i];
+						end
+					end
+					else if (drum_state[i] == 4'd7) begin
+						if (~picked) begin
+							read_addr[i] <= output_random[i];
+							array_hit_card[card_itr] <= output_random[i];
+							drum_state[i] <= 4'd8;
+						end else begin
+							drum_state[i] <= 4'd7;
+						end	
+					end
+					else if (drum_state[i] == 4'd8) begin
+						drum_state[i] <= 4'd9;
+					end
+					else if (drum_state[i] == 4'd9) begin
+						if (dealer_hands >= 5'd17) begin
+							drum_state[i] <= 4'd10; // Result
+						end
+						else begin
+							drawn_card_val[card_itr] <= q[i];
+							card_itr <= card_itr + 4'd1;
+							dealer_hands <= dealer_hands + q[i];
+							drum_state[i] <= 4'd7 ;	//HIT	
+							hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
+						end
+					end
+					else if (drum_state[i] == 4'd10) begin
+						if (player_hands > 5'd21) begin
+							player_result <= 1'd0;
+						end
+						else if (player_hands <= 5'd21 && dealer_hands <= 5'd21 && player_hands < dealer_hands) begin
+							player_result <= 1'd0;
+						end
+						else if ((player_hands > dealer_hands) || (dealer_hands > 5'd21)) begin
+							player_result <= 1'd1;
+						end
+					end
+					
+					/*// STATE 2: Buffer the memory output and ready for the next read operation
 					else if (drum_state[i] == 3'd2) begin //buffer state for dealers card and initiate user reads
 						if (picked == 1) begin
 							read_addr[i] <= output_random[i];
@@ -113,8 +188,9 @@ module testbench();
 						else begin 
 							drum_state[i] <= 3'd3;
 						end
-					end
+					end*/
 					// STATE 3: Player's turn
+					/*
 					else if (drum_state[i] == 3'd3) begin //dealer card read and handle transition into stand or hit
 						//dealer_card <= q[i];
 						drawn_card_val[card_itr - 2] <= q[i];
@@ -132,7 +208,7 @@ module testbench();
 							end
 							else begin
 								drum_state[i] <= 3'd3;	//HIT	
-								hit_card_reg <= (1 << array_hit_card[card_itr]);
+								hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
 								read_addr[i] <= output_random[i];
 								array_hit_card[card_itr] <= output_random[i];
 							end
@@ -158,7 +234,7 @@ module testbench();
 					end
 					// STATE 5: Result
 					else if (drum_state[i] == 3'd5) begin // Dealer HIT State
-					/*
+					
 						// TODO: ACE 1/11, plus blackjack case
 						if (player_hands > 5'd21) begin
 							player_result <= 1'd0;
@@ -169,8 +245,8 @@ module testbench();
 						else if ((player_hands <= 5'd21 && player_hands > dealer_hands) || (dealer_hands > 5'd21)) begin
 							player_result <= 1'd1;
 						end
-						*/
-					end
+						
+					end*/
 				end
 			end 
 			
@@ -184,8 +260,8 @@ endmodule
 module Search_hit_card(picked_card, card, picked);
 	//input clock;
 	//input [3:0] picked_cards_arr [11:0];
-	input [48:0] picked_card;
-	input [9:0]card;
+	input [255:0] picked_card;
+	input [7:0]card;
 	//reg picked_inter;
 	output picked;
     //reg [2:0] check_state; 
@@ -316,7 +392,7 @@ module M10K_32_5(
 );
     // force M10K ram style
     // 307200 words of 8 bits
-    reg [3:0] mem [511:0]  /* synthesis ramstyle = "no_rw_check, M10K" */;
+    reg [3:0] mem [511:0]  /* synthesis ramstyle = "no_rw_check, M10K" */; // TODO 256 bits
 	 
     always @ (posedge clk) begin
         if (we) begin
