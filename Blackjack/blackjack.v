@@ -40,6 +40,7 @@ module testbench();
 	reg [3:0] drum_state [num_simul-1:0];
 	reg [9:0] index_rows [num_simul-1:0];
 	
+	reg tie_check [num_simul-1:0];
 	
 	//Shared m10k
 	genvar i;
@@ -79,8 +80,8 @@ module testbench();
 						if (init_done) begin
 							drum_state[i] <= 4'd1;
 							index_rows[i] <= 10'd0;
-							player_hands <= 5'd0;
-							dealer_hands <= 5'd0;
+							//player_hands <= 5'd0; -> player hands need to be assigned with the value from C
+							//dealer_hands <= 5'd0; -> dealer hands need to be assigned with the top card
 							hit_card_reg <= 48'd0;
 							card_itr <= 4'd0;
 							we[i] <= 1'd0;
@@ -114,66 +115,78 @@ module testbench();
 					else if (drum_state[i] == 4'd3) begin
 						//array_hit_card[card_itr] <= output_random[i];	
 						drawn_card_val[card_itr] <= q[i];
+						dealer_hands <= dealer_hands + q[i];
 						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
 						card_itr <= card_itr + 4'd1;
 						drum_state[i] <= 4'd4;
-					end		
-					else if (drum_state[i] == 4'd4) begin
+					end
+					else if (drum_state[i] == 4'd4) begin // check if dealer gets BJ
+						if (dealer_hands == 5'd21) begin		
+							drum_state[i] <= 4'd10; // if dealer gets BJ, no need to move on, check result right away
+						end
+						else begin
+							drum_state[i] <= 4'd5;
+						end
+					end
+					else if (drum_state[i] == 4'd5) begin
 						if (~picked) begin
 							read_addr[i] <= output_random[i];
 							array_hit_card[card_itr] <= output_random[i];
-							drum_state[i] <= 4'd5;
+							drum_state[i] <= 4'd6;
 						end else begin
-							drum_state[i] <= 4'd4;
+							drum_state[i] <= 4'd5;
 						end
 					end 
-					else if (drum_state[i] == 4'd5) begin
-						drum_state[i] <= 4'd6;
-					end
 					else if (drum_state[i] == 4'd6) begin
+						drum_state[i] <= 4'd7;
+					end
+					else if (drum_state[i] == 4'd7) begin
 						if ((player_hands == 5'd12 && drawn_card_val[0] >= 5'd4 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd13 && player_hands < 5'd17 && drawn_card_val[0] >= 5'd2 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd17)) begin
-							drum_state[i] <= 4'd7; 
+							drum_state[i] <= 4'd8; 
 						end
 						else begin
-							drum_state[i] <= 4'd4;	//HIT	
+							drum_state[i] <= 4'd5;	//HIT	
 							hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
 							drawn_card_val[card_itr] <= q[i];
 							card_itr <= card_itr + 4'd1;
 							player_hands <= player_hands + q[i];
 						end
 					end
-					else if (drum_state[i] == 4'd7) begin
+					else if (drum_state[i] == 4'd8) begin
 						if (~picked) begin
 							read_addr[i] <= output_random[i];
 							array_hit_card[card_itr] <= output_random[i];
-							drum_state[i] <= 4'd8;
+							drum_state[i] <= 4'd9;
 						end else begin
-							drum_state[i] <= 4'd7;
+							drum_state[i] <= 4'd8;
 						end	
 					end
-					else if (drum_state[i] == 4'd8) begin
-						drum_state[i] <= 4'd9;
-					end
 					else if (drum_state[i] == 4'd9) begin
+						drum_state[i] <= 4'd10;
+					end
+					else if (drum_state[i] == 4'd10) begin
 						if (dealer_hands >= 5'd17) begin
-							drum_state[i] <= 4'd10; // Result
+							drum_state[i] <= 4'd11; // Result
 						end
 						else begin
 							drawn_card_val[card_itr] <= q[i];
 							card_itr <= card_itr + 4'd1;
 							dealer_hands <= dealer_hands + q[i];
-							drum_state[i] <= 4'd7 ;	//HIT	
+							drum_state[i] <= 4'd8 ;	//HIT	
 							hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
 						end
 					end
-					else if (drum_state[i] == 4'd10) begin
+					else if (drum_state[i] == 4'd11) begin
 						if (player_hands > 5'd21) begin
 							player_result <= 1'd0;
 						end
-						else if (player_hands <= 5'd21 && dealer_hands <= 5'd21 && player_hands < dealer_hands) begin
+						else if (player_hands < 5'd21 && dealer_hands <= 5'd21 && player_hands < dealer_hands) begin
 							player_result <= 1'd0;
 						end
-						else if ((player_hands > dealer_hands) || (dealer_hands > 5'd21)) begin
+						else if (player_hands == dealer_hands) begin
+							tie_check[i] <= 1'd1;
+						end
+						else if ((player_hands > dealer_hands) && player_hands <= 5'd21 && dealer_hands < 5'd21) || (dealer_hands > 5'd21)) begin
 							player_result <= 1'd1;
 						end
 					end
