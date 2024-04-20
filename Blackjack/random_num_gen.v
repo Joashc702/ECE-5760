@@ -21,9 +21,24 @@ module testbench();
 		#30
 		reset  = 1'b0;
 	end
-    wire [7:0] output_random;
-	rand127 random_num(.rand_out(output_random), .seed_in(64'h54555555), .clock_in(clk_50), .reset_in(reset));
-   
+	wire [5:0] output_random_vals [5:0];
+	genvar i;
+	generate // generate 30 columns
+		for (i = 0; i < 5; i = i+1) begin: initCols 
+			wire [5:0] output_random [5:0];
+			wire [5:0] test_num;
+			assign output_random_vals[i] = {output_random[5][0],output_random[4][0],output_random[3][0],output_random[2][0],output_random[1][0],output_random[0][0]} ;
+			//rand127 random_num(.rand_out(output_random), .seed_in(64'h54555555), .clock_in(clk_50), .reset_in(reset));
+			rand6 random_num(.rand_out(output_random[0]), .seed_in(6'b101010 ^ i), .clock_in(clk_50), .reset_in(reset));
+			rand6 random_num_2(.rand_out(output_random[1]), .seed_in(6'b101011 ^ i), .clock_in(clk_50), .reset_in(reset));
+			rand6 random_num_3(.rand_out(output_random[2]), .seed_in(6'b100010 ^ i), .clock_in(clk_50), .reset_in(reset));
+			rand6 random_num_4(.rand_out(output_random[3]), .seed_in(6'b111010 ^ i), .clock_in(clk_50), .reset_in(reset));
+			rand6 random_num_5(.rand_out(output_random[4]), .seed_in(6'b100010 ^ i), .clock_in(clk_50), .reset_in(reset));
+			rand6 random_num_6(.rand_out(output_random[5]), .seed_in(6'b111110 ^ i), .clock_in(clk_50), .reset_in(reset));
+			
+		end
+	endgenerate
+    
 endmodule
 
 //////////////////////////////////////////////////////////
@@ -35,6 +50,25 @@ endmodule
 // Journal of Computational Physics
 // Volume 51, Issue 2, August 1983, Pages 250-260
 //////////////////////////////////////////////////////////
+
+module rand6(rand_out, seed_in, clock_in, reset_in);
+	output wire [5:0] rand_out;
+	input wire clock_in, reset_in;
+	input wire [5:0] seed_in;
+	
+	reg [5:0] interm_rand;
+	
+	always @(posedge clock_in)
+	begin
+		if (reset_in) begin
+			interm_rand <= seed_in;
+		end
+		else begin
+			interm_rand <= {interm_rand[4], interm_rand[3], interm_rand[2], interm_rand[1], interm_rand[0], interm_rand[5]^interm_rand[4]};
+		end
+	end
+	assign rand_out = interm_rand;
+endmodule
 module rand127(rand_out, seed_in, clock_in, reset_in);
 	// 16-bit random number on every cycle
 	output wire [7:0] rand_out ;
@@ -42,7 +76,8 @@ module rand127(rand_out, seed_in, clock_in, reset_in);
 	//input wire [3:0] state_in ;
 	input wire clock_in, reset_in ;
 	input wire [64:1] seed_in; // 128 bits is 32 hex digits 0xffff_ffff_ffff_ffff_ffff_ffff_ffff_ffff
-
+	
+	
 	reg [8:1] sr1, sr2, sr3, sr4, sr5, sr6, sr7, sr8; 
 				//sr9, sr10, sr11, sr12, sr13, sr14, sr15, sr16;
 	
