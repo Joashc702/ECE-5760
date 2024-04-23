@@ -26,6 +26,7 @@ module testbench();
 	//wire [63:0] seed_samples [5:0];
 	//wire init_done;
 	
+	
 	reg [2:0] read_write_offset;
 	reg [7:0] write_addr_inter;
 	

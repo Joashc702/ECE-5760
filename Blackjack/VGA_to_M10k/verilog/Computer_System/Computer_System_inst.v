@@ -1,4 +1,5 @@
 	Computer_System u0 (
+		.dealer_top_external_connection_export       (<connected-to-dealer_top_external_connection_export>),       //       dealer_top_external_connection.export
 		.hps_io_hps_io_emac1_inst_TX_CLK             (<connected-to-hps_io_hps_io_emac1_inst_TX_CLK>),             //                               hps_io.hps_io_emac1_inst_TX_CLK
 		.hps_io_hps_io_emac1_inst_TXD0               (<connected-to-hps_io_hps_io_emac1_inst_TXD0>),               //                                     .hps_io_emac1_inst_TXD0
 		.hps_io_hps_io_emac1_inst_TXD1               (<connected-to-hps_io_hps_io_emac1_inst_TXD1>),               //                                     .hps_io_emac1_inst_TXD1
@@ -55,6 +56,7 @@
 		.hps_io_hps_io_gpio_inst_GPIO53              (<connected-to-hps_io_hps_io_gpio_inst_GPIO53>),              //                                     .hps_io_gpio_inst_GPIO53
 		.hps_io_hps_io_gpio_inst_GPIO54              (<connected-to-hps_io_hps_io_gpio_inst_GPIO54>),              //                                     .hps_io_gpio_inst_GPIO54
 		.hps_io_hps_io_gpio_inst_GPIO61              (<connected-to-hps_io_hps_io_gpio_inst_GPIO61>),              //                                     .hps_io_gpio_inst_GPIO61
+		.init_done_external_connection_export        (<connected-to-init_done_external_connection_export>),        //        init_done_external_connection.export
 		.m10k_pll_locked_export                      (<connected-to-m10k_pll_locked_export>),                      //                      m10k_pll_locked.export
 		.m10k_pll_outclk0_clk                        (<connected-to-m10k_pll_outclk0_clk>),                        //                     m10k_pll_outclk0.clk
 		.memory_mem_a                                (<connected-to-memory_mem_a>),                                //                               memory.mem_a
@@ -80,11 +82,11 @@
 		.onchip_sram_s1_readdata                     (<connected-to-onchip_sram_s1_readdata>),                     //                                     .readdata
 		.onchip_sram_s1_writedata                    (<connected-to-onchip_sram_s1_writedata>),                    //                                     .writedata
 		.onchip_sram_s1_byteenable                   (<connected-to-onchip_sram_s1_byteenable>),                   //                                     .byteenable
+		.player_init_hand_external_connection_export (<connected-to-player_init_hand_external_connection_export>), // player_init_hand_external_connection.export
+		.shared_write_external_connection_export     (<connected-to-shared_write_external_connection_export>),     //     shared_write_external_connection.export
 		.system_pll_ref_clk_clk                      (<connected-to-system_pll_ref_clk_clk>),                      //                   system_pll_ref_clk.clk
 		.system_pll_ref_reset_reset                  (<connected-to-system_pll_ref_reset_reset>),                  //                 system_pll_ref_reset.reset
 		.vga_pio_locked_export                       (<connected-to-vga_pio_locked_export>),                       //                       vga_pio_locked.export
-		.vga_pio_outclk0_clk                         (<connected-to-vga_pio_outclk0_clk>),                         //                      vga_pio_outclk0.clk
-		.player_init_hand_external_connection_export (<connected-to-player_init_hand_external_connection_export>), // player_init_hand_external_connection.export
-		.dealer_top_external_connection_export       (<connected-to-dealer_top_external_connection_export>)        //       dealer_top_external_connection.export
+		.vga_pio_outclk0_clk                         (<connected-to-vga_pio_outclk0_clk>)                          //                      vga_pio_outclk0.clk
 	);
 

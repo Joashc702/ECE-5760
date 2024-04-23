@@ -1,5 +1,6 @@
 
 module Computer_System (
+	dealer_top_external_connection_export,
 	hps_io_hps_io_emac1_inst_TX_CLK,
 	hps_io_hps_io_emac1_inst_TXD0,
 	hps_io_hps_io_emac1_inst_TXD1,
@@ -56,6 +57,7 @@ module Computer_System (
 	hps_io_hps_io_gpio_inst_GPIO53,
 	hps_io_hps_io_gpio_inst_GPIO54,
 	hps_io_hps_io_gpio_inst_GPIO61,
+	init_done_external_connection_export,
 	m10k_pll_locked_export,
 	m10k_pll_outclk0_clk,
 	memory_mem_a,
@@ -81,13 +83,14 @@ module Computer_System (
 	onchip_sram_s1_readdata,
 	onchip_sram_s1_writedata,
 	onchip_sram_s1_byteenable,
+	player_init_hand_external_connection_export,
+	shared_write_external_connection_export,
 	system_pll_ref_clk_clk,
 	system_pll_ref_reset_reset,
 	vga_pio_locked_export,
-	vga_pio_outclk0_clk,
-	player_init_hand_external_connection_export,
-	dealer_top_external_connection_export);	
+	vga_pio_outclk0_clk);	
 
+	output	[7:0]	dealer_top_external_connection_export;
 	output		hps_io_hps_io_emac1_inst_TX_CLK;
 	output		hps_io_hps_io_emac1_inst_TXD0;
 	output		hps_io_hps_io_emac1_inst_TXD1;
@@ -144,6 +147,7 @@ module Computer_System (
 	inout		hps_io_hps_io_gpio_inst_GPIO53;
 	inout		hps_io_hps_io_gpio_inst_GPIO54;
 	inout		hps_io_hps_io_gpio_inst_GPIO61;
+	output	[7:0]	init_done_external_connection_export;
 	output		m10k_pll_locked_export;
 	output		m10k_pll_outclk0_clk;
 	output	[14:0]	memory_mem_a;
@@ -169,10 +173,10 @@ module Computer_System (
 	output	[31:0]	onchip_sram_s1_readdata;
 	input	[31:0]	onchip_sram_s1_writedata;
 	input	[3:0]	onchip_sram_s1_byteenable;
+	output	[7:0]	player_init_hand_external_connection_export;
+	input	[7:0]	shared_write_external_connection_export;
 	input		system_pll_ref_clk_clk;
 	input		system_pll_ref_reset_reset;
 	output		vga_pio_locked_export;
 	output		vga_pio_outclk0_clk;
-	output	[7:0]	player_init_hand_external_connection_export;
-	output	[7:0]	dealer_top_external_connection_export;
 endmodule

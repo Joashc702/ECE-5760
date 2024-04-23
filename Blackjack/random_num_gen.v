@@ -33,7 +33,7 @@ module testbench();
 			rand6 random_num_2(.rand_out(output_random[1]), .seed_in(6'b101011 ^ i), .clock_in(clk_50), .reset_in(reset));
 			rand6 random_num_3(.rand_out(output_random[2]), .seed_in(6'b100010 ^ i), .clock_in(clk_50), .reset_in(reset));
 			rand6 random_num_4(.rand_out(output_random[3]), .seed_in(6'b111010 ^ i), .clock_in(clk_50), .reset_in(reset));
-			rand6 random_num_5(.rand_out(output_random[4]), .seed_in(6'b100010 ^ i), .clock_in(clk_50), .reset_in(reset));
+			rand6 random_num_5(.rand_out(output_random[4]), .seed_in(6'b100110 ^ i), .clock_in(clk_50), .reset_in(reset));
 			rand6 random_num_6(.rand_out(output_random[5]), .seed_in(6'b111110 ^ i), .clock_in(clk_50), .reset_in(reset));
 			
 		end

@@ -379,7 +379,7 @@ assign HEX5 = hex3_hex0[23:20];
 wire vga_pll_lock ;
 wire vga_pll ;
 reg  vga_reset ;
-assign hex3_hex = max_time;
+//assign hex3_hex = max_time;
 // M10k memory control and data
 wire 		[7:0] 	M10k_out [15:0];
 wire 		[7:0] 	write_data [15:0];
@@ -400,13 +400,13 @@ wire 					M10k_pll_locked ;
 // pios for dealer and player
 wire [7:0] dealer_top_pio;
 wire [7:0] player_init_hand_pio;
-
-assign color_in_VGA = M10k_out[next_x[3:0]];
+//assign color_in_VGA = M10k_out[next_x[3:0]];
 
 // TODO after init_done: dealer pio needs to be assigned to dealer hands right away, player needs to go to player hands
 // TODO replace the init with values from SRAM memory
 
-// Instantiate VGA driver					
+// Instantiate VGA driver		
+/*			
 vga_driver DUT   (	.clock(vga_pll), 
 							.reset(pio_reset_external_connection_export[0] || ~KEY[0]),
 							.color_in(color_in_VGA),	// Pixel color (8-bit) from memory
@@ -420,7 +420,7 @@ vga_driver DUT   (	.clock(vga_pll),
 							.sync(VGA_SYNC_N),
 							.clk(VGA_CLK),
 							.blank(VGA_BLANK_N)
-);
+);*/
 
 // SRAM variables
 wire [31:0] sram_readdata;
@@ -430,8 +430,36 @@ reg sram_write;
 wire sram_clken = 1'b1;
 wire sram_chipselect = 1'b1;
 reg [3:0] sram_state = 4'd0;
+reg shared_mem_done;
+reg [9:0] read_addr_init;
+reg [9:0] write_addr_init;
+reg data_ready;
+wire [7:0] init_done;
 
+
+always @(posedge CLOCK_50) begin
+	if (init_done) begin
+		if (sram_state == 4'd0) begin
+			if (read_addr_init < 10'd52) begin
+				sram_address <= read_addr_init;
+				sram_state <= 4'd1;
+				data_ready <= 1'd0;
+			end else begin
+				shared_mem_done <= 1;
+				data_ready <= 1'd0;
+			end
+		end else if (sram_state == 4'd1) begin // buffer state
+			sram_state <= 4'd2;
+		end else if (sram_state == 4'd2) begin
+			data_buffer <= sram_readdata;
+			read_addr_init <= read_addr_init + 1;
+			sram_state <= 4'd0;
+			data_ready <= 1'd1;
+		end
+	end
+end
 // SRAM SM -> sharing data btwn FPGA and ARM
+/*
 always @(posedge CLOCK_50) begin
 	if (sram_state == 4'd0) begin 
 		sram_address <= 9'd0; // FPGA manipulates memory at addr 0
@@ -464,7 +492,272 @@ always @(posedge CLOCK_50) begin
 		sram_state <= 4'd0;
 	end
 end
+*/
 
+parameter [9:0] num_simul = 5;//half of the number of columns
+ wire [7:0] output_random [num_simul-1:0];
+//wire [63:0] seed_samples [5:0];
+//wire init_done;
+
+reg [2:0] read_write_offset;
+reg [7:0] write_addr_inter;
+
+wire signed [3:0] q [num_simul-1:0];
+reg signed [3:0] d [num_simul-1:0];
+reg [9:0] write_addr [num_simul-1:0];
+reg [9:0] read_addr [num_simul-1:0];
+reg we[num_simul-1:0];
+
+reg [3:0] drum_state [num_simul-1:0];
+reg [9:0] index_rows [num_simul-1:0];
+
+reg tie_check [num_simul-1:0];
+
+//Shared m10k
+
+reg write_init_done [num_simul-1:0];
+wire [4:0] shared_write;
+assign shared_write = {(write_init_done[4]), (write_init_done[3]), (write_init_done[2]), (write_init_done[1]), (write_init_done[0])};
+
+genvar i;
+generate 
+	for (i = 0; i < num_simul; i = i+1) begin: initCols  
+		rand127 random_num(.rand_out(output_random[i]), .seed_in(64'h54555555 ^ i), .clock_in(clk_50), .reset_in(reset));
+		reg [3:0] array_hit_card [11:0]; // track index of card
+		reg [255:0] hit_card_reg;
+		reg [3:0] drawn_card_val [11:0]; // track the value of card being drawn
+		reg [3:0] dealer_card;
+		wire picked; 
+		reg player_result;
+		reg [4:0] dealer_hands, player_hands;
+		reg [4:0] card_itr;
+		reg [3:0] init_samp_counter;
+		reg internal_state;
+		
+		//assign hit_card_reg = ;
+		
+		M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(clk_50));
+		Search_hit_card card_check( .picked_card(hit_card_reg), 
+									.card(output_random[i]), // TODO we don't want generated number all the time
+									.picked(picked));
+									
+		always @ (posedge clk_50) begin
+			if (reset || ~KEY[0]) begin // reset conditions
+				drum_state[i] <= 4'd0;
+				index_rows[i] <= 10'd0;
+				we[i] <= 1'd1; 
+				init_samp_counter <= 4'd0;
+				write_addr[i] <= 9'b0;
+				write_init_done[i] <= 1'b0;
+			end
+			else begin
+				// STATE 0: Initialization
+				if (drum_state[i] == 3'd0) begin // check if initialization has occurred
+					if (data_ready) begin
+						if (~internal_state) begin
+							d[i] <= data_buffer[3:0];
+							internal_state <= 1'd1;
+						end
+						else begin
+							write_addr[i] <= write_addr[i] + 9'b1;
+							internal_state <= 1'd1;
+						end
+					end
+					if (shared_mem_done) begin
+						drum_state[i] <= 4'd1;
+						write_init_done[i] <= 1'b1;
+					end
+					/*
+					if (init_done) begin
+						drum_state[i] <= 4'd1;
+						index_rows[i] <= 10'd0;
+						//player_hands <= 5'd0; -> player hands need to be assigned with the value from C
+						//dealer_hands <= 5'd0; -> dealer hands need to be assigned with the top card
+						hit_card_reg <= 48'd0;
+						card_itr <= 4'd0;
+						we[i] <= 1'd0;
+						
+					end*/
+					/*
+					else begin
+						if (index_rows[i] <= 10'd512) begin
+							
+							if (init_samp_counter >= 4'd10) begin
+								init_samp_counter <= 4'd0;
+							end
+							write_addr[i] <= index_rows[i];
+							d[i] <= init_samp_counter;
+							init_samp_counter <= (init_samp_counter >= 4'd10) ? 4'd0 : init_samp_counter + 4'd1;
+							index_rows[i] <= index_rows[i] + 4'd1;
+						end else begin
+							init_done <= 1'd1;
+						end
+						drum_state[i] <= 4'd0;
+					end*/
+				end
+				// STATE 1: Dealer's card
+				else if (drum_state[i] == 4'd1) begin //initiate dealers cards
+					drum_state[i] <= 4'd2;
+					read_addr[i] <= output_random[i];
+					array_hit_card[card_itr] <= output_random[i];	
+					//card_itr <= card_itr + 4'd1;						
+				end
+				else if (drum_state[i] == 4'd2) begin
+					drum_state[i] <= 4'd3;
+				end
+				else if (drum_state[i] == 4'd3) begin
+					//array_hit_card[card_itr] <= output_random[i];	
+					drawn_card_val[card_itr] <= q[i];
+					dealer_hands <= dealer_hands + q[i];
+					hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
+					card_itr <= card_itr + 4'd1;
+					drum_state[i] <= 4'd4;
+				end
+				else if (drum_state[i] == 4'd4) begin // check if dealer gets BJ
+					if (dealer_hands == 5'd21) begin		
+						drum_state[i] <= 4'd10; // if dealer gets BJ, no need to move on, check result right away
+					end
+					else begin
+						drum_state[i] <= 4'd5;
+					end
+				end
+				else if (drum_state[i] == 4'd5) begin
+					if (~picked) begin
+						read_addr[i] <= output_random[i];
+						array_hit_card[card_itr] <= output_random[i];
+						drum_state[i] <= 4'd6;
+					end else begin
+						drum_state[i] <= 4'd5;
+					end
+				end 
+				else if (drum_state[i] == 4'd6) begin
+					drum_state[i] <= 4'd7;
+				end
+				else if (drum_state[i] == 4'd7) begin
+					if ((player_hands == 5'd12 && drawn_card_val[0] >= 5'd4 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd13 && player_hands < 5'd17 && drawn_card_val[0] >= 5'd2 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd17)) begin
+						drum_state[i] <= 4'd8; 
+					end
+					else begin
+						drum_state[i] <= 4'd5;	//HIT	
+						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
+						drawn_card_val[card_itr] <= q[i];
+						card_itr <= card_itr + 4'd1;
+						player_hands <= player_hands + q[i];
+					end
+				end
+				else if (drum_state[i] == 4'd8) begin
+					if (~picked) begin
+						read_addr[i] <= output_random[i];
+						array_hit_card[card_itr] <= output_random[i];
+						drum_state[i] <= 4'd9;
+					end else begin
+						drum_state[i] <= 4'd8;
+					end	
+				end
+				else if (drum_state[i] == 4'd9) begin
+					drum_state[i] <= 4'd10;
+				end
+				else if (drum_state[i] == 4'd10) begin
+					if (dealer_hands >= 5'd17) begin
+						drum_state[i] <= 4'd11; // Result
+					end
+					else begin
+						drawn_card_val[card_itr] <= q[i];
+						card_itr <= card_itr + 4'd1;
+						dealer_hands <= dealer_hands + q[i];
+						drum_state[i] <= 4'd8 ;	//HIT	
+						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
+					end
+				end
+				else if (drum_state[i] == 4'd11) begin
+					if (player_hands > 5'd21) begin
+						player_result <= 1'd0;
+					end
+					else if (player_hands < 5'd21 && dealer_hands <= 5'd21 && player_hands < dealer_hands) begin
+						player_result <= 1'd0;
+					end
+					else if (player_hands == dealer_hands) begin
+						tie_check[i] <= 1'd1;
+					end
+					else if (((player_hands > dealer_hands) && player_hands <= 5'd21 && dealer_hands < 5'd21) || (dealer_hands > 5'd21)) begin
+						player_result <= 1'd1;
+					end
+				end
+				
+				/*// STATE 2: Buffer the memory output and ready for the next read operation
+				else if (drum_state[i] == 3'd2) begin //buffer state for dealers card and initiate user reads
+					if (picked == 1) begin
+						read_addr[i] <= output_random[i];
+						array_hit_card[card_itr] <= output_random[i];
+						card_itr <= card_itr + 4'd1;
+					end
+					else begin 
+						drum_state[i] <= 3'd3;
+					end
+				end*/
+				// STATE 3: Player's turn
+				/*
+				else if (drum_state[i] == 3'd3) begin //dealer card read and handle transition into stand or hit
+					//dealer_card <= q[i];
+					drawn_card_val[card_itr - 2] <= q[i];
+					card_itr <= card_itr + 4'd1;
+					if (picked == 1) begin
+						read_addr[i] <= output_random[i];
+						array_hit_card[card_itr] <= output_random[i];
+					end
+					else begin
+						//array_hit_card[0] <= q[i]; //TODO
+
+						player_hands <= player_hands + q[i];
+						if ((player_hands == 5'd12 && drawn_card_val[0] >= 5'd4 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd13 && player_hands < 5'd17 && drawn_card_val[0] >= 5'd2 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd17)) begin
+							drum_state[i] <= 3'd4; // STAND
+						end
+						else begin
+							drum_state[i] <= 3'd3;	//HIT	
+							hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
+							read_addr[i] <= output_random[i];
+							array_hit_card[card_itr] <= output_random[i];
+						end
+					end
+				end
+				// STATE 4: Dealer's turn
+				else if (drum_state[i] == 3'd4) begin // Dealer HIT State
+					drawn_card_val[card_itr-2] <= q[i];
+					card_itr <= card_itr + 4'd1;
+					if (picked == 1) begin
+						read_addr[i] <= output_random[i];
+						array_hit_card[0] <= output_random[i];
+					end
+					else begin
+						dealer_hands <= dealer_hands + q[i];
+						if (dealer_hands >= 5'd17) begin
+							drum_state[i] <= 3'd5; // Result
+						end
+						else begin
+							drum_state[i] <= 3'd4;	//HIT	
+						end
+					end
+				end
+				// STATE 5: Result
+				else if (drum_state[i] == 3'd5) begin // Dealer HIT State
+				
+					// TODO: ACE 1/11, plus blackjack case
+					if (player_hands > 5'd21) begin
+						player_result <= 1'd0;
+					end
+					else if (player_hands <= 5'd21 && dealer_hands < 5'd21 && player_hands <= dealer_hands) begin
+						player_result <= 1'd0;
+					end
+					else if ((player_hands <= 5'd21 && player_hands > dealer_hands) || (dealer_hands > 5'd21)) begin
+						player_result <= 1'd1;
+					end
+					
+				end*/
+			end
+		end 
+		
+	end
+endgenerate
 	
 //=======================================================
 //  Structural coding
@@ -597,15 +890,17 @@ Computer_System The_System (
 	.hps_io_hps_io_usb1_inst_NXT		(HPS_USB_NXT),
 	
 	// counting render time
-	.counter_external_connection_export(counter_external_connection_export),
 	
 	// wires for init dealer/player pios
 	.dealer_top_external_connection_export(dealer_top_pio),
-	.player_init_hand_external_connection_export(player_init_hand_pio)
+	.player_init_hand_external_connection_export(player_init_hand_pio),
+	.init_done_external_connection_export(init_done),
+	.shared_write_external_connection_export(shared_write)
 );
 endmodule // end top level
 
 // color write data module
+/*
 module color_write(clk, counter, max_iterations, write_data_out);
 	input clk;
 	input [11:0] counter, max_iterations;
@@ -647,7 +942,7 @@ module color_write(clk, counter, max_iterations, write_data_out);
 	end
 	
 	assign write_data_out = write_data;
-endmodule
+endmodule*/
 
 /*
 // Key debouncing logic
@@ -885,145 +1180,142 @@ endmodule
 ////////////	Mandelbrot Set Visualizer	    //////////////
 //////////////////////////////////////////////////////////////
 
-module mandelbrot (clock, reset, x_coord_init, y_coord_init, step_size_cr, step_size_ci, c_i_init, c_r_init, max_iter, out, write_en, write_addr, done, time_flag, time_counter);
-   input clock, reset;
-	input [9:0] x_coord_init, y_coord_init;
-	input signed [26:0] c_i_init, c_r_init;
-	input signed [26:0] step_size_cr, step_size_ci;
-	input [11:0] max_iter;
-	output [11:0] out;
-	output [18:0] write_addr;
-	output write_en;
-	output done;
-	output time_flag;
-	output [31:0] time_counter;
+module Search_hit_card(picked_card, card, picked);
+	//input clock;
+	//input [3:0] picked_cards_arr [11:0];
+	input [255:0] picked_card;
+	input [7:0]card;
+	//reg picked_inter;
+	output picked;
+    //reg [2:0] check_state; 
+	//reg [3:0] arr_itr;
 	
-	reg t_flag;
-	reg [31:0] running_counter, t_counter;
-	
-	reg write_enable;
-	reg [1:0] state;
-	reg [9:0] x_coord, y_coord;
-	reg signed [26:0] ci, cr;
-	reg [18:0] write_address;
-   reg signed [26:0] z_r, z_i;
-   reg [11:0] temp_iter;
-   wire signed [26:0] zr_sq, zi_sq, zr_zi;
-   wire signed [26:0] zr_temp, zi_temp;
-	wire [26:0] zr_abs, zi_abs;
-
-    // clocked
-    always @(posedge clock) begin
-		 if (reset == 1) begin
-			z_r <= 0;
-			z_i <= 0;
-			x_coord <= x_coord_init;
-			y_coord <= y_coord_init;
-			temp_iter <= 0;
-			ci <= c_i_init;
-			cr <= c_r_init;
-			state <= 2'd0;
-			t_flag <= 1'd0;
-			running_counter <= 32'd0; 
-			t_counter <= 32'd0;
-			write_enable <= 1'd0;
-			write_address <= 19'd0;
-		
-		 end
-		 else begin
-			if (state == 0) begin
-					z_r <= 0;
-					z_i <= 0;
-					temp_iter <= 0;
-					state <= 1;
-					write_enable <= 1'd0;
+	/*always  @ (posedge clock) begin
+		if (!check_state) begin
+			check_state <= 3'd1;
+			arr_itr <= 4'd0;
+		end 
+		else if check_state == 3'd1 begin
+			if (card == array_hit_card[arr_itr]) begin
+				picked_inter <= 1'd1;
 			end
-			else if (state == 1) begin
-				if (~done) begin
-					z_r <= zr_temp;
-					z_i <= zi_temp;
-					temp_iter <= temp_iter + 1;
-					state <= 1;
-				end
-				else begin
-					state <= 2;
-				end
+			
+			if (picked == 1'd1) begin
+				check_state <= 3'd0;
 			end
-			else if (state == 2) begin
-				write_enable <= 1'd1;
-				write_address <= (19'd_40 * y_coord) + (x_coord >> 4);
-				x_coord <= (x_coord==10'd_624 + x_coord_init) ? (x_coord_init) : (x_coord + 10'd_16) ;
-				y_coord <= (x_coord==10'd_624 + x_coord_init) ? ((y_coord==10'd_479) ? 10'd_0 : (y_coord+10'd_1)) : y_coord ;
-				cr <= (x_coord==10'd_624 + x_coord_init) ? (c_r_init) : (cr + step_size_cr); //{4'b0000,23'b00000010011001100110010} // x
-				ci <= (x_coord==10'd_624 + x_coord_init) ? ((y_coord==10'd_479) ? (c_i_init): (ci - step_size_ci)) : ci ; // y
-				state <= 0;
-				t_flag <= ((x_coord==10'd_624 + x_coord_init) && (y_coord==10'd_479)) ? 1 : 0;
-			end
-//			running_counter <= (t_flag == 0) ? (running_counter + 32'd1) : running_counter;
-			if (t_flag != 1) begin
-//				t_counter <= running_counter;
-				running_counter <= (running_counter + 32'd1);
-//	         t_flag <= 0;
-//				running_counter <= 0;
+			else if (picked == 1'd0 && arr_itr ==16) begin
+				check_state <= 3'd0;
 			end
 			else begin
-				running_counter <= 0;
+				check_state <= 3'd1;
 			end
 		end
-    end
-   
-    // signed mults
-    signed_mult zrSq (.out(zr_sq), .a(z_r), .b(z_r));
-    signed_mult ziSq (.out(zi_sq), .a(z_i), .b(z_i));
-    signed_mult twoZrZi (.out(zr_zi), .a(z_r), .b(z_i));
+	end
+	
+	arr_itr <= arr_itr + 4'd1;
+	assign picked = picked_inter;*/
+	
+	/*assign picked = (picked_cards_arr[0] == card) || (picked_cards_arr[1] == card) || (picked_cards_arr[2] == card) || (picked_cards_arr[3] == card) || 
+					(picked_cards_arr[4] == card) || (picked_cards_arr[5] == card) || (picked_cards_arr[6] == card) || (picked_cards_arr[7] == card) || 
+					(picked_cards_arr[8] == card) || (picked_cards_arr[9] == card) || (picked_cards_arr[10] == card) || (picked_cards_arr[11] == card);*/
+					
+	assign picked = ((picked_card) & (1 << card)) >> card;
+	
+endmodule
+//////////////////////////////////////////////////////////
+// 16-bit parallel random number generator ///////////////
+//////////////////////////////////////////////////////////
+// Algorithm is based on:
+// A special-purpose processor for the Monte Carlo simulation of ising spin systems
+// A. Hoogland, J. Spaa, B. Selman and A. Compagner
+// Journal of Computational Physics
+// Volume 51, Issue 2, August 1983, Pages 250-260
+//////////////////////////////////////////////////////////
+module rand127(rand_out, seed_in, clock_in, reset_in);
+	// 16-bit random number on every cycle
+	output wire [7:0] rand_out ;
+	// the clocks and stuff
+	//input wire [3:0] state_in ;
+	input wire clock_in, reset_in ;
+	input wire [64:1] seed_in; // 128 bits is 32 hex digits 0xffff_ffff_ffff_ffff_ffff_ffff_ffff_ffff
 
-    // combinational
-	 assign time_flag = t_flag;
-	 assign time_counter = running_counter;
-    assign zr_temp = zr_sq - zi_sq + cr;
-    assign zi_temp = (zr_zi <<< 1) + ci;
-	 assign zr_abs = (z_r[26] == 1) ? (~z_r + 1) : (z_r);  
-	 assign zi_abs = (z_i[26] == 1) ? (~z_i + 1) : (z_i);  
-    assign done = (zr_abs > {4'd2, 23'd0}) || (zi_abs > {4'd2, 23'd0}) || ((zr_sq + zi_sq) > {4'd4, 23'd0}) || (temp_iter >= max_iter); 
-	 assign out = temp_iter;
-	 assign write_en = write_enable;
-	 assign write_addr = write_address;
+	reg [8:1] sr1, sr2, sr3, sr4, sr5, sr6, sr7, sr8; 
+				//sr9, sr10, sr11, sr12, sr13, sr14, sr15, sr16;
+	
+	// state names
+	parameter react_start= 4'd0 ;
+
+	// generate random numbers	
+	assign rand_out = {sr1[7], sr2[7], sr3[7], sr4[7],
+							sr5[7], sr6[7], sr7[7], sr8[7]};
+							//sr9[7], sr10[7], sr11[7], sr12[7],
+							//sr13[7], sr14[7], sr15[7], sr16[7]} ;
+							
+	always @ (posedge clock_in) //
+	begin
+		if (reset_in)
+		begin	
+			//init random number generator 
+			sr1 <= seed_in[8:1] ;
+			sr2 <= seed_in[16:9] ;
+			sr3 <= seed_in[24:17] ;
+			sr4 <= seed_in[32:25] ;
+			sr5 <= seed_in[40:33] ;
+			sr6 <= seed_in[48:41] ;
+			sr7 <= seed_in[56:49] ;
+			sr8 <= {1'b0, seed_in[63:57]};
+			//sr8 <= seed_in[64:57] ;
+			/*
+			sr9 <= seed_in[72:65] ;
+			sr10 <= seed_in[80:73] ;
+			sr11 <= seed_in[88:81] ;
+			sr12 <= seed_in[96:89] ;
+			sr13 <= seed_in[104:97] ;
+			sr14 <= seed_in[112:105] ;
+			sr15 <= seed_in[120:113] ;
+			sr16 <= {1'b0,seed_in[127:121]} ;*/
+		end
+		
+		// update 127-bit shift register
+		// 16 times in parallel
+		else 
+		begin
+			//if(state_in == react_start) 
+			//begin
+				sr1 <= {sr1[7:1], sr1[7]^sr8[7]} ;
+				sr2 <= {sr2[7:1], sr2[7]^sr1[8]}  ;
+				sr3 <= {sr3[7:1], sr3[7]^sr2[8]}  ;
+				sr4 <= {sr4[7:1], sr4[7]^sr3[8]}  ;
+				sr5 <= {sr5[7:1], sr5[7]^sr4[8]}  ;
+				sr6 <= {sr6[7:1], sr6[7]^sr5[8]}  ;
+				sr7 <= {sr7[7:1], sr7[7]^sr6[8]}  ;
+				sr8 <= {sr8[7:1], sr8[7]^sr7[8]}  ;
+				//sr9 <= {sr9[7:1], sr9[7]^sr8[8]}  ;
+				/*
+				sr10 <= {sr10[7:1], sr10[7]^sr9[8]}  ;
+				sr11 <= {sr11[7:1], sr11[7]^sr10[8]}  ;
+				sr12 <= {sr12[7:1], sr12[7]^sr11[8]}  ;
+				sr13 <= {sr13[7:1], sr13[7]^sr12[8]}  ;
+				sr14 <= {sr14[7:1], sr14[7]^sr13[8]}  ;
+				sr15 <= {sr15[7:1], sr15[7]^sr14[8]}  ;
+				sr16 <= {sr16[6:1], sr16[7]^sr15[8]}  ;*/
+			//end	
+		end
+	end
 endmodule
 
-//////////////////////////////////////////////////
-//// signed mult of 4.23 format 2'comp////////////
-//////////////////////////////////////////////////
-module signed_mult (out, a, b);
-	output 	signed  [26:0]	out;
-	input 	signed	[26:0] 	a;
-	input 	signed	[26:0] 	b;
-    
-	// intermediate full bit length
-	wire 	signed	[53:0]	mult_out;
-	assign mult_out = a * b;
-    
-	// select bits for 4.23 fixed point
-	assign out = {mult_out[53], mult_out[48:23]};
-endmodule
-
-
 //============================================================
-// M10K module for testing
+// M10K module
 //============================================================
-// See example 12-16 in 
-// http://people.ece.cornell.edu/land/courses/ece5760/DE1_SOC/HDL_style_qts_qii51007.pdf
-//============================================================
-
-module M10K_1000_8( 
-    output reg [7:0] q,
-    input [7:0] d,
-    input [18:0] write_address, read_address,
+module M10K_32_5( 
+    output reg [3:0] q,
+    input [3:0] d,
+    input [9:0] write_address, read_address,
     input we, clk
 );
-	 // force M10K ram style
-	 // 307200 words of 8 bits
-	 //307200
-    reg [7:0] mem [19200:0]  /* synthesis ramstyle = "no_rw_check, M10K" */;
+    // force M10K ram style
+    // 307200 words of 8 bits
+    reg [3:0] mem [511:0]  /* synthesis ramstyle = "no_rw_check, M10K" */; // TODO 256 bits
 	 
     always @ (posedge clk) begin
         if (we) begin

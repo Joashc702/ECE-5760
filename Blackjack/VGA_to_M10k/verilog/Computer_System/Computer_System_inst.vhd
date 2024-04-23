@@ -1,5 +1,6 @@
 	component Computer_System is
 		port (
+			dealer_top_external_connection_export       : out   std_logic_vector(7 downto 0);                     -- export
 			hps_io_hps_io_emac1_inst_TX_CLK             : out   std_logic;                                        -- hps_io_emac1_inst_TX_CLK
 			hps_io_hps_io_emac1_inst_TXD0               : out   std_logic;                                        -- hps_io_emac1_inst_TXD0
 			hps_io_hps_io_emac1_inst_TXD1               : out   std_logic;                                        -- hps_io_emac1_inst_TXD1
@@ -56,6 +57,7 @@
 			hps_io_hps_io_gpio_inst_GPIO53              : inout std_logic                     := 'X';             -- hps_io_gpio_inst_GPIO53
 			hps_io_hps_io_gpio_inst_GPIO54              : inout std_logic                     := 'X';             -- hps_io_gpio_inst_GPIO54
 			hps_io_hps_io_gpio_inst_GPIO61              : inout std_logic                     := 'X';             -- hps_io_gpio_inst_GPIO61
+			init_done_external_connection_export        : out   std_logic_vector(7 downto 0);                     -- export
 			m10k_pll_locked_export                      : out   std_logic;                                        -- export
 			m10k_pll_outclk0_clk                        : out   std_logic;                                        -- clk
 			memory_mem_a                                : out   std_logic_vector(14 downto 0);                    -- mem_a
@@ -81,17 +83,18 @@
 			onchip_sram_s1_readdata                     : out   std_logic_vector(31 downto 0);                    -- readdata
 			onchip_sram_s1_writedata                    : in    std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
 			onchip_sram_s1_byteenable                   : in    std_logic_vector(3 downto 0)  := (others => 'X'); -- byteenable
+			player_init_hand_external_connection_export : out   std_logic_vector(7 downto 0);                     -- export
+			shared_write_external_connection_export     : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
 			system_pll_ref_clk_clk                      : in    std_logic                     := 'X';             -- clk
 			system_pll_ref_reset_reset                  : in    std_logic                     := 'X';             -- reset
 			vga_pio_locked_export                       : out   std_logic;                                        -- export
-			vga_pio_outclk0_clk                         : out   std_logic;                                        -- clk
-			player_init_hand_external_connection_export : out   std_logic_vector(7 downto 0);                     -- export
-			dealer_top_external_connection_export       : out   std_logic_vector(7 downto 0)                      -- export
+			vga_pio_outclk0_clk                         : out   std_logic                                         -- clk
 		);
 	end component Computer_System;
 
 	u0 : component Computer_System
 		port map (
+			dealer_top_external_connection_export       => CONNECTED_TO_dealer_top_external_connection_export,       --       dealer_top_external_connection.export
 			hps_io_hps_io_emac1_inst_TX_CLK             => CONNECTED_TO_hps_io_hps_io_emac1_inst_TX_CLK,             --                               hps_io.hps_io_emac1_inst_TX_CLK
 			hps_io_hps_io_emac1_inst_TXD0               => CONNECTED_TO_hps_io_hps_io_emac1_inst_TXD0,               --                                     .hps_io_emac1_inst_TXD0
 			hps_io_hps_io_emac1_inst_TXD1               => CONNECTED_TO_hps_io_hps_io_emac1_inst_TXD1,               --                                     .hps_io_emac1_inst_TXD1
@@ -148,6 +151,7 @@
 			hps_io_hps_io_gpio_inst_GPIO53              => CONNECTED_TO_hps_io_hps_io_gpio_inst_GPIO53,              --                                     .hps_io_gpio_inst_GPIO53
 			hps_io_hps_io_gpio_inst_GPIO54              => CONNECTED_TO_hps_io_hps_io_gpio_inst_GPIO54,              --                                     .hps_io_gpio_inst_GPIO54
 			hps_io_hps_io_gpio_inst_GPIO61              => CONNECTED_TO_hps_io_hps_io_gpio_inst_GPIO61,              --                                     .hps_io_gpio_inst_GPIO61
+			init_done_external_connection_export        => CONNECTED_TO_init_done_external_connection_export,        --        init_done_external_connection.export
 			m10k_pll_locked_export                      => CONNECTED_TO_m10k_pll_locked_export,                      --                      m10k_pll_locked.export
 			m10k_pll_outclk0_clk                        => CONNECTED_TO_m10k_pll_outclk0_clk,                        --                     m10k_pll_outclk0.clk
 			memory_mem_a                                => CONNECTED_TO_memory_mem_a,                                --                               memory.mem_a
@@ -173,11 +177,11 @@
 			onchip_sram_s1_readdata                     => CONNECTED_TO_onchip_sram_s1_readdata,                     --                                     .readdata
 			onchip_sram_s1_writedata                    => CONNECTED_TO_onchip_sram_s1_writedata,                    --                                     .writedata
 			onchip_sram_s1_byteenable                   => CONNECTED_TO_onchip_sram_s1_byteenable,                   --                                     .byteenable
+			player_init_hand_external_connection_export => CONNECTED_TO_player_init_hand_external_connection_export, -- player_init_hand_external_connection.export
+			shared_write_external_connection_export     => CONNECTED_TO_shared_write_external_connection_export,     --     shared_write_external_connection.export
 			system_pll_ref_clk_clk                      => CONNECTED_TO_system_pll_ref_clk_clk,                      --                   system_pll_ref_clk.clk
 			system_pll_ref_reset_reset                  => CONNECTED_TO_system_pll_ref_reset_reset,                  --                 system_pll_ref_reset.reset
 			vga_pio_locked_export                       => CONNECTED_TO_vga_pio_locked_export,                       --                       vga_pio_locked.export
-			vga_pio_outclk0_clk                         => CONNECTED_TO_vga_pio_outclk0_clk,                         --                      vga_pio_outclk0.clk
-			player_init_hand_external_connection_export => CONNECTED_TO_player_init_hand_external_connection_export, -- player_init_hand_external_connection.export
-			dealer_top_external_connection_export       => CONNECTED_TO_dealer_top_external_connection_export        --       dealer_top_external_connection.export
+			vga_pio_outclk0_clk                         => CONNECTED_TO_vga_pio_outclk0_clk                          --                      vga_pio_outclk0.clk
 		);
 
