@@ -1,5 +1,5 @@
 |DE1_SoC_Computer
-CLOCK_50 => CLOCK_50.IN1
+CLOCK_50 => CLOCK_50.IN11
 CLOCK2_50 => ~NO_FANOUT~
 CLOCK3_50 => ~NO_FANOUT~
 CLOCK4_50 => ~NO_FANOUT~
@@ -170,11 +170,7 @@ HEX5[5] <= <GND>
 HEX5[6] <= <GND>
 IRDA_RXD => ~NO_FANOUT~
 IRDA_TXD <= <GND>
-KEY[0] => always5.IN1
-KEY[0] => always1.IN1
-KEY[0] => always2.IN1
-KEY[0] => always3.IN1
-KEY[0] => always4.IN1
+KEY[0] => ~NO_FANOUT~
 KEY[1] => ~NO_FANOUT~
 KEY[2] => ~NO_FANOUT~
 KEY[3] => ~NO_FANOUT~

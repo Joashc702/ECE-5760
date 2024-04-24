@@ -434,7 +434,7 @@ reg shared_mem_done;
 reg [9:0] read_addr_init;
 reg [9:0] write_addr_init;
 reg data_ready;
-wire [7:0] init_done;
+wire [7:0] init_done /*synthesis keep */;
 
 
 always @(posedge CLOCK_50) begin
@@ -515,14 +515,16 @@ reg tie_check [num_simul-1:0];
 
 //Shared m10k
 
-reg write_init_done [num_simul-1:0];
+reg write_init_done [num_simul-1:0] /*synthesis keep */;
 wire [4:0] shared_write;
 assign shared_write = {(write_init_done[4]), (write_init_done[3]), (write_init_done[2]), (write_init_done[1]), (write_init_done[0])};
+
+//assign shared_write = init_done;
 
 genvar i;
 generate 
 	for (i = 0; i < num_simul; i = i+1) begin: initCols  
-		rand127 random_num(.rand_out(output_random[i]), .seed_in(64'h54555555 ^ i), .clock_in(clk_50), .reset_in(reset));
+		rand127 random_num(.rand_out(output_random[i]), .seed_in(64'h54555555 ^ i), .clock_in(CLOCK_50), .reset_in(reset));
 		reg [3:0] array_hit_card [11:0]; // track index of card
 		reg [255:0] hit_card_reg;
 		reg [3:0] drawn_card_val [11:0]; // track the value of card being drawn
@@ -531,69 +533,35 @@ generate
 		reg player_result;
 		reg [4:0] dealer_hands, player_hands;
 		reg [4:0] card_itr;
-		reg [3:0] init_samp_counter;
-		reg internal_state;
+		// reg internal_state;
 		
 		//assign hit_card_reg = ;
 		
-		M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(clk_50));
+		M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
 		Search_hit_card card_check( .picked_card(hit_card_reg), 
 									.card(output_random[i]), // TODO we don't want generated number all the time
 									.picked(picked));
 									
-		always @ (posedge clk_50) begin
-			if (reset || ~KEY[0]) begin // reset conditions
+		always @ (posedge CLOCK_50) begin
+			if (init_done) begin // reset conditions
 				drum_state[i] <= 4'd0;
 				index_rows[i] <= 10'd0;
 				we[i] <= 1'd1; 
-				init_samp_counter <= 4'd0;
 				write_addr[i] <= 9'b0;
 				write_init_done[i] <= 1'b0;
 			end
 			else begin
 				// STATE 0: Initialization
-				if (drum_state[i] == 3'd0) begin // check if initialization has occurred
+				if (drum_state[i] == 4'd0) begin // check if initialization has occurred
 					if (data_ready) begin
-						if (~internal_state) begin
-							d[i] <= data_buffer[3:0];
-							internal_state <= 1'd1;
-						end
-						else begin
-							write_addr[i] <= write_addr[i] + 9'b1;
-							internal_state <= 1'd1;
-						end
+						d[i] <= data_buffer[3:0];
+						write_addr[i] <= write_addr[i] + 10'b1;
 					end
 					if (shared_mem_done) begin
 						drum_state[i] <= 4'd1;
 						write_init_done[i] <= 1'b1;
+
 					end
-					/*
-					if (init_done) begin
-						drum_state[i] <= 4'd1;
-						index_rows[i] <= 10'd0;
-						//player_hands <= 5'd0; -> player hands need to be assigned with the value from C
-						//dealer_hands <= 5'd0; -> dealer hands need to be assigned with the top card
-						hit_card_reg <= 48'd0;
-						card_itr <= 4'd0;
-						we[i] <= 1'd0;
-						
-					end*/
-					/*
-					else begin
-						if (index_rows[i] <= 10'd512) begin
-							
-							if (init_samp_counter >= 4'd10) begin
-								init_samp_counter <= 4'd0;
-							end
-							write_addr[i] <= index_rows[i];
-							d[i] <= init_samp_counter;
-							init_samp_counter <= (init_samp_counter >= 4'd10) ? 4'd0 : init_samp_counter + 4'd1;
-							index_rows[i] <= index_rows[i] + 4'd1;
-						end else begin
-							init_done <= 1'd1;
-						end
-						drum_state[i] <= 4'd0;
-					end*/
 				end
 				// STATE 1: Dealer's card
 				else if (drum_state[i] == 4'd1) begin //initiate dealers cards
@@ -602,9 +570,11 @@ generate
 					array_hit_card[card_itr] <= output_random[i];	
 					//card_itr <= card_itr + 4'd1;						
 				end
+				// STATE 2: Buffer state
 				else if (drum_state[i] == 4'd2) begin
 					drum_state[i] <= 4'd3;
 				end
+				// STATE 3: Get dealer hidden card
 				else if (drum_state[i] == 4'd3) begin
 					//array_hit_card[card_itr] <= output_random[i];	
 					drawn_card_val[card_itr] <= q[i];
@@ -613,6 +583,7 @@ generate
 					card_itr <= card_itr + 4'd1;
 					drum_state[i] <= 4'd4;
 				end
+				// STATE 4: Check dealer blackjack
 				else if (drum_state[i] == 4'd4) begin // check if dealer gets BJ
 					if (dealer_hands == 5'd21) begin		
 						drum_state[i] <= 4'd10; // if dealer gets BJ, no need to move on, check result right away
@@ -621,6 +592,7 @@ generate
 						drum_state[i] <= 4'd5;
 					end
 				end
+				// STATE 5: Player's turn
 				else if (drum_state[i] == 4'd5) begin
 					if (~picked) begin
 						read_addr[i] <= output_random[i];
@@ -630,9 +602,11 @@ generate
 						drum_state[i] <= 4'd5;
 					end
 				end 
+				// STATE 6: Buffer state
 				else if (drum_state[i] == 4'd6) begin
 					drum_state[i] <= 4'd7;
 				end
+				// STATE 7: Player playing til stand
 				else if (drum_state[i] == 4'd7) begin
 					if ((player_hands == 5'd12 && drawn_card_val[0] >= 5'd4 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd13 && player_hands < 5'd17 && drawn_card_val[0] >= 5'd2 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd17)) begin
 						drum_state[i] <= 4'd8; 
@@ -645,6 +619,7 @@ generate
 						player_hands <= player_hands + q[i];
 					end
 				end
+				// STATE 8: Dealer's turn
 				else if (drum_state[i] == 4'd8) begin
 					if (~picked) begin
 						read_addr[i] <= output_random[i];
@@ -654,9 +629,11 @@ generate
 						drum_state[i] <= 4'd8;
 					end	
 				end
+				// STATE 9: Buffer state
 				else if (drum_state[i] == 4'd9) begin
 					drum_state[i] <= 4'd10;
 				end
+				// STATE 10: Dealer playing until >=17
 				else if (drum_state[i] == 4'd10) begin
 					if (dealer_hands >= 5'd17) begin
 						drum_state[i] <= 4'd11; // Result
@@ -669,6 +646,7 @@ generate
 						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
 					end
 				end
+				// STATE 11: Check final result 
 				else if (drum_state[i] == 4'd11) begin
 					if (player_hands > 5'd21) begin
 						player_result <= 1'd0;
