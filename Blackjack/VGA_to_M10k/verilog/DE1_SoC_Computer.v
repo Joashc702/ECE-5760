@@ -438,14 +438,18 @@ wire [7:0] init_done /*synthesis keep */;
 
 
 always @(posedge CLOCK_50) begin
-	if (init_done) begin
+	if (init_done == 8'd0) begin
+		read_addr_init <= 10'b0;
+		shared_mem_done <= 1'd0;
+	end
+	if (init_done == 8'd1) begin
 		if (sram_state == 4'd0) begin
 			if (read_addr_init < 10'd52) begin
 				sram_address <= read_addr_init;
 				sram_state <= 4'd1;
 				data_ready <= 1'd0;
 			end else begin
-				shared_mem_done <= 1;
+				shared_mem_done <= 1'd1;
 				data_ready <= 1'd0;
 			end
 		end else if (sram_state == 4'd1) begin // buffer state
@@ -495,15 +499,15 @@ end
 */
 
 parameter [9:0] num_simul = 5;//half of the number of columns
- wire [7:0] output_random [num_simul-1:0];
+ wire [7:0] output_random [num_simul-1:0] /*synthesis keep */; 
 //wire [63:0] seed_samples [5:0];
 //wire init_done;
 
 reg [2:0] read_write_offset;
 reg [7:0] write_addr_inter;
 
-wire signed [3:0] q [num_simul-1:0];
-reg signed [3:0] d [num_simul-1:0];
+wire unsigned [3:0] q [num_simul-1:0];
+reg unsigned  [3:0] d [num_simul-1:0];
 reg [9:0] write_addr [num_simul-1:0];
 reg [9:0] read_addr [num_simul-1:0];
 reg we[num_simul-1:0];
@@ -517,22 +521,67 @@ reg tie_check [num_simul-1:0];
 
 reg write_init_done [num_simul-1:0] /*synthesis keep */;
 wire [4:0] shared_write;
-assign shared_write = {(write_init_done[4]), (write_init_done[3]), (write_init_done[2]), (write_init_done[1]), (write_init_done[0])};
+reg [4:0] card_itr [num_simul-1:0];
+//assign shared_write = {(write_init_done[4]), (write_init_done[3]), (write_init_done[2]), (write_init_done[1]), (write_init_done[0])};
 
-//assign shared_write = init_done;
+
+wire [7:0] test_1; // output_random
+wire [31:0] test_2; 
+wire [7:0] test_3;
+
+wire [7:0] draw_dealer_1[num_simul-1:0];
+wire [7:0] draw_dealer_2[num_simul-1:0];
+wire [7:0] draw_dealer_3[num_simul-1:0];
+
+reg [7:0] test_draw_dealer_1[num_simul-1:0];
+reg [7:0] test_draw_dealer_2[num_simul-1:0];
+reg [7:0] test_draw_dealer_3[num_simul-1:0];
+
+
+wire [7:0] draw_player_1[num_simul-1:0];
+wire [7:0] draw_player_2[num_simul-1:0];
+wire [7:0] draw_player_3[num_simul-1:0];
+
+reg [7:0] test_draw_player_1[num_simul-1:0];
+reg [7:0] test_draw_player_2[num_simul-1:0];
+reg [7:0] test_draw_player_3[num_simul-1:0];
+
+
+wire [7:0] which_simulation; //output from the Arm
+
+
+assign draw_dealer_1[0] = test_draw_dealer_1[0];
+assign draw_dealer_2[0] = test_draw_dealer_2[0];
+assign draw_dealer_3[0] = test_draw_dealer_3[0];
+
+assign draw_player_1[0] = test_draw_player_1[0];
+assign draw_player_2[0] = test_draw_player_2[0];
+assign draw_player_3[0] = test_draw_player_3[0];
+
+
+reg player_result[num_simul-1:0];
+assign test_3 = player_result[0]; //input to the arm
+
+// Send back to the arm and verify
+//assign shared_write = output_random[0];
+assign shared_write = card_itr[0];
+
+assign test_1 = dealer_hands[0];
+assign test_2 = player_hands[0];
+
+reg [4:0] player_hands [num_simul - 1:0];
+reg [4:0] dealer_hands [num_simul - 1:0];
 
 genvar i;
 generate 
 	for (i = 0; i < num_simul; i = i+1) begin: initCols  
-		rand127 random_num(.rand_out(output_random[i]), .seed_in(64'h54555555 ^ i), .clock_in(CLOCK_50), .reset_in(reset));
+		rand127 random_num(.rand_out(output_random[i]), .seed_in(64'h54555555 ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
 		reg [3:0] array_hit_card [11:0]; // track index of card
 		reg [255:0] hit_card_reg;
 		reg [3:0] drawn_card_val [11:0]; // track the value of card being drawn
 		reg [3:0] dealer_card;
 		wire picked; 
-		reg player_result;
-		reg [4:0] dealer_hands, player_hands;
-		reg [4:0] card_itr;
+
 		// reg internal_state;
 		
 		//assign hit_card_reg = ;
@@ -543,12 +592,28 @@ generate
 									.picked(picked));
 									
 		always @ (posedge CLOCK_50) begin
-			if (init_done) begin // reset conditions
+			if (init_done == 8'd0) begin // reset conditions
 				drum_state[i] <= 4'd0;
 				index_rows[i] <= 10'd0;
 				we[i] <= 1'd1; 
-				write_addr[i] <= 9'b0;
+				write_addr[i] <= 10'b0;
 				write_init_done[i] <= 1'b0;
+				read_addr[i] <= 10'd0;
+				
+				hit_card_reg <= 256'd0;
+				player_hands[i] <= 5'd0;
+				dealer_hands[i] <= 5'd0;
+			
+				card_itr[i] <= 5'd0;
+				
+				test_draw_dealer_1[i] <= 8'd0;
+				test_draw_dealer_2[i] <= 8'd0;
+				test_draw_dealer_3[i] <= 8'd0;
+
+				test_draw_player_1[i] <= 8'd0;
+				test_draw_player_2[i] <= 8'd0;
+				test_draw_player_3[i] <= 8'd0;
+				
 			end
 			else begin
 				// STATE 0: Initialization
@@ -567,7 +632,7 @@ generate
 				else if (drum_state[i] == 4'd1) begin //initiate dealers cards
 					drum_state[i] <= 4'd2;
 					read_addr[i] <= output_random[i];
-					array_hit_card[card_itr] <= output_random[i];	
+					array_hit_card[card_itr[i]] <= output_random[i];	
 					//card_itr <= card_itr + 4'd1;						
 				end
 				// STATE 2: Buffer state
@@ -576,16 +641,21 @@ generate
 				end
 				// STATE 3: Get dealer hidden card
 				else if (drum_state[i] == 4'd3) begin
-					//array_hit_card[card_itr] <= output_random[i];	
-					drawn_card_val[card_itr] <= q[i];
-					dealer_hands <= dealer_hands + q[i];
-					hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
-					card_itr <= card_itr + 4'd1;
+					//array_hit_card[card_itr] <= output_random[i];
+				   if(card_itr[i] == 5'd0) begin
+						test_draw_dealer_1[i] <= q[i];
+					end
+					
+					
+					drawn_card_val[card_itr[i]] <= q[i];
+					dealer_hands[i] <= dealer_hands[i] + q[i];
+					hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr[i]]);
+					card_itr[i] <= card_itr[i] + 5'd1;
 					drum_state[i] <= 4'd4;
 				end
 				// STATE 4: Check dealer blackjack
 				else if (drum_state[i] == 4'd4) begin // check if dealer gets BJ
-					if (dealer_hands == 5'd21) begin		
+					if (dealer_hands[i] == 5'd21) begin		
 						drum_state[i] <= 4'd10; // if dealer gets BJ, no need to move on, check result right away
 					end
 					else begin
@@ -596,7 +666,7 @@ generate
 				else if (drum_state[i] == 4'd5) begin
 					if (~picked) begin
 						read_addr[i] <= output_random[i];
-						array_hit_card[card_itr] <= output_random[i];
+						array_hit_card[card_itr[i]] <= output_random[i];
 						drum_state[i] <= 4'd6;
 					end else begin
 						drum_state[i] <= 4'd5;
@@ -608,22 +678,34 @@ generate
 				end
 				// STATE 7: Player playing til stand
 				else if (drum_state[i] == 4'd7) begin
-					if ((player_hands == 5'd12 && drawn_card_val[0] >= 5'd4 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd13 && player_hands < 5'd17 && drawn_card_val[0] >= 5'd2 && drawn_card_val[0] <= 5'd6) || (player_hands >= 5'd17)) begin
+					if ((player_hands[i] == 5'd12 && drawn_card_val[0] >= 5'd4 && drawn_card_val[0] <= 5'd6) || (player_hands[i] >= 5'd13 && player_hands[i] < 5'd17 && drawn_card_val[0] >= 5'd2 && drawn_card_val[0] <= 5'd6) || (player_hands[i] >= 5'd17)) begin
 						drum_state[i] <= 4'd8; 
 					end
 					else begin
 						drum_state[i] <= 4'd5;	//HIT	
-						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
-						drawn_card_val[card_itr] <= q[i];
-						card_itr <= card_itr + 4'd1;
-						player_hands <= player_hands + q[i];
+						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr[i]]);
+						
+						if (card_itr[i] == 5'd1) begin
+							test_draw_player_1[i] <= q[i];
+						end
+						else if (card_itr[i] == 5'd2) begin
+							test_draw_player_2[i]<= q[i];
+						end
+						else if (card_itr[i] == 5'd3) begin
+							test_draw_player_3[i]<= q[i];
+						end
+						
+						
+						drawn_card_val[card_itr[i]] <= q[i];
+						card_itr[i] <= card_itr[i] + 5'd1;
+						player_hands[i] <= player_hands[i] + q[i];
 					end
 				end
 				// STATE 8: Dealer's turn
 				else if (drum_state[i] == 4'd8) begin
 					if (~picked) begin
 						read_addr[i] <= output_random[i];
-						array_hit_card[card_itr] <= output_random[i];
+						array_hit_card[card_itr[i]] <= output_random[i];
 						drum_state[i] <= 4'd9;
 					end else begin
 						drum_state[i] <= 4'd8;
@@ -635,30 +717,38 @@ generate
 				end
 				// STATE 10: Dealer playing until >=17
 				else if (drum_state[i] == 4'd10) begin
-					if (dealer_hands >= 5'd17) begin
+					if (dealer_hands[i] >= 5'd17) begin
 						drum_state[i] <= 4'd11; // Result
 					end
 					else begin
-						drawn_card_val[card_itr] <= q[i];
-						card_itr <= card_itr + 4'd1;
-						dealer_hands <= dealer_hands + q[i];
+						if(card_itr[i] == 5'd4) begin
+							test_draw_dealer_2[i] <= q[i];
+						end
+						else if(card_itr[i] == 5'd5) begin
+							test_draw_dealer_3[i] <= q[i];
+						end
+						
+						
+						drawn_card_val[card_itr[i]] <= q[i];
+						card_itr[i] <= card_itr[i] + 5'd1;
+						dealer_hands[i] <= dealer_hands[i] + q[i];
 						drum_state[i] <= 4'd8 ;	//HIT	
-						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr]);
+						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr[i]]);
 					end
 				end
 				// STATE 11: Check final result 
 				else if (drum_state[i] == 4'd11) begin
-					if (player_hands > 5'd21) begin
-						player_result <= 1'd0;
+					if (player_hands[i] > 5'd21) begin
+						player_result[i] <= 1'd0;
 					end
-					else if (player_hands < 5'd21 && dealer_hands <= 5'd21 && player_hands < dealer_hands) begin
-						player_result <= 1'd0;
+					else if (player_hands[i] < 5'd21 && dealer_hands[i] <= 5'd21 && player_hands[i] < dealer_hands[i]) begin
+						player_result[i] <= 1'd0;
 					end
-					else if (player_hands == dealer_hands) begin
+					else if (player_hands[i] == dealer_hands[i]) begin
 						tie_check[i] <= 1'd1;
 					end
-					else if (((player_hands > dealer_hands) && player_hands <= 5'd21 && dealer_hands < 5'd21) || (dealer_hands > 5'd21)) begin
-						player_result <= 1'd1;
+					else if (((player_hands[i] > dealer_hands[i]) && player_hands[i] <= 5'd21 && dealer_hands[i] < 5'd21) || (dealer_hands[i] > 5'd21)) begin
+						player_result[i] <= 1'd1;
 					end
 				end
 				
@@ -873,9 +963,22 @@ Computer_System The_System (
 	.dealer_top_external_connection_export(dealer_top_pio),
 	.player_init_hand_external_connection_export(player_init_hand_pio),
 	.init_done_external_connection_export(init_done),
-	.shared_write_external_connection_export(shared_write)
+	.shared_write_external_connection_export(shared_write),
+	.read_addr_test_external_connection_export(test_1),
+	.output_random_test_external_connection_export(test_2),
+	
+	.draw_dealer_1_external_connection_export(draw_dealer_1[0]),
+	.draw_dealer_2_external_connection_export(draw_dealer_2[0]),
+	.draw_dealer_3_external_connection_export(draw_dealer_3[0]),
+	.draw_player_1_external_connection_export(draw_player_1[0]),
+	.draw_player_2_external_connection_export(draw_player_2[0]),
+	.draw_player_3_external_connection_export(draw_player_3[0]),
+	.test_3_external_connection_export(test_3),
+	.which_simulation_external_connection_export(which_simulation)
+	
 );
 endmodule // end top level
+
 
 // color write data module
 /*

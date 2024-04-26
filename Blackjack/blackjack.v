@@ -69,20 +69,20 @@ module testbench();
 			init_done <= 1'd0;
 		end else begin
 			if (~init_state) begin
-				index_rows <= 9'd0;
+				index_rows <= 10'd0;
 				init_samp_counter <= 4'd0;
 				sram_write_en <= 1'd1;
 				init_state <= 1'd1;
 			end
 			else begin
-				if (index_rows <= 10'd49) begin
+				if (index_rows <= 10'd510) begin
 					//if (init_samp_counter >= 4'd10) begin
 					//	init_samp_counter <= 4'd0;
 					//end
 					sram_write_address <= index_rows;
 					sram_write <= init_samp_counter;
 					init_samp_counter <= (init_samp_counter >= 4'd10) ? 4'd0 : init_samp_counter + 4'd1;
-					index_rows <= index_rows + 4'd1;
+					index_rows <= index_rows + 10'd1;
 				end else begin
 					sram_write_en <= 1'd0;
 					init_done <= 1'd1;
@@ -100,7 +100,7 @@ module testbench();
 	always @(posedge clk_50) begin
 		if (init_done) begin
 			if (sram_state == 4'd0) begin
-				if (read_addr_init < 10'd52) begin
+				if (read_addr_init < 10'd510) begin
 					sram_address <= read_addr_init;
 					sram_state <= 4'd1;
 					data_ready <= 1'd0;
@@ -151,6 +151,12 @@ module testbench();
 					we[i] <= 1'd1;
 					//init_done <= 1'd0;
 					write_addr[i] <= 10'd0;
+					read_addr[i] <= 10'd0;
+					card_itr <= 5'd0;
+					hit_card_reg <= 256'd0;
+					player_hands <= 5'd0;
+					dealer_hands <= 5'd0;
+					shared_mem_done <= 1'd0;
 				end
 				else begin
 					// STATE 0: Initialization
@@ -203,8 +209,8 @@ module testbench();
 					// STATE 1: Dealer's card
 					else if (drum_state[i] == 4'd1) begin //initiate dealers cards
 						drum_state[i] <= 4'd2;
-						read_addr[i] <= output_random[i];
-						array_hit_card[card_itr] <= output_random[i];	
+						read_addr[i] <= (output_random[i] + 8'd1);
+						array_hit_card[card_itr] <= (output_random[i] + 8'd1);	
 						//card_itr <= card_itr + 4'd1;						
 					end
 					// STATE 2: Buffer state
@@ -232,8 +238,8 @@ module testbench();
 					// STATE 5: Player's turn
 					else if (drum_state[i] == 4'd5) begin
 						if (~picked) begin
-							read_addr[i] <= output_random[i];
-							array_hit_card[card_itr] <= output_random[i];
+							read_addr[i] <= output_random[i] + 8'd1;
+							array_hit_card[card_itr] <= output_random[i] + 8'd1;
 							drum_state[i] <= 4'd6;
 						end else begin
 							drum_state[i] <= 4'd5;
@@ -259,8 +265,8 @@ module testbench();
 					// STATE 8: Dealer's turn
 					else if (drum_state[i] == 4'd8) begin
 						if (~picked) begin
-							read_addr[i] <= output_random[i];
-							array_hit_card[card_itr] <= output_random[i];
+							read_addr[i] <= output_random[i] + 8'd1;
+							array_hit_card[card_itr] <= output_random[i] + 8'd1;
 							drum_state[i] <= 4'd9;
 						end else begin
 							drum_state[i] <= 4'd8;

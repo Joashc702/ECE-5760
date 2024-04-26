@@ -83,12 +83,22 @@ module Computer_System (
 	onchip_sram_s1_readdata,
 	onchip_sram_s1_writedata,
 	onchip_sram_s1_byteenable,
+	output_random_test_external_connection_export,
 	player_init_hand_external_connection_export,
+	read_addr_test_external_connection_export,
 	shared_write_external_connection_export,
 	system_pll_ref_clk_clk,
 	system_pll_ref_reset_reset,
 	vga_pio_locked_export,
-	vga_pio_outclk0_clk);	
+	vga_pio_outclk0_clk,
+	which_simulation_external_connection_export,
+	draw_dealer_1_external_connection_export,
+	draw_dealer_2_external_connection_export,
+	draw_dealer_3_external_connection_export,
+	draw_player_1_external_connection_export,
+	draw_player_2_external_connection_export,
+	draw_player_3_external_connection_export,
+	test_3_external_connection_export);	
 
 	output	[7:0]	dealer_top_external_connection_export;
 	output		hps_io_hps_io_emac1_inst_TX_CLK;
@@ -173,10 +183,20 @@ module Computer_System (
 	output	[31:0]	onchip_sram_s1_readdata;
 	input	[31:0]	onchip_sram_s1_writedata;
 	input	[3:0]	onchip_sram_s1_byteenable;
+	input	[31:0]	output_random_test_external_connection_export;
 	output	[7:0]	player_init_hand_external_connection_export;
+	input	[7:0]	read_addr_test_external_connection_export;
 	input	[7:0]	shared_write_external_connection_export;
 	input		system_pll_ref_clk_clk;
 	input		system_pll_ref_reset_reset;
 	output		vga_pio_locked_export;
 	output		vga_pio_outclk0_clk;
+	output	[7:0]	which_simulation_external_connection_export;
+	input	[7:0]	draw_dealer_1_external_connection_export;
+	input	[7:0]	draw_dealer_2_external_connection_export;
+	input	[7:0]	draw_dealer_3_external_connection_export;
+	input	[7:0]	draw_player_1_external_connection_export;
+	input	[7:0]	draw_player_2_external_connection_export;
+	input	[7:0]	draw_player_3_external_connection_export;
+	input	[7:0]	test_3_external_connection_export;
 endmodule
