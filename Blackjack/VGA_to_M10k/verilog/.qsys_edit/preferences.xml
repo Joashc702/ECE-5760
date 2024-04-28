@@ -3,13 +3,12 @@
  <debug showDebugMenu="0" />
  <systemtable filter="All Interfaces">
   <columns>
-   <connections preferredWidth="223" />
-   <irq preferredWidth="47" />
+   <connections preferredWidth="47" />
+   <irq preferredWidth="34" />
    <name preferredWidth="178" />
   </columns>
  </systemtable>
- <library
-   expandedCategories="Library/Basic Functions/Bridges and Adaptors/Clock,Library/Basic Functions/Bridges and Adaptors,Library,Library/Basic Functions/On Chip Memory,Project,Library/Basic Functions" />
+ <library expandedCategories="Project,Library" />
  <window width="1920" height="1040" x="0" y="0" />
  <generation block_symbol_file="0" />
 </preferences>

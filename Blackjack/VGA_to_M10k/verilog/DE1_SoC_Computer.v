@@ -433,7 +433,7 @@ wire sram_chipselect = 1'b1;
 reg [3:0] sram_state_seed = 4'd0;
 wire [31:0] sram_readdata_seed;
 reg [31:0] data_buffer_seed, sram_writedata_seed;
-reg [8:0] sram_address_seed; // (52*6)*4
+reg [10:0] sram_address_seed; // (52*6)*4
 reg sram_write_seed;
 wire sram_clken_seed = 1'b1;
 wire sram_chipselect_seed = 1'b1;
@@ -445,7 +445,7 @@ reg [9:0] read_addr_init;
 reg [9:0] write_addr_init;
 
 reg [10:0] read_addr_init_seed;
-reg [9:0] write_addr_init_seed;
+reg [10:0] write_addr_init_seed;
 reg seed_init;
 reg data_ready;
 reg data_ready_seed;
@@ -455,6 +455,7 @@ always @(posedge CLOCK_50) begin
 	if (init_done == 8'd0) begin
 		read_addr_init_seed <= 11'd0;
 		seed_init <= 1'd0;
+		sram_address_seed <= 11'd0;
 	end
 	else if (init_done == 8'd1) begin
 		if (sram_state_seed == 4'd0) begin
@@ -539,7 +540,7 @@ end
 */
 
 parameter [9:0] num_simul = 5;//half of the number of columns
- wire [7:0] output_random [num_simul-1:0] /*synthesis keep */; 
+wire [7:0] output_random [num_simul-1:0] /*synthesis keep */; 
 //wire [63:0] seed_samples [5:0];
 //wire init_done;
 
@@ -639,7 +640,9 @@ generate
 		//assign seed_in[1] = (data_ready_seed == 1'd1 && read_addr_init_seed == (i*3) + 1) ? data_buffer_seed : 6'd0;
 		//assign seed_in[2] = (data_ready_seed == 1'd1 && read_addr_init_seed == (i*3) + 2) ? data_buffer_seed : 6'd0;
 		assign seed_test[i] = seed_in[0];
-		reg internal_reset;
+		reg internal_reset_1;
+		reg internal_reset_2;
+		reg internal_reset_3;
 		
 		
 		
@@ -650,36 +653,49 @@ generate
 				seed_in[0] <= 6'd0;
 				seed_in[1] <= 6'd0;
 				seed_in[2] <= 6'd0;
-				internal_reset <= 1'd0;
+				internal_reset_1 <= 1'd0;
+				internal_reset_2 <= 1'd0;
+				internal_reset_3 <= 1'd0;
 
 			end
 			if (~seed_init && init_done == 8'd1) begin
-				if ((data_ready_seed == 1'd1 && read_addr_init_seed == i*3)) begin
+				if ((data_ready_seed == 1'd1 && sram_address_seed == i*3)) begin
 					seed_in[0] <= data_buffer_seed;
-					internal_reset <= 1'd1;
+					internal_reset_1 <= 1'd1;
 				end
-				if (internal_reset == 1'd1) begin
-					internal_reset <= 1'd0;
+				if (internal_reset_1 == 1'd1) begin
+					internal_reset_1 <= 1'd0;
 				end
-				if ((data_ready_seed == 1'd1 && read_addr_init_seed == i*3 + 1)) begin
+				
+				if ((data_ready_seed == 1'd1 && sram_address_seed == (i*3 + 1))) begin
 					seed_in[1] <= data_buffer_seed;
+					internal_reset_2 <= 1'd1;
 				end
-				if ((data_ready_seed == 1'd1 && read_addr_init_seed == i*3 + 2)) begin
+				if (internal_reset_2 == 1'd1) begin
+					internal_reset_2 <= 1'd0;
+				end
+				
+				if ((data_ready_seed == 1'd1 && sram_address_seed == (i*3 + 2))) begin
 					seed_in[2] <= data_buffer_seed;
-					
+					internal_reset_3 <= 1'd1;
+				end
+				if (internal_reset_3 == 1'd1) begin
+					internal_reset_3 <= 1'd0;
 				end
 			end
 		end
 		
-		assign lfsr_test[i] = output_random_vals[0];
+		assign lfsr_test[i] = output_random[i];
 		assign output_random[i] = {output_random_vals[5][0],output_random_vals[4][0],output_random_vals[3][0],output_random_vals[2][0],output_random_vals[1][0],output_random_vals[0][0]} ;
-			//rand127 random_num(.rand_out(output_random), .seed_in(64'h54555555), .clock_in(clk_50), .reset_in(reset));
-		rand6 random_num(.rand_out(output_random_vals[0]), .seed_in(seed_in[0]), .clock_in(CLOCK_50), .reset_in(internal_reset));
-		rand6 random_num_2(.rand_out(output_random_vals[1]), .seed_in(seed_in[1]), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
-		rand6 random_num_3(.rand_out(output_random_vals[2]), .seed_in(seed_in[2]), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
-		rand6 random_num_4(.rand_out(output_random_vals[3]), .seed_in(seed_in[0] ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
-		rand6 random_num_5(.rand_out(output_random_vals[4]), .seed_in(seed_in[1] ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
-		rand6 random_num_6(.rand_out(output_random_vals[5]), .seed_in(seed_in[2] ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
+		
+		//rand127 random_num(.rand_out(output_random), .seed_in(64'h54555555), .clock_in(clk_50), .reset_in(reset));
+			
+		rand6 random_num(.rand_out(output_random_vals[0]), .seed_in(seed_in[0]), .clock_in(CLOCK_50), .reset_in(internal_reset_1));
+		rand6 random_num_2(.rand_out(output_random_vals[1]), .seed_in(seed_in[1]), .clock_in(CLOCK_50), .reset_in(internal_reset_2));
+		rand6 random_num_3(.rand_out(output_random_vals[2]), .seed_in(seed_in[2]), .clock_in(CLOCK_50), .reset_in(internal_reset_3));
+		rand6 random_num_4(.rand_out(output_random_vals[3]), .seed_in(seed_in[0] ^ i), .clock_in(CLOCK_50), .reset_in(internal_reset_1));
+		rand6 random_num_5(.rand_out(output_random_vals[4]), .seed_in(seed_in[1] ^ i), .clock_in(CLOCK_50), .reset_in(internal_reset_2));
+		rand6 random_num_6(.rand_out(output_random_vals[5]), .seed_in(seed_in[2] ^ i), .clock_in(CLOCK_50), .reset_in(internal_reset_3));
 	
 		M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
 		Search_hit_card card_check( .picked_card(hit_card_reg), 
