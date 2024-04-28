@@ -429,13 +429,53 @@ reg [8:0] sram_address; // (52*6)*4
 reg sram_write;
 wire sram_clken = 1'b1;
 wire sram_chipselect = 1'b1;
+
+reg [3:0] sram_state_seed = 4'd0;
+wire [31:0] sram_readdata_seed;
+reg [31:0] data_buffer_seed, sram_writedata_seed;
+reg [8:0] sram_address_seed; // (52*6)*4
+reg sram_write_seed;
+wire sram_clken_seed = 1'b1;
+wire sram_chipselect_seed = 1'b1;
+
+
 reg [3:0] sram_state = 4'd0;
 reg shared_mem_done;
 reg [9:0] read_addr_init;
 reg [9:0] write_addr_init;
+
+reg [10:0] read_addr_init_seed;
+reg [9:0] write_addr_init_seed;
+reg seed_init;
 reg data_ready;
+reg data_ready_seed;
 wire [7:0] init_done /*synthesis keep */;
 
+always @(posedge CLOCK_50) begin
+	if (init_done == 8'd0) begin
+		read_addr_init_seed <= 11'd0;
+		seed_init <= 1'd0;
+	end
+	else if (init_done == 8'd1) begin
+		if (sram_state_seed == 4'd0) begin
+			if (read_addr_init_seed < 11'd2000) begin
+				sram_address_seed <= read_addr_init_seed;
+				sram_state_seed <= 4'd1;
+				data_ready_seed <= 1'd0;
+			end else begin
+				seed_init <= 1'd1;
+				data_ready_seed <= 1'd0;
+			end
+		end else if (sram_state_seed == 4'd1) begin // buffer state
+			sram_state_seed <= 4'd2;
+		end else if (sram_state_seed == 4'd2) begin
+			data_buffer_seed <= sram_readdata_seed;
+			read_addr_init_seed <= read_addr_init_seed + 11'd1;
+			sram_state_seed <= 4'd0;
+			data_ready_seed <= 1'd1;
+		end
+	end
+end
 
 always @(posedge CLOCK_50) begin
 	if (init_done == 8'd0) begin
@@ -550,13 +590,17 @@ reg [7:0] test_draw_player_3[num_simul-1:0];
 wire [7:0] which_simulation; //output from the Arm
 
 
-assign draw_dealer_1[0] = test_draw_dealer_1[0];
-assign draw_dealer_2[0] = test_draw_dealer_2[0];
-assign draw_dealer_3[0] = test_draw_dealer_3[0];
+//assign draw_dealer_1[0] = test_draw_dealer_1[0];
+//assign draw_dealer_2[0] = test_draw_dealer_2[0];
 
-assign draw_player_1[0] = test_draw_player_1[0];
-assign draw_player_2[0] = test_draw_player_2[0];
-assign draw_player_3[0] = test_draw_player_3[0];
+assign draw_dealer_1[0] = seed_test[2];
+assign draw_dealer_2[0] = seed_init;
+//assign draw_dealer_3[0] = test_draw_dealer_3[0];
+assign draw_dealer_3[0] = output_random[0];
+//assign draw_player_1[0] = test_draw_player_1[0];
+assign draw_player_1[0] = lfsr_test[0];
+assign draw_player_2[0] = seed_test[3];
+assign draw_player_3[0] = seed_test[1];
 
 
 reg player_result[num_simul-1:0];
@@ -566,26 +610,77 @@ assign test_3 = player_result[0]; //input to the arm
 //assign shared_write = output_random[0];
 assign shared_write = card_itr[0];
 
-assign test_1 = dealer_hands[0];
-assign test_2 = player_hands[0];
+assign test_1 = drum_state[0];
+assign test_2 = ((init_done == 8'd0) ? 1'd1 : 1'd0);
 
 reg [4:0] player_hands [num_simul - 1:0];
 reg [4:0] dealer_hands [num_simul - 1:0];
 
+wire [5:0] seed_test [num_simul - 1: 0];
+wire [5:0] lfsr_test [num_simul - 1: 0];
+
 genvar i;
 generate 
 	for (i = 0; i < num_simul; i = i+1) begin: initCols  
-		rand127 random_num(.rand_out(output_random[i]), .seed_in(64'h54555555 ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
+		//rand127 random_num(.rand_out(output_random[i]), .seed_in(64'h54555555 ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
 		reg [3:0] array_hit_card [11:0]; // track index of card
 		reg [255:0] hit_card_reg;
 		reg [3:0] drawn_card_val [11:0]; // track the value of card being drawn
 		reg [3:0] dealer_card;
+		wire [5:0] output_random_vals[5:0];
 		wire picked; 
 
 		// reg internal_state;
 		
 		//assign hit_card_reg = ;
 		
+		reg [5:0] seed_in [2:0];
+		//assign seed_in[0] = (data_ready_seed == 1'd1 && read_addr_init_seed == i*3) ? data_buffer_seed : 6'd0;
+		//assign seed_in[1] = (data_ready_seed == 1'd1 && read_addr_init_seed == (i*3) + 1) ? data_buffer_seed : 6'd0;
+		//assign seed_in[2] = (data_ready_seed == 1'd1 && read_addr_init_seed == (i*3) + 2) ? data_buffer_seed : 6'd0;
+		assign seed_test[i] = seed_in[0];
+		reg internal_reset;
+		
+		
+		
+		//TODO: on chip SRAM does not work because seed_in does not pick up value
+		
+		always @(posedge CLOCK_50) begin
+			if (init_done == 8'd0) begin
+				seed_in[0] <= 6'd0;
+				seed_in[1] <= 6'd0;
+				seed_in[2] <= 6'd0;
+				internal_reset <= 1'd0;
+
+			end
+			if (~seed_init && init_done == 8'd1) begin
+				if ((data_ready_seed == 1'd1 && read_addr_init_seed == i*3)) begin
+					seed_in[0] <= data_buffer_seed;
+					internal_reset <= 1'd1;
+				end
+				if (internal_reset == 1'd1) begin
+					internal_reset <= 1'd0;
+				end
+				if ((data_ready_seed == 1'd1 && read_addr_init_seed == i*3 + 1)) begin
+					seed_in[1] <= data_buffer_seed;
+				end
+				if ((data_ready_seed == 1'd1 && read_addr_init_seed == i*3 + 2)) begin
+					seed_in[2] <= data_buffer_seed;
+					
+				end
+			end
+		end
+		
+		assign lfsr_test[i] = output_random_vals[0];
+		assign output_random[i] = {output_random_vals[5][0],output_random_vals[4][0],output_random_vals[3][0],output_random_vals[2][0],output_random_vals[1][0],output_random_vals[0][0]} ;
+			//rand127 random_num(.rand_out(output_random), .seed_in(64'h54555555), .clock_in(clk_50), .reset_in(reset));
+		rand6 random_num(.rand_out(output_random_vals[0]), .seed_in(seed_in[0]), .clock_in(CLOCK_50), .reset_in(internal_reset));
+		rand6 random_num_2(.rand_out(output_random_vals[1]), .seed_in(seed_in[1]), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
+		rand6 random_num_3(.rand_out(output_random_vals[2]), .seed_in(seed_in[2]), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
+		rand6 random_num_4(.rand_out(output_random_vals[3]), .seed_in(seed_in[0] ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
+		rand6 random_num_5(.rand_out(output_random_vals[4]), .seed_in(seed_in[1] ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
+		rand6 random_num_6(.rand_out(output_random_vals[5]), .seed_in(seed_in[2] ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
+	
 		M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
 		Search_hit_card card_check( .picked_card(hit_card_reg), 
 									.card(output_random[i]), // TODO we don't want generated number all the time
@@ -614,6 +709,8 @@ generate
 				test_draw_player_2[i] <= 8'd0;
 				test_draw_player_3[i] <= 8'd0;
 				
+				
+				
 			end
 			else begin
 				// STATE 0: Initialization
@@ -622,7 +719,7 @@ generate
 						d[i] <= data_buffer[3:0];
 						write_addr[i] <= write_addr[i] + 10'b1;
 					end
-					if (shared_mem_done) begin
+					if (shared_mem_done && seed_init) begin
 						drum_state[i] <= 4'd1;
 						write_init_done[i] <= 1'b1;
 
@@ -843,6 +940,15 @@ Computer_System The_System (
 	.onchip_sram_s1_readdata(sram_readdata),     
 	.onchip_sram_s1_writedata(sram_writedata),
 	.onchip_sram_s1_byteenable(4'b1111),
+	
+	
+	.onchip_memory_seed_s1_address(sram_address_seed),                 //                  onchip_memory_seed_s1.address
+	.onchip_memory_seed_s1_clken(sram_clken_seed),                   //                                       .clken
+	.onchip_memory_seed_s1_chipselect(sram_chipselect_seed),              //                                       .chipselect
+	.onchip_memory_seed_s1_write(sram_write_seed),                   //                                       .write
+	.onchip_memory_seed_s1_readdata(sram_readdata_seed),                //                                       .readdata
+	.onchip_memory_seed_s1_writedata(sram_writedata_seed),               //                                       .writedata
+	.onchip_memory_seed_s1_byteenable(4'b1111),   
 	
 	.vga_pio_locked_export			(vga_pll_lock),           //       vga_pio_locked.export
 	.vga_pio_outclk0_clk				(vga_pll),              //      vga_pio_outclk0.clk
@@ -1302,6 +1408,25 @@ module Search_hit_card(picked_card, card, picked);
 					
 	assign picked = ((picked_card) & (1 << card)) >> card;
 	
+endmodule
+
+module rand6(rand_out, seed_in, clock_in, reset_in);
+	output wire [5:0] rand_out;
+	input wire clock_in, reset_in;
+	input wire [5:0] seed_in;
+	
+	reg [5:0] interm_rand;
+	
+	always @(posedge clock_in)
+	begin
+		if (reset_in) begin
+			interm_rand <= seed_in;
+		end
+		else begin
+			interm_rand <= {interm_rand[4], interm_rand[3], interm_rand[2], interm_rand[1], interm_rand[0], interm_rand[5]^interm_rand[4]};
+		end
+	end
+	assign rand_out = interm_rand;
 endmodule
 //////////////////////////////////////////////////////////
 // 16-bit parallel random number generator ///////////////

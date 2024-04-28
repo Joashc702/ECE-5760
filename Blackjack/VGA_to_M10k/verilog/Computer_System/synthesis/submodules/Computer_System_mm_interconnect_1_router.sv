@@ -280,13 +280,13 @@ module Computer_System_mm_interconnect_1_router
 
     // ( 0x120 .. 0x130 )
     if ( {address[RG:PAD12],{PAD12{1'b0}}} == 9'h120  && read_transaction  ) begin
-            src_channel = 14'b01000000000000;
+            src_channel = 14'b10000000000000;
             src_data[PKT_DEST_ID_H:PKT_DEST_ID_L] = 6;
     end
 
     // ( 0x130 .. 0x140 )
     if ( {address[RG:PAD13],{PAD13{1'b0}}} == 9'h130  && read_transaction  ) begin
-            src_channel = 14'b10000000000000;
+            src_channel = 14'b01000000000000;
             src_data[PKT_DEST_ID_H:PKT_DEST_ID_L] = 12;
     end
 

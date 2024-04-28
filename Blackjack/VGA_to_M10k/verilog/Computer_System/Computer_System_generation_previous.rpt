@@ -12,6 +12,18 @@ Progress: Adding clock_bridge_0 [altera_clock_bridge 18.1]
 Progress: Parameterizing module clock_bridge_0
 Progress: Adding dealer_top [altera_avalon_pio 18.1]
 Progress: Parameterizing module dealer_top
+Progress: Adding draw_dealer_1 [altera_avalon_pio 18.1]
+Progress: Parameterizing module draw_dealer_1
+Progress: Adding draw_dealer_2 [altera_avalon_pio 18.1]
+Progress: Parameterizing module draw_dealer_2
+Progress: Adding draw_dealer_3 [altera_avalon_pio 18.1]
+Progress: Parameterizing module draw_dealer_3
+Progress: Adding draw_player_1 [altera_avalon_pio 18.1]
+Progress: Parameterizing module draw_player_1
+Progress: Adding draw_player_2 [altera_avalon_pio 18.1]
+Progress: Parameterizing module draw_player_2
+Progress: Adding draw_player_3 [altera_avalon_pio 18.1]
+Progress: Parameterizing module draw_player_3
 Progress: Adding init_done [altera_avalon_pio 18.1]
 Progress: Parameterizing module init_done
 Progress: Adding m10k_pll [altera_pll 18.1]
@@ -24,8 +36,12 @@ Progress: Adding read_addr_test [altera_avalon_pio 18.1]
 Progress: Parameterizing module read_addr_test
 Progress: Adding shared_write [altera_avalon_pio 18.1]
 Progress: Parameterizing module shared_write
+Progress: Adding test_3 [altera_avalon_pio 18.1]
+Progress: Parameterizing module test_3
 Progress: Adding vga_pio [altera_pll 18.1]
 Progress: Parameterizing module vga_pio
+Progress: Adding which_simulation [altera_avalon_pio 18.1]
+Progress: Parameterizing module which_simulation
 Progress: Building connections
 Progress: Parameterizing connections
 Progress: Validating
@@ -36,11 +52,18 @@ Warning: Computer_System.ARM_A9_HPS: "Configuration/HPS-to-FPGA user 0 clock fre
 Warning: Computer_System.ARM_A9_HPS: "QSPI clock frequency" (desired_qspi_clk_mhz) requested 400.0 MHz, but only achieved 370.0 MHz
 Warning: Computer_System.ARM_A9_HPS: 1 or more output clock frequencies cannot be achieved precisely, consider revising desired output clock frequencies.
 Info: Computer_System.System_PLL: Refclk Freq: 50.0
+Info: Computer_System.draw_dealer_1: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.draw_dealer_2: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.draw_dealer_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.draw_player_1: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.draw_player_2: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.draw_player_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Info: Computer_System.m10k_pll: The legal reference clock frequency is 5.0 MHz..800.0 MHz
 Info: Computer_System.m10k_pll: Able to implement PLL with user settings
 Info: Computer_System.output_random_test: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Info: Computer_System.read_addr_test: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Info: Computer_System.shared_write: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.test_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Info: Computer_System.vga_pio: The legal reference clock frequency is 5.0 MHz..800.0 MHz
 Info: Computer_System.vga_pio: Able to implement PLL with user settings
 Warning: Computer_System.: You have exported the interface Onchip_SRAM.s1 but not its associated clock interface.  Export the driver of Onchip_SRAM.clk1
@@ -59,23 +82,23 @@ Warning: ARM_A9_HPS: "QSPI clock frequency" (desired_qspi_clk_mhz) requested 400
 Warning: ARM_A9_HPS: 1 or more output clock frequencies cannot be achieved precisely, consider revising desired output clock frequencies.
 Info: ARM_A9_HPS: "Computer_System" instantiated altera_hps "ARM_A9_HPS"
 Info: Onchip_SRAM: Starting RTL generation for module 'Computer_System_Onchip_SRAM'
-Info: Onchip_SRAM:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=Computer_System_Onchip_SRAM --dir=C:/Users/hh759/AppData/Local/Temp/alt9838_496049710362926324.dir/0002_Onchip_SRAM_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9838_496049710362926324.dir/0002_Onchip_SRAM_gen//Computer_System_Onchip_SRAM_component_configuration.pl  --do_build_sim=0  ]
+Info: Onchip_SRAM:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=Computer_System_Onchip_SRAM --dir=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0002_Onchip_SRAM_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0002_Onchip_SRAM_gen//Computer_System_Onchip_SRAM_component_configuration.pl  --do_build_sim=0  ]
 Info: Onchip_SRAM: Done RTL generation for module 'Computer_System_Onchip_SRAM'
 Info: Onchip_SRAM: "Computer_System" instantiated altera_avalon_onchip_memory2 "Onchip_SRAM"
 Info: System_PLL: "Computer_System" instantiated altera_up_avalon_sys_sdram_pll "System_PLL"
 Info: dealer_top: Starting RTL generation for module 'Computer_System_dealer_top'
-Info: dealer_top:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_dealer_top --dir=C:/Users/hh759/AppData/Local/Temp/alt9838_496049710362926324.dir/0003_dealer_top_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9838_496049710362926324.dir/0003_dealer_top_gen//Computer_System_dealer_top_component_configuration.pl  --do_build_sim=0  ]
+Info: dealer_top:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_dealer_top --dir=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0003_dealer_top_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0003_dealer_top_gen//Computer_System_dealer_top_component_configuration.pl  --do_build_sim=0  ]
 Info: dealer_top: Done RTL generation for module 'Computer_System_dealer_top'
 Info: dealer_top: "Computer_System" instantiated altera_avalon_pio "dealer_top"
+Info: draw_dealer_1: Starting RTL generation for module 'Computer_System_draw_dealer_1'
+Info: draw_dealer_1:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_draw_dealer_1 --dir=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0004_draw_dealer_1_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0004_draw_dealer_1_gen//Computer_System_draw_dealer_1_component_configuration.pl  --do_build_sim=0  ]
+Info: draw_dealer_1: Done RTL generation for module 'Computer_System_draw_dealer_1'
+Info: draw_dealer_1: "Computer_System" instantiated altera_avalon_pio "draw_dealer_1"
 Info: m10k_pll: "Computer_System" instantiated altera_pll "m10k_pll"
 Info: output_random_test: Starting RTL generation for module 'Computer_System_output_random_test'
-Info: output_random_test:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_output_random_test --dir=C:/Users/hh759/AppData/Local/Temp/alt9838_496049710362926324.dir/0005_output_random_test_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9838_496049710362926324.dir/0005_output_random_test_gen//Computer_System_output_random_test_component_configuration.pl  --do_build_sim=0  ]
+Info: output_random_test:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_output_random_test --dir=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0006_output_random_test_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0006_output_random_test_gen//Computer_System_output_random_test_component_configuration.pl  --do_build_sim=0  ]
 Info: output_random_test: Done RTL generation for module 'Computer_System_output_random_test'
 Info: output_random_test: "Computer_System" instantiated altera_avalon_pio "output_random_test"
-Info: read_addr_test: Starting RTL generation for module 'Computer_System_read_addr_test'
-Info: read_addr_test:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_read_addr_test --dir=C:/Users/hh759/AppData/Local/Temp/alt9838_496049710362926324.dir/0006_read_addr_test_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9838_496049710362926324.dir/0006_read_addr_test_gen//Computer_System_read_addr_test_component_configuration.pl  --do_build_sim=0  ]
-Info: read_addr_test: Done RTL generation for module 'Computer_System_read_addr_test'
-Info: read_addr_test: "Computer_System" instantiated altera_avalon_pio "read_addr_test"
 Info: vga_pio: "Computer_System" instantiated altera_pll "vga_pio"
 Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
 Info: mm_interconnect_0: "Computer_System" instantiated altera_mm_interconnect "mm_interconnect_0"
@@ -85,6 +108,14 @@ Info: avalon_st_adapter_002: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_003: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_004: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_005: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_006: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_007: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_008: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_009: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_010: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_011: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_012: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_013: Inserting error_adapter: error_adapter_0
 Info: mm_interconnect_1: "Computer_System" instantiated altera_mm_interconnect "mm_interconnect_1"
 Info: irq_mapper: "Computer_System" instantiated altera_irq_mapper "irq_mapper"
 Info: rst_controller: "Computer_System" instantiated altera_reset_controller "rst_controller"

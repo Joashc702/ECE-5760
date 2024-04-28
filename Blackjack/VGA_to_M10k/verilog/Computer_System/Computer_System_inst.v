@@ -1,5 +1,11 @@
 	Computer_System u0 (
 		.dealer_top_external_connection_export         (<connected-to-dealer_top_external_connection_export>),         //         dealer_top_external_connection.export
+		.draw_dealer_1_external_connection_export      (<connected-to-draw_dealer_1_external_connection_export>),      //      draw_dealer_1_external_connection.export
+		.draw_dealer_2_external_connection_export      (<connected-to-draw_dealer_2_external_connection_export>),      //      draw_dealer_2_external_connection.export
+		.draw_dealer_3_external_connection_export      (<connected-to-draw_dealer_3_external_connection_export>),      //      draw_dealer_3_external_connection.export
+		.draw_player_1_external_connection_export      (<connected-to-draw_player_1_external_connection_export>),      //      draw_player_1_external_connection.export
+		.draw_player_2_external_connection_export      (<connected-to-draw_player_2_external_connection_export>),      //      draw_player_2_external_connection.export
+		.draw_player_3_external_connection_export      (<connected-to-draw_player_3_external_connection_export>),      //      draw_player_3_external_connection.export
 		.hps_io_hps_io_emac1_inst_TX_CLK               (<connected-to-hps_io_hps_io_emac1_inst_TX_CLK>),               //                                 hps_io.hps_io_emac1_inst_TX_CLK
 		.hps_io_hps_io_emac1_inst_TXD0                 (<connected-to-hps_io_hps_io_emac1_inst_TXD0>),                 //                                       .hps_io_emac1_inst_TXD0
 		.hps_io_hps_io_emac1_inst_TXD1                 (<connected-to-hps_io_hps_io_emac1_inst_TXD1>),                 //                                       .hps_io_emac1_inst_TXD1
@@ -88,15 +94,16 @@
 		.shared_write_external_connection_export       (<connected-to-shared_write_external_connection_export>),       //       shared_write_external_connection.export
 		.system_pll_ref_clk_clk                        (<connected-to-system_pll_ref_clk_clk>),                        //                     system_pll_ref_clk.clk
 		.system_pll_ref_reset_reset                    (<connected-to-system_pll_ref_reset_reset>),                    //                   system_pll_ref_reset.reset
+		.test_3_external_connection_export             (<connected-to-test_3_external_connection_export>),             //             test_3_external_connection.export
 		.vga_pio_locked_export                         (<connected-to-vga_pio_locked_export>),                         //                         vga_pio_locked.export
 		.vga_pio_outclk0_clk                           (<connected-to-vga_pio_outclk0_clk>),                           //                        vga_pio_outclk0.clk
 		.which_simulation_external_connection_export   (<connected-to-which_simulation_external_connection_export>),   //   which_simulation_external_connection.export
-		.draw_dealer_1_external_connection_export      (<connected-to-draw_dealer_1_external_connection_export>),      //      draw_dealer_1_external_connection.export
-		.draw_dealer_2_external_connection_export      (<connected-to-draw_dealer_2_external_connection_export>),      //      draw_dealer_2_external_connection.export
-		.draw_dealer_3_external_connection_export      (<connected-to-draw_dealer_3_external_connection_export>),      //      draw_dealer_3_external_connection.export
-		.draw_player_1_external_connection_export      (<connected-to-draw_player_1_external_connection_export>),      //      draw_player_1_external_connection.export
-		.draw_player_2_external_connection_export      (<connected-to-draw_player_2_external_connection_export>),      //      draw_player_2_external_connection.export
-		.draw_player_3_external_connection_export      (<connected-to-draw_player_3_external_connection_export>),      //      draw_player_3_external_connection.export
-		.test_3_external_connection_export             (<connected-to-test_3_external_connection_export>)              //             test_3_external_connection.export
+		.onchip_memory_seed_s1_address                 (<connected-to-onchip_memory_seed_s1_address>),                 //                  onchip_memory_seed_s1.address
+		.onchip_memory_seed_s1_clken                   (<connected-to-onchip_memory_seed_s1_clken>),                   //                                       .clken
+		.onchip_memory_seed_s1_chipselect              (<connected-to-onchip_memory_seed_s1_chipselect>),              //                                       .chipselect
+		.onchip_memory_seed_s1_write                   (<connected-to-onchip_memory_seed_s1_write>),                   //                                       .write
+		.onchip_memory_seed_s1_readdata                (<connected-to-onchip_memory_seed_s1_readdata>),                //                                       .readdata
+		.onchip_memory_seed_s1_writedata               (<connected-to-onchip_memory_seed_s1_writedata>),               //                                       .writedata
+		.onchip_memory_seed_s1_byteenable              (<connected-to-onchip_memory_seed_s1_byteenable>)               //                                       .byteenable
 	);
 

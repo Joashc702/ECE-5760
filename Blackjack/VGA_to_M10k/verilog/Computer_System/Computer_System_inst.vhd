@@ -1,6 +1,12 @@
 	component Computer_System is
 		port (
 			dealer_top_external_connection_export         : out   std_logic_vector(7 downto 0);                     -- export
+			draw_dealer_1_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
+			draw_dealer_2_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
+			draw_dealer_3_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
+			draw_player_1_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
+			draw_player_2_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
+			draw_player_3_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
 			hps_io_hps_io_emac1_inst_TX_CLK               : out   std_logic;                                        -- hps_io_emac1_inst_TX_CLK
 			hps_io_hps_io_emac1_inst_TXD0                 : out   std_logic;                                        -- hps_io_emac1_inst_TXD0
 			hps_io_hps_io_emac1_inst_TXD1                 : out   std_logic;                                        -- hps_io_emac1_inst_TXD1
@@ -89,22 +95,29 @@
 			shared_write_external_connection_export       : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
 			system_pll_ref_clk_clk                        : in    std_logic                     := 'X';             -- clk
 			system_pll_ref_reset_reset                    : in    std_logic                     := 'X';             -- reset
+			test_3_external_connection_export             : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
 			vga_pio_locked_export                         : out   std_logic;                                        -- export
 			vga_pio_outclk0_clk                           : out   std_logic;                                        -- clk
 			which_simulation_external_connection_export   : out   std_logic_vector(7 downto 0);                     -- export
-			draw_dealer_1_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
-			draw_dealer_2_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
-			draw_dealer_3_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
-			draw_player_1_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
-			draw_player_2_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
-			draw_player_3_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
-			test_3_external_connection_export             : in    std_logic_vector(7 downto 0)  := (others => 'X')  -- export
+			onchip_memory_seed_s1_address                 : in    std_logic_vector(11 downto 0) := (others => 'X'); -- address
+			onchip_memory_seed_s1_clken                   : in    std_logic                     := 'X';             -- clken
+			onchip_memory_seed_s1_chipselect              : in    std_logic                     := 'X';             -- chipselect
+			onchip_memory_seed_s1_write                   : in    std_logic                     := 'X';             -- write
+			onchip_memory_seed_s1_readdata                : out   std_logic_vector(31 downto 0);                    -- readdata
+			onchip_memory_seed_s1_writedata               : in    std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
+			onchip_memory_seed_s1_byteenable              : in    std_logic_vector(3 downto 0)  := (others => 'X')  -- byteenable
 		);
 	end component Computer_System;
 
 	u0 : component Computer_System
 		port map (
 			dealer_top_external_connection_export         => CONNECTED_TO_dealer_top_external_connection_export,         --         dealer_top_external_connection.export
+			draw_dealer_1_external_connection_export      => CONNECTED_TO_draw_dealer_1_external_connection_export,      --      draw_dealer_1_external_connection.export
+			draw_dealer_2_external_connection_export      => CONNECTED_TO_draw_dealer_2_external_connection_export,      --      draw_dealer_2_external_connection.export
+			draw_dealer_3_external_connection_export      => CONNECTED_TO_draw_dealer_3_external_connection_export,      --      draw_dealer_3_external_connection.export
+			draw_player_1_external_connection_export      => CONNECTED_TO_draw_player_1_external_connection_export,      --      draw_player_1_external_connection.export
+			draw_player_2_external_connection_export      => CONNECTED_TO_draw_player_2_external_connection_export,      --      draw_player_2_external_connection.export
+			draw_player_3_external_connection_export      => CONNECTED_TO_draw_player_3_external_connection_export,      --      draw_player_3_external_connection.export
 			hps_io_hps_io_emac1_inst_TX_CLK               => CONNECTED_TO_hps_io_hps_io_emac1_inst_TX_CLK,               --                                 hps_io.hps_io_emac1_inst_TX_CLK
 			hps_io_hps_io_emac1_inst_TXD0                 => CONNECTED_TO_hps_io_hps_io_emac1_inst_TXD0,                 --                                       .hps_io_emac1_inst_TXD0
 			hps_io_hps_io_emac1_inst_TXD1                 => CONNECTED_TO_hps_io_hps_io_emac1_inst_TXD1,                 --                                       .hps_io_emac1_inst_TXD1
@@ -193,15 +206,16 @@
 			shared_write_external_connection_export       => CONNECTED_TO_shared_write_external_connection_export,       --       shared_write_external_connection.export
 			system_pll_ref_clk_clk                        => CONNECTED_TO_system_pll_ref_clk_clk,                        --                     system_pll_ref_clk.clk
 			system_pll_ref_reset_reset                    => CONNECTED_TO_system_pll_ref_reset_reset,                    --                   system_pll_ref_reset.reset
+			test_3_external_connection_export             => CONNECTED_TO_test_3_external_connection_export,             --             test_3_external_connection.export
 			vga_pio_locked_export                         => CONNECTED_TO_vga_pio_locked_export,                         --                         vga_pio_locked.export
 			vga_pio_outclk0_clk                           => CONNECTED_TO_vga_pio_outclk0_clk,                           --                        vga_pio_outclk0.clk
 			which_simulation_external_connection_export   => CONNECTED_TO_which_simulation_external_connection_export,   --   which_simulation_external_connection.export
-			draw_dealer_1_external_connection_export      => CONNECTED_TO_draw_dealer_1_external_connection_export,      --      draw_dealer_1_external_connection.export
-			draw_dealer_2_external_connection_export      => CONNECTED_TO_draw_dealer_2_external_connection_export,      --      draw_dealer_2_external_connection.export
-			draw_dealer_3_external_connection_export      => CONNECTED_TO_draw_dealer_3_external_connection_export,      --      draw_dealer_3_external_connection.export
-			draw_player_1_external_connection_export      => CONNECTED_TO_draw_player_1_external_connection_export,      --      draw_player_1_external_connection.export
-			draw_player_2_external_connection_export      => CONNECTED_TO_draw_player_2_external_connection_export,      --      draw_player_2_external_connection.export
-			draw_player_3_external_connection_export      => CONNECTED_TO_draw_player_3_external_connection_export,      --      draw_player_3_external_connection.export
-			test_3_external_connection_export             => CONNECTED_TO_test_3_external_connection_export              --             test_3_external_connection.export
+			onchip_memory_seed_s1_address                 => CONNECTED_TO_onchip_memory_seed_s1_address,                 --                  onchip_memory_seed_s1.address
+			onchip_memory_seed_s1_clken                   => CONNECTED_TO_onchip_memory_seed_s1_clken,                   --                                       .clken
+			onchip_memory_seed_s1_chipselect              => CONNECTED_TO_onchip_memory_seed_s1_chipselect,              --                                       .chipselect
+			onchip_memory_seed_s1_write                   => CONNECTED_TO_onchip_memory_seed_s1_write,                   --                                       .write
+			onchip_memory_seed_s1_readdata                => CONNECTED_TO_onchip_memory_seed_s1_readdata,                --                                       .readdata
+			onchip_memory_seed_s1_writedata               => CONNECTED_TO_onchip_memory_seed_s1_writedata,               --                                       .writedata
+			onchip_memory_seed_s1_byteenable              => CONNECTED_TO_onchip_memory_seed_s1_byteenable               --                                       .byteenable
 		);
 

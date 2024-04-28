@@ -1,6 +1,12 @@
 
 module Computer_System (
 	dealer_top_external_connection_export,
+	draw_dealer_1_external_connection_export,
+	draw_dealer_2_external_connection_export,
+	draw_dealer_3_external_connection_export,
+	draw_player_1_external_connection_export,
+	draw_player_2_external_connection_export,
+	draw_player_3_external_connection_export,
 	hps_io_hps_io_emac1_inst_TX_CLK,
 	hps_io_hps_io_emac1_inst_TXD0,
 	hps_io_hps_io_emac1_inst_TXD1,
@@ -89,18 +95,25 @@ module Computer_System (
 	shared_write_external_connection_export,
 	system_pll_ref_clk_clk,
 	system_pll_ref_reset_reset,
+	test_3_external_connection_export,
 	vga_pio_locked_export,
 	vga_pio_outclk0_clk,
 	which_simulation_external_connection_export,
-	draw_dealer_1_external_connection_export,
-	draw_dealer_2_external_connection_export,
-	draw_dealer_3_external_connection_export,
-	draw_player_1_external_connection_export,
-	draw_player_2_external_connection_export,
-	draw_player_3_external_connection_export,
-	test_3_external_connection_export);	
+	onchip_memory_seed_s1_address,
+	onchip_memory_seed_s1_clken,
+	onchip_memory_seed_s1_chipselect,
+	onchip_memory_seed_s1_write,
+	onchip_memory_seed_s1_readdata,
+	onchip_memory_seed_s1_writedata,
+	onchip_memory_seed_s1_byteenable);	
 
 	output	[7:0]	dealer_top_external_connection_export;
+	input	[7:0]	draw_dealer_1_external_connection_export;
+	input	[7:0]	draw_dealer_2_external_connection_export;
+	input	[7:0]	draw_dealer_3_external_connection_export;
+	input	[7:0]	draw_player_1_external_connection_export;
+	input	[7:0]	draw_player_2_external_connection_export;
+	input	[7:0]	draw_player_3_external_connection_export;
 	output		hps_io_hps_io_emac1_inst_TX_CLK;
 	output		hps_io_hps_io_emac1_inst_TXD0;
 	output		hps_io_hps_io_emac1_inst_TXD1;
@@ -189,14 +202,15 @@ module Computer_System (
 	input	[7:0]	shared_write_external_connection_export;
 	input		system_pll_ref_clk_clk;
 	input		system_pll_ref_reset_reset;
+	input	[7:0]	test_3_external_connection_export;
 	output		vga_pio_locked_export;
 	output		vga_pio_outclk0_clk;
 	output	[7:0]	which_simulation_external_connection_export;
-	input	[7:0]	draw_dealer_1_external_connection_export;
-	input	[7:0]	draw_dealer_2_external_connection_export;
-	input	[7:0]	draw_dealer_3_external_connection_export;
-	input	[7:0]	draw_player_1_external_connection_export;
-	input	[7:0]	draw_player_2_external_connection_export;
-	input	[7:0]	draw_player_3_external_connection_export;
-	input	[7:0]	test_3_external_connection_export;
+	input	[11:0]	onchip_memory_seed_s1_address;
+	input		onchip_memory_seed_s1_clken;
+	input		onchip_memory_seed_s1_chipselect;
+	input		onchip_memory_seed_s1_write;
+	output	[31:0]	onchip_memory_seed_s1_readdata;
+	input	[31:0]	onchip_memory_seed_s1_writedata;
+	input	[3:0]	onchip_memory_seed_s1_byteenable;
 endmodule

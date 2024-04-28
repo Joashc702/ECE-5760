@@ -10,6 +10,8 @@ Progress: Adding System_PLL [altera_up_avalon_sys_sdram_pll 18.0]
 Progress: Parameterizing module System_PLL
 Progress: Adding clock_bridge_0 [altera_clock_bridge 18.1]
 Progress: Parameterizing module clock_bridge_0
+Progress: Adding clock_bridge_1 [altera_clock_bridge 18.1]
+Progress: Parameterizing module clock_bridge_1
 Progress: Adding dealer_top [altera_avalon_pio 18.1]
 Progress: Parameterizing module dealer_top
 Progress: Adding draw_dealer_1 [altera_avalon_pio 18.1]
@@ -28,6 +30,8 @@ Progress: Adding init_done [altera_avalon_pio 18.1]
 Progress: Parameterizing module init_done
 Progress: Adding m10k_pll [altera_pll 18.1]
 Progress: Parameterizing module m10k_pll
+Progress: Adding onchip_memory_seed [altera_avalon_onchip_memory2 18.1]
+Progress: Parameterizing module onchip_memory_seed
 Progress: Adding output_random_test [altera_avalon_pio 18.1]
 Progress: Parameterizing module output_random_test
 Progress: Adding player_init_hand [altera_avalon_pio 18.1]
@@ -66,10 +70,11 @@ Info: Computer_System.shared_write: PIO inputs are not hardwired in test bench. 
 Info: Computer_System.test_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Info: Computer_System.vga_pio: The legal reference clock frequency is 5.0 MHz..800.0 MHz
 Info: Computer_System.vga_pio: Able to implement PLL with user settings
+Warning: Computer_System.: You have exported the interface onchip_memory_seed.s1 but not its associated clock interface.  Export the driver of onchip_memory_seed.clk1
+Warning: Computer_System.: You have exported the interface onchip_memory_seed.s1 but not its associated reset interface.  Export the driver(s) of onchip_memory_seed.reset1
 Warning: Computer_System.: You have exported the interface Onchip_SRAM.s1 but not its associated clock interface.  Export the driver of Onchip_SRAM.clk1
 Warning: Computer_System.: You have exported the interface Onchip_SRAM.s1 but not its associated reset interface.  Export the driver(s) of Onchip_SRAM.reset1
 Info: Computer_System: Generating Computer_System "Computer_System" for QUARTUS_SYNTH
-Info: Interconnect is inserted between master ARM_A9_HPS.h2f_axi_master and slave Onchip_SRAM.s2 because the master is of type axi and the slave is of type avalon.
 Warning: ARM_A9_HPS.f2h_irq0: Cannot connect clock for irq_mapper.sender
 Warning: ARM_A9_HPS.f2h_irq0: Cannot connect reset for irq_mapper.sender
 Warning: ARM_A9_HPS.f2h_irq1: Cannot connect clock for irq_mapper_001.sender
@@ -82,25 +87,30 @@ Warning: ARM_A9_HPS: "QSPI clock frequency" (desired_qspi_clk_mhz) requested 400
 Warning: ARM_A9_HPS: 1 or more output clock frequencies cannot be achieved precisely, consider revising desired output clock frequencies.
 Info: ARM_A9_HPS: "Computer_System" instantiated altera_hps "ARM_A9_HPS"
 Info: Onchip_SRAM: Starting RTL generation for module 'Computer_System_Onchip_SRAM'
-Info: Onchip_SRAM:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=Computer_System_Onchip_SRAM --dir=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0002_Onchip_SRAM_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0002_Onchip_SRAM_gen//Computer_System_Onchip_SRAM_component_configuration.pl  --do_build_sim=0  ]
+Info: Onchip_SRAM:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=Computer_System_Onchip_SRAM --dir=C:/Users/hh759/AppData/Local/Temp/alt9840_991021821691032170.dir/0002_Onchip_SRAM_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9840_991021821691032170.dir/0002_Onchip_SRAM_gen//Computer_System_Onchip_SRAM_component_configuration.pl  --do_build_sim=0  ]
 Info: Onchip_SRAM: Done RTL generation for module 'Computer_System_Onchip_SRAM'
 Info: Onchip_SRAM: "Computer_System" instantiated altera_avalon_onchip_memory2 "Onchip_SRAM"
 Info: System_PLL: "Computer_System" instantiated altera_up_avalon_sys_sdram_pll "System_PLL"
 Info: dealer_top: Starting RTL generation for module 'Computer_System_dealer_top'
-Info: dealer_top:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_dealer_top --dir=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0003_dealer_top_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0003_dealer_top_gen//Computer_System_dealer_top_component_configuration.pl  --do_build_sim=0  ]
+Info: dealer_top:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_dealer_top --dir=C:/Users/hh759/AppData/Local/Temp/alt9840_991021821691032170.dir/0003_dealer_top_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9840_991021821691032170.dir/0003_dealer_top_gen//Computer_System_dealer_top_component_configuration.pl  --do_build_sim=0  ]
 Info: dealer_top: Done RTL generation for module 'Computer_System_dealer_top'
 Info: dealer_top: "Computer_System" instantiated altera_avalon_pio "dealer_top"
 Info: draw_dealer_1: Starting RTL generation for module 'Computer_System_draw_dealer_1'
-Info: draw_dealer_1:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_draw_dealer_1 --dir=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0004_draw_dealer_1_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0004_draw_dealer_1_gen//Computer_System_draw_dealer_1_component_configuration.pl  --do_build_sim=0  ]
+Info: draw_dealer_1:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_draw_dealer_1 --dir=C:/Users/hh759/AppData/Local/Temp/alt9840_991021821691032170.dir/0004_draw_dealer_1_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9840_991021821691032170.dir/0004_draw_dealer_1_gen//Computer_System_draw_dealer_1_component_configuration.pl  --do_build_sim=0  ]
 Info: draw_dealer_1: Done RTL generation for module 'Computer_System_draw_dealer_1'
 Info: draw_dealer_1: "Computer_System" instantiated altera_avalon_pio "draw_dealer_1"
 Info: m10k_pll: "Computer_System" instantiated altera_pll "m10k_pll"
+Info: onchip_memory_seed: Starting RTL generation for module 'Computer_System_onchip_memory_seed'
+Info: onchip_memory_seed:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=Computer_System_onchip_memory_seed --dir=C:/Users/hh759/AppData/Local/Temp/alt9840_991021821691032170.dir/0006_onchip_memory_seed_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9840_991021821691032170.dir/0006_onchip_memory_seed_gen//Computer_System_onchip_memory_seed_component_configuration.pl  --do_build_sim=0  ]
+Info: onchip_memory_seed: Done RTL generation for module 'Computer_System_onchip_memory_seed'
+Info: onchip_memory_seed: "Computer_System" instantiated altera_avalon_onchip_memory2 "onchip_memory_seed"
 Info: output_random_test: Starting RTL generation for module 'Computer_System_output_random_test'
-Info: output_random_test:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_output_random_test --dir=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0006_output_random_test_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9839_6499776344508918735.dir/0006_output_random_test_gen//Computer_System_output_random_test_component_configuration.pl  --do_build_sim=0  ]
+Info: output_random_test:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_output_random_test --dir=C:/Users/hh759/AppData/Local/Temp/alt9840_991021821691032170.dir/0007_output_random_test_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9840_991021821691032170.dir/0007_output_random_test_gen//Computer_System_output_random_test_component_configuration.pl  --do_build_sim=0  ]
 Info: output_random_test: Done RTL generation for module 'Computer_System_output_random_test'
 Info: output_random_test: "Computer_System" instantiated altera_avalon_pio "output_random_test"
 Info: vga_pio: "Computer_System" instantiated altera_pll "vga_pio"
 Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
 Info: mm_interconnect_0: "Computer_System" instantiated altera_mm_interconnect "mm_interconnect_0"
 Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
@@ -129,8 +139,11 @@ Info: Onchip_SRAM_s2_agent: "mm_interconnect_0" instantiated altera_merlin_slave
 Info: Onchip_SRAM_s2_agent_rsp_fifo: "mm_interconnect_0" instantiated altera_avalon_sc_fifo "Onchip_SRAM_s2_agent_rsp_fifo"
 Info: router: "mm_interconnect_0" instantiated altera_merlin_router "router"
 Info: router_002: "mm_interconnect_0" instantiated altera_merlin_router "router_002"
+Info: ARM_A9_HPS_h2f_axi_master_wr_limiter: "mm_interconnect_0" instantiated altera_merlin_traffic_limiter "ARM_A9_HPS_h2f_axi_master_wr_limiter"
+Info: Reusing file C:/Users/hh759/Documents/GitHub/ECE-5760/Blackjack/VGA_to_M10k/verilog/Computer_System/synthesis/submodules/altera_avalon_sc_fifo.v
 Info: Onchip_SRAM_s2_burst_adapter: "mm_interconnect_0" instantiated altera_merlin_burst_adapter "Onchip_SRAM_s2_burst_adapter"
 Info: Reusing file C:/Users/hh759/Documents/GitHub/ECE-5760/Blackjack/VGA_to_M10k/verilog/Computer_System/synthesis/submodules/altera_merlin_address_alignment.sv
+Info: Reusing file C:/Users/hh759/Documents/GitHub/ECE-5760/Blackjack/VGA_to_M10k/verilog/Computer_System/synthesis/submodules/altera_avalon_st_pipeline_base.v
 Info: cmd_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux"
 Info: cmd_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux"
 Info: rsp_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux"
@@ -142,9 +155,6 @@ Info: Reusing file C:/Users/hh759/Documents/GitHub/ECE-5760/Blackjack/VGA_to_M10
 Info: avalon_st_adapter: "mm_interconnect_0" instantiated altera_avalon_st_adapter "avalon_st_adapter"
 Info: router: "mm_interconnect_1" instantiated altera_merlin_router "router"
 Info: router_002: "mm_interconnect_1" instantiated altera_merlin_router "router_002"
-Info: ARM_A9_HPS_h2f_lw_axi_master_wr_limiter: "mm_interconnect_1" instantiated altera_merlin_traffic_limiter "ARM_A9_HPS_h2f_lw_axi_master_wr_limiter"
-Info: Reusing file C:/Users/hh759/Documents/GitHub/ECE-5760/Blackjack/VGA_to_M10k/verilog/Computer_System/synthesis/submodules/altera_avalon_sc_fifo.v
-Info: Reusing file C:/Users/hh759/Documents/GitHub/ECE-5760/Blackjack/VGA_to_M10k/verilog/Computer_System/synthesis/submodules/altera_avalon_st_pipeline_base.v
 Info: cmd_demux: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "cmd_demux"
 Info: cmd_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "cmd_mux"
 Info: Reusing file C:/Users/hh759/Documents/GitHub/ECE-5760/Blackjack/VGA_to_M10k/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
@@ -153,6 +163,6 @@ Info: rsp_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "rsp_m
 Info: Reusing file C:/Users/hh759/Documents/GitHub/ECE-5760/Blackjack/VGA_to_M10k/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
 Info: border: "hps_io" instantiated altera_interface_generator "border"
 Info: error_adapter_0: "avalon_st_adapter" instantiated error_adapter "error_adapter_0"
-Info: Computer_System: Done "Computer_System" with 39 modules, 100 files
+Info: Computer_System: Done "Computer_System" with 40 modules, 102 files
 Info: qsys-generate succeeded.
 Info: Finished: Create HDL design files for synthesis
