@@ -594,6 +594,7 @@ wire [7:0] which_simulation; //output from the Arm
 //assign draw_dealer_1[0] = test_draw_dealer_1[0];
 //assign draw_dealer_2[0] = test_draw_dealer_2[0];
 
+/*
 assign draw_dealer_1[0] = seed_test[2];
 assign draw_dealer_2[0] = seed_init;
 //assign draw_dealer_3[0] = test_draw_dealer_3[0];
@@ -602,23 +603,89 @@ assign draw_dealer_3[0] = output_random[0];
 assign draw_player_1[0] = lfsr_test[0];
 assign draw_player_2[0] = seed_test[3];
 assign draw_player_3[0] = seed_test[1];
+*/
 
-
-reg player_result[num_simul-1:0];
-assign test_3 = player_result[0]; //input to the arm
+reg [1:0] player_result[num_simul-1:0];
 
 // Send back to the arm and verify
 //assign shared_write = output_random[0];
-assign shared_write = card_itr[0];
 
 assign test_1 = drum_state[0];
-assign test_2 = ((init_done == 8'd0) ? 1'd1 : 1'd0);
+assign test_2 = num_wins;
+assign test_3 = num_ties; //input to the arm
+assign shared_write = &result_record_test;
+
+reg [10:0] num_wins;
+reg [10:0] num_ties;
+reg [10:0] result_counter;
+
+reg checked_card [num_simul - 1:0];
+always @(posedge CLOCK_50) begin
+	if (init_done == 8'd0) begin
+		num_wins <= 11'd0;
+		num_ties <= 11'd0;
+		result_counter <= 11'd0;
+	end
+	else begin
+		if (result_counter == num_simul - 1) begin
+			result_counter <= 11'd0;
+		end
+		else begin 
+			if (prob_result[result_counter] && checked_card[result_counter] == 1'd0) begin
+				if (player_result[result_counter] == 2'd1) begin
+					num_wins <= num_wins + 11'd1;
+				end
+				else if (player_result[result_counter] == 2'd2) begin
+					num_ties <= num_ties + 11'd1;
+				end
+				checked_card[result_counter] <= 1'd1;
+			end
+			result_counter <= result_counter + 11'd1;
+		end
+	end
+	/*
+	if (shared_write) begin
+		if (result_counter <= num_simul - 1) begin
+			if (player_result[result_counter] == 2'd1) begin
+				num_wins <= num_wins + 11'd1;
+			end
+			else if (player_result[result_counter] == 2'd2) begin
+				num_ties <= num_ties + 11'd1;
+			end
+			result_counter <= result_counter + 11'd1;
+		end
+	end*/
+end
+
 
 reg [4:0] player_hands [num_simul - 1:0];
 reg [4:0] dealer_hands [num_simul - 1:0];
 
+
+
+
 wire [5:0] seed_test [num_simul - 1: 0];
-wire [5:0] lfsr_test [num_simul - 1: 0];
+wire [5:0] lfsr_test_1 [num_simul - 1: 0];
+wire [5:0] lfsr_test_2 [num_simul - 1: 0];
+wire [5:0] lfsr_test_3 [num_simul - 1: 0];
+wire [5:0] lfsr_test_4 [num_simul - 1: 0];
+wire [5:0] lfsr_test_5 [num_simul - 1: 0];
+wire [5:0] lfsr_test_6 [num_simul - 1: 0];
+
+wire [5:0] lfsr_test_7 [num_simul - 1: 0] /*synthesis keep */;
+
+assign draw_dealer_1[0] = player_hands[0];
+assign draw_dealer_2[0] = dealer_hands[0];
+assign draw_dealer_3[0] = output_random[2];
+
+assign draw_player_1[0] = output_random[3];
+assign draw_player_2[0] = output_random[4];
+assign draw_player_3[0] = lfsr_test_6[0];
+
+
+reg prob_result [num_simul - 1: 0];
+wire [4:0] result_record_test;
+assign result_record_test = {prob_result[0], prob_result[1], prob_result[2], prob_result[3], prob_result[4]};
 
 genvar i;
 generate 
@@ -685,17 +752,26 @@ generate
 			end
 		end
 		
-		assign lfsr_test[i] = output_random[i];
-		assign output_random[i] = {output_random_vals[5][0],output_random_vals[4][0],output_random_vals[3][0],output_random_vals[2][0],output_random_vals[1][0],output_random_vals[0][0]} ;
+		assign lfsr_test_1[i] = seed_in[0];
+		assign lfsr_test_2[i] = seed_in[1];
+		assign lfsr_test_3[i] = seed_in[2];
+		assign lfsr_test_4[i] = (seed_in[0] ^ seed_in[1]);
+		assign lfsr_test_5[i] = (seed_in[1] ^ seed_in[2]);
+		assign lfsr_test_6[i] = (seed_in[2] ^ seed_in[0]);
 		
+		
+
+		//assign lfsr_test_1[i] = output_random[i];
+		assign output_random[i] = {output_random_vals[5][0],output_random_vals[4][0],output_random_vals[3][0],output_random_vals[2][0],output_random_vals[1][0],output_random_vals[0][0]} ;
+		assign lfsr_test_7[i] = output_random[i];
 		//rand127 random_num(.rand_out(output_random), .seed_in(64'h54555555), .clock_in(clk_50), .reset_in(reset));
 			
 		rand6 random_num(.rand_out(output_random_vals[0]), .seed_in(seed_in[0]), .clock_in(CLOCK_50), .reset_in(internal_reset_1));
 		rand6 random_num_2(.rand_out(output_random_vals[1]), .seed_in(seed_in[1]), .clock_in(CLOCK_50), .reset_in(internal_reset_2));
 		rand6 random_num_3(.rand_out(output_random_vals[2]), .seed_in(seed_in[2]), .clock_in(CLOCK_50), .reset_in(internal_reset_3));
-		rand6 random_num_4(.rand_out(output_random_vals[3]), .seed_in(seed_in[0] ^ i), .clock_in(CLOCK_50), .reset_in(internal_reset_1));
-		rand6 random_num_5(.rand_out(output_random_vals[4]), .seed_in(seed_in[1] ^ i), .clock_in(CLOCK_50), .reset_in(internal_reset_2));
-		rand6 random_num_6(.rand_out(output_random_vals[5]), .seed_in(seed_in[2] ^ i), .clock_in(CLOCK_50), .reset_in(internal_reset_3));
+		rand6 random_num_4(.rand_out(output_random_vals[3]), .seed_in(seed_in[0] ^ seed_in[1]), .clock_in(CLOCK_50), .reset_in(internal_reset_2));
+		rand6 random_num_5(.rand_out(output_random_vals[4]), .seed_in(seed_in[1] ^ seed_in[2]), .clock_in(CLOCK_50), .reset_in(internal_reset_3));
+		rand6 random_num_6(.rand_out(output_random_vals[5]), .seed_in(seed_in[2] ^ seed_in[0]), .clock_in(CLOCK_50), .reset_in(internal_reset_3));
 	
 		M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
 		Search_hit_card card_check( .picked_card(hit_card_reg), 
@@ -712,8 +788,11 @@ generate
 				read_addr[i] <= 10'd0;
 				
 				hit_card_reg <= 256'd0;
-				player_hands[i] <= 5'd0;
-				dealer_hands[i] <= 5'd0;
+				
+				player_hands[i] <= player_init_hand_pio;
+				dealer_hands[i] <= dealer_top_pio;
+				//player_hands[i] <= 5'd0;
+				//dealer_hands[i] <= 5'd0;
 			
 				card_itr[i] <= 5'd0;
 				
@@ -725,6 +804,7 @@ generate
 				test_draw_player_2[i] <= 8'd0;
 				test_draw_player_3[i] <= 8'd0;
 				
+				prob_result[i] <= 1'd0;
 				
 				
 			end
@@ -852,19 +932,28 @@ generate
 				// STATE 11: Check final result 
 				else if (drum_state[i] == 4'd11) begin
 					if (player_hands[i] > 5'd21) begin
-						player_result[i] <= 1'd0;
+						player_result[i] <= 2'd0;
+						drum_state[i] <= 4'd12;
 					end
 					else if (player_hands[i] < 5'd21 && dealer_hands[i] <= 5'd21 && player_hands[i] < dealer_hands[i]) begin
-						player_result[i] <= 1'd0;
+						player_result[i] <= 2'd0;
+						drum_state[i] <= 4'd12;
 					end
 					else if (player_hands[i] == dealer_hands[i]) begin
+						player_result[i] <= 2'd2;
 						tie_check[i] <= 1'd1;
+						drum_state[i] <= 4'd12;
 					end
 					else if (((player_hands[i] > dealer_hands[i]) && player_hands[i] <= 5'd21 && dealer_hands[i] < 5'd21) || (dealer_hands[i] > 5'd21)) begin
-						player_result[i] <= 1'd1;
+						player_result[i] <= 2'd1;
+						drum_state[i] <= 4'd12;
 					end
 				end
-				
+
+				// STATE 11: record the result for Prob
+				else if (drum_state[i] == 4'd12) begin
+					prob_result[i] <= 1'd1; 
+				end
 				/*// STATE 2: Buffer the memory output and ready for the next read operation
 				else if (drum_state[i] == 3'd2) begin //buffer state for dealers card and initiate user reads
 					if (picked == 1) begin
@@ -1422,7 +1511,7 @@ module Search_hit_card(picked_card, card, picked);
 					(picked_cards_arr[4] == card) || (picked_cards_arr[5] == card) || (picked_cards_arr[6] == card) || (picked_cards_arr[7] == card) || 
 					(picked_cards_arr[8] == card) || (picked_cards_arr[9] == card) || (picked_cards_arr[10] == card) || (picked_cards_arr[11] == card);*/
 					
-	assign picked = ((picked_card) & (1 << card)) >> card;
+	assign picked = card > 52 || ((picked_card) & (1 << card)) >> card;
 	
 endmodule
 
