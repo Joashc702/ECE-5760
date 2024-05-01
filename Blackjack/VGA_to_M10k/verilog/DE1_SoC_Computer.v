@@ -539,7 +539,7 @@ always @(posedge CLOCK_50) begin
 end
 */
 
-parameter [9:0] num_simul = 5;//half of the number of columns
+parameter [9:0] num_simul = 2;//half of the number of columns
 wire [7:0] output_random [num_simul-1:0] /*synthesis keep */; 
 //wire [63:0] seed_samples [5:0];
 //wire init_done;
@@ -610,16 +610,16 @@ reg [1:0] player_result[num_simul-1:0];
 // Send back to the arm and verify
 //assign shared_write = output_random[0];
 
-assign test_1 = drum_state[0];
-assign test_2 = num_wins;
-assign test_3 = num_ties; //input to the arm
-assign shared_write = &result_record_test;
+assign test_1 = player_hands[0];
+assign test_2 = player_hands[1];
+assign test_3 = dealer_hands[0]; //input to the arm
+assign shared_write = dealer_hands[1];
 
 reg [10:0] num_wins;
 reg [10:0] num_ties;
 reg [10:0] result_counter;
 
-reg checked_card [num_simul - 1:0];
+reg checked_card [num_simul - 1:0] /*synthesis keep */;
 always @(posedge CLOCK_50) begin
 	if (init_done == 8'd0) begin
 		num_wins <= 11'd0;
@@ -627,20 +627,23 @@ always @(posedge CLOCK_50) begin
 		result_counter <= 11'd0;
 	end
 	else begin
-		if (result_counter == num_simul - 1) begin
-			result_counter <= 11'd0;
+		if (result_counter == num_simul) begin
+			//result_counter <= 11'd0;
 		end
 		else begin 
-			if (prob_result[result_counter] && checked_card[result_counter] == 1'd0) begin
+			if (prob_result[result_counter] == 1'd1 /*&& checked_card[result_counter] == 1'd0*/) begin
 				if (player_result[result_counter] == 2'd1) begin
 					num_wins <= num_wins + 11'd1;
 				end
 				else if (player_result[result_counter] == 2'd2) begin
 					num_ties <= num_ties + 11'd1;
 				end
-				checked_card[result_counter] <= 1'd1;
+				/*checked_card[result_counter] <= 1'd1;*/
+				result_counter <= result_counter + 11'd1;
+			end else begin
+				result_counter <= result_counter;
 			end
-			result_counter <= result_counter + 11'd1;
+			
 		end
 	end
 	/*
@@ -674,18 +677,18 @@ wire [5:0] lfsr_test_6 [num_simul - 1: 0];
 
 wire [5:0] lfsr_test_7 [num_simul - 1: 0] /*synthesis keep */;
 
-assign draw_dealer_1[0] = player_hands[0];
-assign draw_dealer_2[0] = dealer_hands[0];
-assign draw_dealer_3[0] = output_random[2];
+assign draw_dealer_1[0] = player_init_hand_pio;
+assign draw_dealer_2[0] = dealer_top_pio;
+assign draw_dealer_3[0] = num_wins;
 
-assign draw_player_1[0] = output_random[3];
-assign draw_player_2[0] = output_random[4];
+assign draw_player_1[0] = num_ties;
+assign draw_player_2[0] = result_counter;
 assign draw_player_3[0] = lfsr_test_6[0];
 
 
 reg prob_result [num_simul - 1: 0];
 wire [4:0] result_record_test;
-assign result_record_test = {prob_result[0], prob_result[1], prob_result[2], prob_result[3], prob_result[4]};
+//assign result_record_test = {prob_result[0], prob_result[1], prob_result[2], prob_result[3], prob_result[4]};
 
 genvar i;
 generate 
