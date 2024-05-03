@@ -1,5 +1,7 @@
 
 module Computer_System (
+	av_config_external_interface_SDAT,
+	av_config_external_interface_SCLK,
 	dealer_top_external_connection_export,
 	draw_dealer_1_external_connection_export,
 	draw_dealer_2_external_connection_export,
@@ -82,6 +84,13 @@ module Computer_System (
 	memory_mem_odt,
 	memory_mem_dm,
 	memory_oct_rzqin,
+	onchip_memory_seed_s1_address,
+	onchip_memory_seed_s1_clken,
+	onchip_memory_seed_s1_chipselect,
+	onchip_memory_seed_s1_write,
+	onchip_memory_seed_s1_readdata,
+	onchip_memory_seed_s1_writedata,
+	onchip_memory_seed_s1_byteenable,
 	onchip_sram_s1_address,
 	onchip_sram_s1_clken,
 	onchip_sram_s1_chipselect,
@@ -92,21 +101,34 @@ module Computer_System (
 	output_random_test_external_connection_export,
 	player_init_hand_external_connection_export,
 	read_addr_test_external_connection_export,
+	sdram_wire_addr,
+	sdram_wire_ba,
+	sdram_wire_cas_n,
+	sdram_wire_cke,
+	sdram_wire_cs_n,
+	sdram_wire_dq,
+	sdram_wire_dqm,
+	sdram_wire_ras_n,
+	sdram_wire_we_n,
 	shared_write_external_connection_export,
 	system_pll_ref_clk_clk,
 	system_pll_ref_reset_reset,
+	system_pll_sdram_clk_clk,
 	test_3_external_connection_export,
-	vga_pio_locked_export,
-	vga_pio_outclk0_clk,
-	which_simulation_external_connection_export,
-	onchip_memory_seed_s1_address,
-	onchip_memory_seed_s1_clken,
-	onchip_memory_seed_s1_chipselect,
-	onchip_memory_seed_s1_write,
-	onchip_memory_seed_s1_readdata,
-	onchip_memory_seed_s1_writedata,
-	onchip_memory_seed_s1_byteenable);	
+	vga_subsystem_vga_CLK,
+	vga_subsystem_vga_HS,
+	vga_subsystem_vga_VS,
+	vga_subsystem_vga_BLANK,
+	vga_subsystem_vga_SYNC,
+	vga_subsystem_vga_R,
+	vga_subsystem_vga_G,
+	vga_subsystem_vga_B,
+	vga_subsystem_vga_pll_ref_clk_clk,
+	vga_subsystem_vga_pll_ref_reset_reset,
+	which_simulation_external_connection_export);	
 
+	inout		av_config_external_interface_SDAT;
+	output		av_config_external_interface_SCLK;
 	output	[7:0]	dealer_top_external_connection_export;
 	input	[7:0]	draw_dealer_1_external_connection_export;
 	input	[7:0]	draw_dealer_2_external_connection_export;
@@ -189,6 +211,13 @@ module Computer_System (
 	output		memory_mem_odt;
 	output	[3:0]	memory_mem_dm;
 	input		memory_oct_rzqin;
+	input	[11:0]	onchip_memory_seed_s1_address;
+	input		onchip_memory_seed_s1_clken;
+	input		onchip_memory_seed_s1_chipselect;
+	input		onchip_memory_seed_s1_write;
+	output	[31:0]	onchip_memory_seed_s1_readdata;
+	input	[31:0]	onchip_memory_seed_s1_writedata;
+	input	[3:0]	onchip_memory_seed_s1_byteenable;
 	input	[8:0]	onchip_sram_s1_address;
 	input		onchip_sram_s1_clken;
 	input		onchip_sram_s1_chipselect;
@@ -199,18 +228,29 @@ module Computer_System (
 	input	[31:0]	output_random_test_external_connection_export;
 	output	[7:0]	player_init_hand_external_connection_export;
 	input	[7:0]	read_addr_test_external_connection_export;
+	output	[12:0]	sdram_wire_addr;
+	output	[1:0]	sdram_wire_ba;
+	output		sdram_wire_cas_n;
+	output		sdram_wire_cke;
+	output		sdram_wire_cs_n;
+	inout	[15:0]	sdram_wire_dq;
+	output	[1:0]	sdram_wire_dqm;
+	output		sdram_wire_ras_n;
+	output		sdram_wire_we_n;
 	input	[7:0]	shared_write_external_connection_export;
 	input		system_pll_ref_clk_clk;
 	input		system_pll_ref_reset_reset;
+	output		system_pll_sdram_clk_clk;
 	input	[7:0]	test_3_external_connection_export;
-	output		vga_pio_locked_export;
-	output		vga_pio_outclk0_clk;
+	output		vga_subsystem_vga_CLK;
+	output		vga_subsystem_vga_HS;
+	output		vga_subsystem_vga_VS;
+	output		vga_subsystem_vga_BLANK;
+	output		vga_subsystem_vga_SYNC;
+	output	[7:0]	vga_subsystem_vga_R;
+	output	[7:0]	vga_subsystem_vga_G;
+	output	[7:0]	vga_subsystem_vga_B;
+	input		vga_subsystem_vga_pll_ref_clk_clk;
+	input		vga_subsystem_vga_pll_ref_reset_reset;
 	output	[7:0]	which_simulation_external_connection_export;
-	input	[11:0]	onchip_memory_seed_s1_address;
-	input		onchip_memory_seed_s1_clken;
-	input		onchip_memory_seed_s1_chipselect;
-	input		onchip_memory_seed_s1_write;
-	output	[31:0]	onchip_memory_seed_s1_readdata;
-	input	[31:0]	onchip_memory_seed_s1_writedata;
-	input	[3:0]	onchip_memory_seed_s1_byteenable;
 endmodule

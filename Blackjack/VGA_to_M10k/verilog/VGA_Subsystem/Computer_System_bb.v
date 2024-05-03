@@ -1,16 +1,12 @@
 
 module Computer_System (
-	audio_ADCDAT,
-	audio_ADCLRCK,
-	audio_BCLK,
-	audio_DACDAT,
-	audio_DACLRCK,
-	audio_clk_clk,
-	audio_pll_ref_clk_clk,
-	audio_pll_ref_reset_reset,
-	av_config_SDAT,
-	av_config_SCLK,
-	hex3_hex0_export,
+	dealer_top_external_connection_export,
+	draw_dealer_1_external_connection_export,
+	draw_dealer_2_external_connection_export,
+	draw_dealer_3_external_connection_export,
+	draw_player_1_external_connection_export,
+	draw_player_2_external_connection_export,
+	draw_player_3_external_connection_export,
 	hps_io_hps_io_emac1_inst_TX_CLK,
 	hps_io_hps_io_emac1_inst_TXD0,
 	hps_io_hps_io_emac1_inst_TXD1,
@@ -67,7 +63,9 @@ module Computer_System (
 	hps_io_hps_io_gpio_inst_GPIO53,
 	hps_io_hps_io_gpio_inst_GPIO54,
 	hps_io_hps_io_gpio_inst_GPIO61,
-	leds_export,
+	init_done_external_connection_export,
+	m10k_pll_locked_export,
+	m10k_pll_outclk0_clk,
 	memory_mem_a,
 	memory_mem_ba,
 	memory_mem_ck,
@@ -84,49 +82,58 @@ module Computer_System (
 	memory_mem_odt,
 	memory_mem_dm,
 	memory_oct_rzqin,
-	pushbuttons_export,
-	sdram_addr,
-	sdram_ba,
-	sdram_cas_n,
-	sdram_cke,
-	sdram_cs_n,
-	sdram_dq,
-	sdram_dqm,
-	sdram_ras_n,
-	sdram_we_n,
-	sdram_clk_clk,
-	slider_switches_export,
+	onchip_memory_seed_s1_address,
+	onchip_memory_seed_s1_clken,
+	onchip_memory_seed_s1_chipselect,
+	onchip_memory_seed_s1_write,
+	onchip_memory_seed_s1_readdata,
+	onchip_memory_seed_s1_writedata,
+	onchip_memory_seed_s1_byteenable,
+	onchip_sram_s1_address,
+	onchip_sram_s1_clken,
+	onchip_sram_s1_chipselect,
+	onchip_sram_s1_write,
+	onchip_sram_s1_readdata,
+	onchip_sram_s1_writedata,
+	onchip_sram_s1_byteenable,
+	output_random_test_external_connection_export,
+	player_init_hand_external_connection_export,
+	read_addr_test_external_connection_export,
+	sdram_wire_addr,
+	sdram_wire_ba,
+	sdram_wire_cas_n,
+	sdram_wire_cke,
+	sdram_wire_cs_n,
+	sdram_wire_dq,
+	sdram_wire_dqm,
+	sdram_wire_ras_n,
+	sdram_wire_we_n,
+	shared_write_external_connection_export,
 	system_pll_ref_clk_clk,
 	system_pll_ref_reset_reset,
-	vga_CLK,
-	vga_HS,
-	vga_VS,
-	vga_BLANK,
-	vga_SYNC,
-	vga_R,
-	vga_G,
-	vga_B,
-	vga_pll_ref_clk_clk,
-	vga_pll_ref_reset_reset,
-	video_in_TD_CLK27,
-	video_in_TD_DATA,
-	video_in_TD_HS,
-	video_in_TD_VS,
-	video_in_clk27_reset,
-	video_in_TD_RESET,
-	video_in_overflow_flag);	
+	system_pll_sdram_clk_clk,
+	test_3_external_connection_export,
+	vga_pio_locked_export,
+	vga_pio_outclk0_clk,
+	vga_subsystem_vga_CLK,
+	vga_subsystem_vga_HS,
+	vga_subsystem_vga_VS,
+	vga_subsystem_vga_BLANK,
+	vga_subsystem_vga_SYNC,
+	vga_subsystem_vga_R,
+	vga_subsystem_vga_G,
+	vga_subsystem_vga_B,
+	vga_subsystem_vga_pll_ref_clk_clk,
+	vga_subsystem_vga_pll_ref_reset_reset,
+	which_simulation_external_connection_export);	
 
-	input		audio_ADCDAT;
-	input		audio_ADCLRCK;
-	input		audio_BCLK;
-	output		audio_DACDAT;
-	input		audio_DACLRCK;
-	output		audio_clk_clk;
-	input		audio_pll_ref_clk_clk;
-	input		audio_pll_ref_reset_reset;
-	inout		av_config_SDAT;
-	output		av_config_SCLK;
-	output	[15:0]	hex3_hex0_export;
+	output	[7:0]	dealer_top_external_connection_export;
+	input	[7:0]	draw_dealer_1_external_connection_export;
+	input	[7:0]	draw_dealer_2_external_connection_export;
+	input	[7:0]	draw_dealer_3_external_connection_export;
+	input	[7:0]	draw_player_1_external_connection_export;
+	input	[7:0]	draw_player_2_external_connection_export;
+	input	[7:0]	draw_player_3_external_connection_export;
 	output		hps_io_hps_io_emac1_inst_TX_CLK;
 	output		hps_io_hps_io_emac1_inst_TXD0;
 	output		hps_io_hps_io_emac1_inst_TXD1;
@@ -183,7 +190,9 @@ module Computer_System (
 	inout		hps_io_hps_io_gpio_inst_GPIO53;
 	inout		hps_io_hps_io_gpio_inst_GPIO54;
 	inout		hps_io_hps_io_gpio_inst_GPIO61;
-	output	[9:0]	leds_export;
+	output	[7:0]	init_done_external_connection_export;
+	output		m10k_pll_locked_export;
+	output		m10k_pll_outclk0_clk;
 	output	[14:0]	memory_mem_a;
 	output	[2:0]	memory_mem_ba;
 	output		memory_mem_ck;
@@ -200,35 +209,48 @@ module Computer_System (
 	output		memory_mem_odt;
 	output	[3:0]	memory_mem_dm;
 	input		memory_oct_rzqin;
-	input	[3:0]	pushbuttons_export;
-	output	[12:0]	sdram_addr;
-	output	[1:0]	sdram_ba;
-	output		sdram_cas_n;
-	output		sdram_cke;
-	output		sdram_cs_n;
-	inout	[15:0]	sdram_dq;
-	output	[1:0]	sdram_dqm;
-	output		sdram_ras_n;
-	output		sdram_we_n;
-	output		sdram_clk_clk;
-	input	[9:0]	slider_switches_export;
+	input	[11:0]	onchip_memory_seed_s1_address;
+	input		onchip_memory_seed_s1_clken;
+	input		onchip_memory_seed_s1_chipselect;
+	input		onchip_memory_seed_s1_write;
+	output	[31:0]	onchip_memory_seed_s1_readdata;
+	input	[31:0]	onchip_memory_seed_s1_writedata;
+	input	[3:0]	onchip_memory_seed_s1_byteenable;
+	input	[8:0]	onchip_sram_s1_address;
+	input		onchip_sram_s1_clken;
+	input		onchip_sram_s1_chipselect;
+	input		onchip_sram_s1_write;
+	output	[31:0]	onchip_sram_s1_readdata;
+	input	[31:0]	onchip_sram_s1_writedata;
+	input	[3:0]	onchip_sram_s1_byteenable;
+	input	[31:0]	output_random_test_external_connection_export;
+	output	[7:0]	player_init_hand_external_connection_export;
+	input	[7:0]	read_addr_test_external_connection_export;
+	output	[12:0]	sdram_wire_addr;
+	output	[1:0]	sdram_wire_ba;
+	output		sdram_wire_cas_n;
+	output		sdram_wire_cke;
+	output		sdram_wire_cs_n;
+	inout	[15:0]	sdram_wire_dq;
+	output	[1:0]	sdram_wire_dqm;
+	output		sdram_wire_ras_n;
+	output		sdram_wire_we_n;
+	input	[7:0]	shared_write_external_connection_export;
 	input		system_pll_ref_clk_clk;
 	input		system_pll_ref_reset_reset;
-	output		vga_CLK;
-	output		vga_HS;
-	output		vga_VS;
-	output		vga_BLANK;
-	output		vga_SYNC;
-	output	[7:0]	vga_R;
-	output	[7:0]	vga_G;
-	output	[7:0]	vga_B;
-	input		vga_pll_ref_clk_clk;
-	input		vga_pll_ref_reset_reset;
-	input		video_in_TD_CLK27;
-	input	[7:0]	video_in_TD_DATA;
-	input		video_in_TD_HS;
-	input		video_in_TD_VS;
-	input		video_in_clk27_reset;
-	output		video_in_TD_RESET;
-	output		video_in_overflow_flag;
+	output		system_pll_sdram_clk_clk;
+	input	[7:0]	test_3_external_connection_export;
+	output		vga_pio_locked_export;
+	output		vga_pio_outclk0_clk;
+	output		vga_subsystem_vga_CLK;
+	output		vga_subsystem_vga_HS;
+	output		vga_subsystem_vga_VS;
+	output		vga_subsystem_vga_BLANK;
+	output		vga_subsystem_vga_SYNC;
+	output	[7:0]	vga_subsystem_vga_R;
+	output	[7:0]	vga_subsystem_vga_G;
+	output	[7:0]	vga_subsystem_vga_B;
+	input		vga_subsystem_vga_pll_ref_clk_clk;
+	input		vga_subsystem_vga_pll_ref_reset_reset;
+	output	[7:0]	which_simulation_external_connection_export;
 endmodule

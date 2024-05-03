@@ -1,5 +1,7 @@
 	component Computer_System is
 		port (
+			av_config_external_interface_SDAT             : inout std_logic                     := 'X';             -- SDAT
+			av_config_external_interface_SCLK             : out   std_logic;                                        -- SCLK
 			dealer_top_external_connection_export         : out   std_logic_vector(7 downto 0);                     -- export
 			draw_dealer_1_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
 			draw_dealer_2_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
@@ -82,6 +84,13 @@
 			memory_mem_odt                                : out   std_logic;                                        -- mem_odt
 			memory_mem_dm                                 : out   std_logic_vector(3 downto 0);                     -- mem_dm
 			memory_oct_rzqin                              : in    std_logic                     := 'X';             -- oct_rzqin
+			onchip_memory_seed_s1_address                 : in    std_logic_vector(11 downto 0) := (others => 'X'); -- address
+			onchip_memory_seed_s1_clken                   : in    std_logic                     := 'X';             -- clken
+			onchip_memory_seed_s1_chipselect              : in    std_logic                     := 'X';             -- chipselect
+			onchip_memory_seed_s1_write                   : in    std_logic                     := 'X';             -- write
+			onchip_memory_seed_s1_readdata                : out   std_logic_vector(31 downto 0);                    -- readdata
+			onchip_memory_seed_s1_writedata               : in    std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
+			onchip_memory_seed_s1_byteenable              : in    std_logic_vector(3 downto 0)  := (others => 'X'); -- byteenable
 			onchip_sram_s1_address                        : in    std_logic_vector(8 downto 0)  := (others => 'X'); -- address
 			onchip_sram_s1_clken                          : in    std_logic                     := 'X';             -- clken
 			onchip_sram_s1_chipselect                     : in    std_logic                     := 'X';             -- chipselect
@@ -92,25 +101,38 @@
 			output_random_test_external_connection_export : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			player_init_hand_external_connection_export   : out   std_logic_vector(7 downto 0);                     -- export
 			read_addr_test_external_connection_export     : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
+			sdram_wire_addr                               : out   std_logic_vector(12 downto 0);                    -- addr
+			sdram_wire_ba                                 : out   std_logic_vector(1 downto 0);                     -- ba
+			sdram_wire_cas_n                              : out   std_logic;                                        -- cas_n
+			sdram_wire_cke                                : out   std_logic;                                        -- cke
+			sdram_wire_cs_n                               : out   std_logic;                                        -- cs_n
+			sdram_wire_dq                                 : inout std_logic_vector(15 downto 0) := (others => 'X'); -- dq
+			sdram_wire_dqm                                : out   std_logic_vector(1 downto 0);                     -- dqm
+			sdram_wire_ras_n                              : out   std_logic;                                        -- ras_n
+			sdram_wire_we_n                               : out   std_logic;                                        -- we_n
 			shared_write_external_connection_export       : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
 			system_pll_ref_clk_clk                        : in    std_logic                     := 'X';             -- clk
 			system_pll_ref_reset_reset                    : in    std_logic                     := 'X';             -- reset
+			system_pll_sdram_clk_clk                      : out   std_logic;                                        -- clk
 			test_3_external_connection_export             : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
-			vga_pio_locked_export                         : out   std_logic;                                        -- export
-			vga_pio_outclk0_clk                           : out   std_logic;                                        -- clk
-			which_simulation_external_connection_export   : out   std_logic_vector(7 downto 0);                     -- export
-			onchip_memory_seed_s1_address                 : in    std_logic_vector(11 downto 0) := (others => 'X'); -- address
-			onchip_memory_seed_s1_clken                   : in    std_logic                     := 'X';             -- clken
-			onchip_memory_seed_s1_chipselect              : in    std_logic                     := 'X';             -- chipselect
-			onchip_memory_seed_s1_write                   : in    std_logic                     := 'X';             -- write
-			onchip_memory_seed_s1_readdata                : out   std_logic_vector(31 downto 0);                    -- readdata
-			onchip_memory_seed_s1_writedata               : in    std_logic_vector(31 downto 0) := (others => 'X'); -- writedata
-			onchip_memory_seed_s1_byteenable              : in    std_logic_vector(3 downto 0)  := (others => 'X')  -- byteenable
+			vga_subsystem_vga_CLK                         : out   std_logic;                                        -- CLK
+			vga_subsystem_vga_HS                          : out   std_logic;                                        -- HS
+			vga_subsystem_vga_VS                          : out   std_logic;                                        -- VS
+			vga_subsystem_vga_BLANK                       : out   std_logic;                                        -- BLANK
+			vga_subsystem_vga_SYNC                        : out   std_logic;                                        -- SYNC
+			vga_subsystem_vga_R                           : out   std_logic_vector(7 downto 0);                     -- R
+			vga_subsystem_vga_G                           : out   std_logic_vector(7 downto 0);                     -- G
+			vga_subsystem_vga_B                           : out   std_logic_vector(7 downto 0);                     -- B
+			vga_subsystem_vga_pll_ref_clk_clk             : in    std_logic                     := 'X';             -- clk
+			vga_subsystem_vga_pll_ref_reset_reset         : in    std_logic                     := 'X';             -- reset
+			which_simulation_external_connection_export   : out   std_logic_vector(7 downto 0)                      -- export
 		);
 	end component Computer_System;
 
 	u0 : component Computer_System
 		port map (
+			av_config_external_interface_SDAT             => CONNECTED_TO_av_config_external_interface_SDAT,             --           av_config_external_interface.SDAT
+			av_config_external_interface_SCLK             => CONNECTED_TO_av_config_external_interface_SCLK,             --                                       .SCLK
 			dealer_top_external_connection_export         => CONNECTED_TO_dealer_top_external_connection_export,         --         dealer_top_external_connection.export
 			draw_dealer_1_external_connection_export      => CONNECTED_TO_draw_dealer_1_external_connection_export,      --      draw_dealer_1_external_connection.export
 			draw_dealer_2_external_connection_export      => CONNECTED_TO_draw_dealer_2_external_connection_export,      --      draw_dealer_2_external_connection.export
@@ -193,6 +215,13 @@
 			memory_mem_odt                                => CONNECTED_TO_memory_mem_odt,                                --                                       .mem_odt
 			memory_mem_dm                                 => CONNECTED_TO_memory_mem_dm,                                 --                                       .mem_dm
 			memory_oct_rzqin                              => CONNECTED_TO_memory_oct_rzqin,                              --                                       .oct_rzqin
+			onchip_memory_seed_s1_address                 => CONNECTED_TO_onchip_memory_seed_s1_address,                 --                  onchip_memory_seed_s1.address
+			onchip_memory_seed_s1_clken                   => CONNECTED_TO_onchip_memory_seed_s1_clken,                   --                                       .clken
+			onchip_memory_seed_s1_chipselect              => CONNECTED_TO_onchip_memory_seed_s1_chipselect,              --                                       .chipselect
+			onchip_memory_seed_s1_write                   => CONNECTED_TO_onchip_memory_seed_s1_write,                   --                                       .write
+			onchip_memory_seed_s1_readdata                => CONNECTED_TO_onchip_memory_seed_s1_readdata,                --                                       .readdata
+			onchip_memory_seed_s1_writedata               => CONNECTED_TO_onchip_memory_seed_s1_writedata,               --                                       .writedata
+			onchip_memory_seed_s1_byteenable              => CONNECTED_TO_onchip_memory_seed_s1_byteenable,              --                                       .byteenable
 			onchip_sram_s1_address                        => CONNECTED_TO_onchip_sram_s1_address,                        --                         onchip_sram_s1.address
 			onchip_sram_s1_clken                          => CONNECTED_TO_onchip_sram_s1_clken,                          --                                       .clken
 			onchip_sram_s1_chipselect                     => CONNECTED_TO_onchip_sram_s1_chipselect,                     --                                       .chipselect
@@ -203,19 +232,30 @@
 			output_random_test_external_connection_export => CONNECTED_TO_output_random_test_external_connection_export, -- output_random_test_external_connection.export
 			player_init_hand_external_connection_export   => CONNECTED_TO_player_init_hand_external_connection_export,   --   player_init_hand_external_connection.export
 			read_addr_test_external_connection_export     => CONNECTED_TO_read_addr_test_external_connection_export,     --     read_addr_test_external_connection.export
+			sdram_wire_addr                               => CONNECTED_TO_sdram_wire_addr,                               --                             sdram_wire.addr
+			sdram_wire_ba                                 => CONNECTED_TO_sdram_wire_ba,                                 --                                       .ba
+			sdram_wire_cas_n                              => CONNECTED_TO_sdram_wire_cas_n,                              --                                       .cas_n
+			sdram_wire_cke                                => CONNECTED_TO_sdram_wire_cke,                                --                                       .cke
+			sdram_wire_cs_n                               => CONNECTED_TO_sdram_wire_cs_n,                               --                                       .cs_n
+			sdram_wire_dq                                 => CONNECTED_TO_sdram_wire_dq,                                 --                                       .dq
+			sdram_wire_dqm                                => CONNECTED_TO_sdram_wire_dqm,                                --                                       .dqm
+			sdram_wire_ras_n                              => CONNECTED_TO_sdram_wire_ras_n,                              --                                       .ras_n
+			sdram_wire_we_n                               => CONNECTED_TO_sdram_wire_we_n,                               --                                       .we_n
 			shared_write_external_connection_export       => CONNECTED_TO_shared_write_external_connection_export,       --       shared_write_external_connection.export
 			system_pll_ref_clk_clk                        => CONNECTED_TO_system_pll_ref_clk_clk,                        --                     system_pll_ref_clk.clk
 			system_pll_ref_reset_reset                    => CONNECTED_TO_system_pll_ref_reset_reset,                    --                   system_pll_ref_reset.reset
+			system_pll_sdram_clk_clk                      => CONNECTED_TO_system_pll_sdram_clk_clk,                      --                   system_pll_sdram_clk.clk
 			test_3_external_connection_export             => CONNECTED_TO_test_3_external_connection_export,             --             test_3_external_connection.export
-			vga_pio_locked_export                         => CONNECTED_TO_vga_pio_locked_export,                         --                         vga_pio_locked.export
-			vga_pio_outclk0_clk                           => CONNECTED_TO_vga_pio_outclk0_clk,                           --                        vga_pio_outclk0.clk
-			which_simulation_external_connection_export   => CONNECTED_TO_which_simulation_external_connection_export,   --   which_simulation_external_connection.export
-			onchip_memory_seed_s1_address                 => CONNECTED_TO_onchip_memory_seed_s1_address,                 --                  onchip_memory_seed_s1.address
-			onchip_memory_seed_s1_clken                   => CONNECTED_TO_onchip_memory_seed_s1_clken,                   --                                       .clken
-			onchip_memory_seed_s1_chipselect              => CONNECTED_TO_onchip_memory_seed_s1_chipselect,              --                                       .chipselect
-			onchip_memory_seed_s1_write                   => CONNECTED_TO_onchip_memory_seed_s1_write,                   --                                       .write
-			onchip_memory_seed_s1_readdata                => CONNECTED_TO_onchip_memory_seed_s1_readdata,                --                                       .readdata
-			onchip_memory_seed_s1_writedata               => CONNECTED_TO_onchip_memory_seed_s1_writedata,               --                                       .writedata
-			onchip_memory_seed_s1_byteenable              => CONNECTED_TO_onchip_memory_seed_s1_byteenable               --                                       .byteenable
+			vga_subsystem_vga_CLK                         => CONNECTED_TO_vga_subsystem_vga_CLK,                         --                      vga_subsystem_vga.CLK
+			vga_subsystem_vga_HS                          => CONNECTED_TO_vga_subsystem_vga_HS,                          --                                       .HS
+			vga_subsystem_vga_VS                          => CONNECTED_TO_vga_subsystem_vga_VS,                          --                                       .VS
+			vga_subsystem_vga_BLANK                       => CONNECTED_TO_vga_subsystem_vga_BLANK,                       --                                       .BLANK
+			vga_subsystem_vga_SYNC                        => CONNECTED_TO_vga_subsystem_vga_SYNC,                        --                                       .SYNC
+			vga_subsystem_vga_R                           => CONNECTED_TO_vga_subsystem_vga_R,                           --                                       .R
+			vga_subsystem_vga_G                           => CONNECTED_TO_vga_subsystem_vga_G,                           --                                       .G
+			vga_subsystem_vga_B                           => CONNECTED_TO_vga_subsystem_vga_B,                           --                                       .B
+			vga_subsystem_vga_pll_ref_clk_clk             => CONNECTED_TO_vga_subsystem_vga_pll_ref_clk_clk,             --          vga_subsystem_vga_pll_ref_clk.clk
+			vga_subsystem_vga_pll_ref_reset_reset         => CONNECTED_TO_vga_subsystem_vga_pll_ref_reset_reset,         --        vga_subsystem_vga_pll_ref_reset.reset
+			which_simulation_external_connection_export   => CONNECTED_TO_which_simulation_external_connection_export    --   which_simulation_external_connection.export
 		);
 

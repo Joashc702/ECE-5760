@@ -1,4 +1,6 @@
 	Computer_System u0 (
+		.av_config_external_interface_SDAT             (<connected-to-av_config_external_interface_SDAT>),             //           av_config_external_interface.SDAT
+		.av_config_external_interface_SCLK             (<connected-to-av_config_external_interface_SCLK>),             //                                       .SCLK
 		.dealer_top_external_connection_export         (<connected-to-dealer_top_external_connection_export>),         //         dealer_top_external_connection.export
 		.draw_dealer_1_external_connection_export      (<connected-to-draw_dealer_1_external_connection_export>),      //      draw_dealer_1_external_connection.export
 		.draw_dealer_2_external_connection_export      (<connected-to-draw_dealer_2_external_connection_export>),      //      draw_dealer_2_external_connection.export
@@ -81,6 +83,13 @@
 		.memory_mem_odt                                (<connected-to-memory_mem_odt>),                                //                                       .mem_odt
 		.memory_mem_dm                                 (<connected-to-memory_mem_dm>),                                 //                                       .mem_dm
 		.memory_oct_rzqin                              (<connected-to-memory_oct_rzqin>),                              //                                       .oct_rzqin
+		.onchip_memory_seed_s1_address                 (<connected-to-onchip_memory_seed_s1_address>),                 //                  onchip_memory_seed_s1.address
+		.onchip_memory_seed_s1_clken                   (<connected-to-onchip_memory_seed_s1_clken>),                   //                                       .clken
+		.onchip_memory_seed_s1_chipselect              (<connected-to-onchip_memory_seed_s1_chipselect>),              //                                       .chipselect
+		.onchip_memory_seed_s1_write                   (<connected-to-onchip_memory_seed_s1_write>),                   //                                       .write
+		.onchip_memory_seed_s1_readdata                (<connected-to-onchip_memory_seed_s1_readdata>),                //                                       .readdata
+		.onchip_memory_seed_s1_writedata               (<connected-to-onchip_memory_seed_s1_writedata>),               //                                       .writedata
+		.onchip_memory_seed_s1_byteenable              (<connected-to-onchip_memory_seed_s1_byteenable>),              //                                       .byteenable
 		.onchip_sram_s1_address                        (<connected-to-onchip_sram_s1_address>),                        //                         onchip_sram_s1.address
 		.onchip_sram_s1_clken                          (<connected-to-onchip_sram_s1_clken>),                          //                                       .clken
 		.onchip_sram_s1_chipselect                     (<connected-to-onchip_sram_s1_chipselect>),                     //                                       .chipselect
@@ -91,19 +100,30 @@
 		.output_random_test_external_connection_export (<connected-to-output_random_test_external_connection_export>), // output_random_test_external_connection.export
 		.player_init_hand_external_connection_export   (<connected-to-player_init_hand_external_connection_export>),   //   player_init_hand_external_connection.export
 		.read_addr_test_external_connection_export     (<connected-to-read_addr_test_external_connection_export>),     //     read_addr_test_external_connection.export
+		.sdram_wire_addr                               (<connected-to-sdram_wire_addr>),                               //                             sdram_wire.addr
+		.sdram_wire_ba                                 (<connected-to-sdram_wire_ba>),                                 //                                       .ba
+		.sdram_wire_cas_n                              (<connected-to-sdram_wire_cas_n>),                              //                                       .cas_n
+		.sdram_wire_cke                                (<connected-to-sdram_wire_cke>),                                //                                       .cke
+		.sdram_wire_cs_n                               (<connected-to-sdram_wire_cs_n>),                               //                                       .cs_n
+		.sdram_wire_dq                                 (<connected-to-sdram_wire_dq>),                                 //                                       .dq
+		.sdram_wire_dqm                                (<connected-to-sdram_wire_dqm>),                                //                                       .dqm
+		.sdram_wire_ras_n                              (<connected-to-sdram_wire_ras_n>),                              //                                       .ras_n
+		.sdram_wire_we_n                               (<connected-to-sdram_wire_we_n>),                               //                                       .we_n
 		.shared_write_external_connection_export       (<connected-to-shared_write_external_connection_export>),       //       shared_write_external_connection.export
 		.system_pll_ref_clk_clk                        (<connected-to-system_pll_ref_clk_clk>),                        //                     system_pll_ref_clk.clk
 		.system_pll_ref_reset_reset                    (<connected-to-system_pll_ref_reset_reset>),                    //                   system_pll_ref_reset.reset
+		.system_pll_sdram_clk_clk                      (<connected-to-system_pll_sdram_clk_clk>),                      //                   system_pll_sdram_clk.clk
 		.test_3_external_connection_export             (<connected-to-test_3_external_connection_export>),             //             test_3_external_connection.export
-		.vga_pio_locked_export                         (<connected-to-vga_pio_locked_export>),                         //                         vga_pio_locked.export
-		.vga_pio_outclk0_clk                           (<connected-to-vga_pio_outclk0_clk>),                           //                        vga_pio_outclk0.clk
-		.which_simulation_external_connection_export   (<connected-to-which_simulation_external_connection_export>),   //   which_simulation_external_connection.export
-		.onchip_memory_seed_s1_address                 (<connected-to-onchip_memory_seed_s1_address>),                 //                  onchip_memory_seed_s1.address
-		.onchip_memory_seed_s1_clken                   (<connected-to-onchip_memory_seed_s1_clken>),                   //                                       .clken
-		.onchip_memory_seed_s1_chipselect              (<connected-to-onchip_memory_seed_s1_chipselect>),              //                                       .chipselect
-		.onchip_memory_seed_s1_write                   (<connected-to-onchip_memory_seed_s1_write>),                   //                                       .write
-		.onchip_memory_seed_s1_readdata                (<connected-to-onchip_memory_seed_s1_readdata>),                //                                       .readdata
-		.onchip_memory_seed_s1_writedata               (<connected-to-onchip_memory_seed_s1_writedata>),               //                                       .writedata
-		.onchip_memory_seed_s1_byteenable              (<connected-to-onchip_memory_seed_s1_byteenable>)               //                                       .byteenable
+		.vga_subsystem_vga_CLK                         (<connected-to-vga_subsystem_vga_CLK>),                         //                      vga_subsystem_vga.CLK
+		.vga_subsystem_vga_HS                          (<connected-to-vga_subsystem_vga_HS>),                          //                                       .HS
+		.vga_subsystem_vga_VS                          (<connected-to-vga_subsystem_vga_VS>),                          //                                       .VS
+		.vga_subsystem_vga_BLANK                       (<connected-to-vga_subsystem_vga_BLANK>),                       //                                       .BLANK
+		.vga_subsystem_vga_SYNC                        (<connected-to-vga_subsystem_vga_SYNC>),                        //                                       .SYNC
+		.vga_subsystem_vga_R                           (<connected-to-vga_subsystem_vga_R>),                           //                                       .R
+		.vga_subsystem_vga_G                           (<connected-to-vga_subsystem_vga_G>),                           //                                       .G
+		.vga_subsystem_vga_B                           (<connected-to-vga_subsystem_vga_B>),                           //                                       .B
+		.vga_subsystem_vga_pll_ref_clk_clk             (<connected-to-vga_subsystem_vga_pll_ref_clk_clk>),             //          vga_subsystem_vga_pll_ref_clk.clk
+		.vga_subsystem_vga_pll_ref_reset_reset         (<connected-to-vga_subsystem_vga_pll_ref_reset_reset>),         //        vga_subsystem_vga_pll_ref_reset.reset
+		.which_simulation_external_connection_export   (<connected-to-which_simulation_external_connection_export>)    //   which_simulation_external_connection.export
 	);
 

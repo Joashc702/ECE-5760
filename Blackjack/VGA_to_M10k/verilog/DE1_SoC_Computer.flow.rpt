@@ -1,5 +1,5 @@
 Flow report for DE1_SoC_Computer
-Mon Apr 29 23:33:32 2024
+Thu May 02 19:11:15 2024
 Quartus Prime Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition
 
 
@@ -40,24 +40,24 @@ refer to the applicable agreement for further details.
 +-------------------------------------------------------------------------------+
 ; Flow Summary                                                                  ;
 +---------------------------------+---------------------------------------------+
-; Flow Status                     ; Successful - Mon Apr 29 23:32:59 2024       ;
+; Flow Status                     ; Successful - Thu May 02 19:10:40 2024       ;
 ; Quartus Prime Version           ; 18.1.0 Build 625 09/12/2018 SJ Lite Edition ;
 ; Revision Name                   ; DE1_SoC_Computer                            ;
 ; Top-level Entity Name           ; DE1_SoC_Computer                            ;
 ; Family                          ; Cyclone V                                   ;
 ; Device                          ; 5CSEMA5F31C6                                ;
 ; Timing Models                   ; Final                                       ;
-; Logic utilization (in ALMs)     ; 4,048 / 32,070 ( 13 % )                     ;
-; Total registers                 ; 7349                                        ;
+; Logic utilization (in ALMs)     ; 5,725 / 32,070 ( 18 % )                     ;
+; Total registers                 ; 9737                                        ;
 ; Total pins                      ; 368 / 457 ( 81 % )                          ;
 ; Total virtual pins              ; 0                                           ;
-; Total block memory bits         ; 1,877,888 / 4,065,280 ( 46 % )              ;
-; Total DSP Blocks                ; 0 / 87 ( 0 % )                              ;
+; Total block memory bits         ; 1,604,992 / 4,065,280 ( 39 % )              ;
+; Total DSP Blocks                ; 6 / 87 ( 7 % )                              ;
 ; Total HSSI RX PCSs              ; 0                                           ;
 ; Total HSSI PMA RX Deserializers ; 0                                           ;
 ; Total HSSI TX PCSs              ; 0                                           ;
 ; Total HSSI PMA TX Serializers   ; 0                                           ;
-; Total PLLs                      ; 1 / 6 ( 17 % )                              ;
+; Total PLLs                      ; 2 / 6 ( 33 % )                              ;
 ; Total DLLs                      ; 1 / 4 ( 25 % )                              ;
 +---------------------------------+---------------------------------------------+
 
@@ -67,7 +67,7 @@ refer to the applicable agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 04/29/2024 23:26:46 ;
+; Start date & time ; 05/02/2024 19:02:58 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; DE1_SoC_Computer    ;
 +-------------------+---------------------+
@@ -78,7 +78,7 @@ refer to the applicable agreement for further details.
 +-------------------------------------+-------------------------------------------------------------------------------+---------------+------------------------------------------+------------------+
 ; Assignment Name                     ; Value                                                                         ; Default Value ; Entity Name                              ; Section Id       ;
 +-------------------------------------+-------------------------------------------------------------------------------+---------------+------------------------------------------+------------------+
-; COMPILER_SIGNATURE_ID               ; 211267926428516.171444760314308                                               ; --            ; --                                       ; --               ;
+; COMPILER_SIGNATURE_ID               ; 211267926428516.171469097515244                                               ; --            ; --                                       ; --               ;
 ; ENABLE_SIGNALTAP                    ; On                                                                            ; --            ; --                                       ; --               ;
 ; HPS_ISW_FILE                        ; Computer_System/synthesis/submodules/sequencer/alt_types.pre.h                ; --            ; Computer_System_ARM_A9_HPS_hps_io_border ; --               ;
 ; HPS_ISW_FILE                        ; Computer_System/synthesis/submodules/sequencer/emif.pre.xml                   ; --            ; Computer_System_ARM_A9_HPS_hps_io_border ; --               ;
@@ -122,7 +122,7 @@ refer to the applicable agreement for further details.
 ; SLD_FILE                            ; Computer_System/synthesis/Computer_System.regmap                              ; --            ; --                                       ; --               ;
 ; SLD_FILE                            ; Computer_System/synthesis/Computer_System.debuginfo                           ; --            ; --                                       ; --               ;
 ; SLD_FILE                            ; db/test_bj_stap_auto_stripped.stp                                             ; --            ; --                                       ; --               ;
-; SLD_INFO                            ; QSYS_NAME Computer_System HAS_SOPCINFO 1 GENERATION_ID 1714251220             ; --            ; Computer_System                          ; --               ;
+; SLD_INFO                            ; QSYS_NAME Computer_System HAS_SOPCINFO 1 GENERATION_ID 1714690899             ; --            ; Computer_System                          ; --               ;
 ; SLD_NODE_CREATOR_ID                 ; 110                                                                           ; --            ; --                                       ; auto_signaltap_0 ;
 ; SLD_NODE_ENTITY_NAME                ; sld_signaltap                                                                 ; --            ; --                                       ; auto_signaltap_0 ;
 ; SLD_NODE_PARAMETER_ASSIGNMENT       ; SLD_RAM_BLOCK_TYPE=AUTO                                                       ; --            ; --                                       ; auto_signaltap_0 ;
@@ -148,8 +148,8 @@ refer to the applicable agreement for further details.
 ; SLD_NODE_PARAMETER_ASSIGNMENT       ; SLD_INVERSION_MASK_LENGTH=29                                                  ; --            ; --                                       ; auto_signaltap_0 ;
 ; SLD_NODE_PARAMETER_ASSIGNMENT       ; SLD_SEGMENT_SIZE=4096                                                         ; --            ; --                                       ; auto_signaltap_0 ;
 ; SLD_NODE_PARAMETER_ASSIGNMENT       ; SLD_SAMPLE_DEPTH=4096                                                         ; --            ; --                                       ; auto_signaltap_0 ;
-; SLD_NODE_PARAMETER_ASSIGNMENT       ; SLD_DATA_BITS=434                                                             ; --            ; --                                       ; auto_signaltap_0 ;
-; SLD_NODE_PARAMETER_ASSIGNMENT       ; SLD_STORAGE_QUALIFIER_BITS=434                                                ; --            ; --                                       ; auto_signaltap_0 ;
+; SLD_NODE_PARAMETER_ASSIGNMENT       ; SLD_DATA_BITS=351                                                             ; --            ; --                                       ; auto_signaltap_0 ;
+; SLD_NODE_PARAMETER_ASSIGNMENT       ; SLD_STORAGE_QUALIFIER_BITS=351                                                ; --            ; --                                       ; auto_signaltap_0 ;
 ; SOPCINFO_FILE                       ; Computer_System/synthesis/../../Computer_System.sopcinfo                      ; --            ; --                                       ; --               ;
 ; SYNTHESIS_ONLY_QIP                  ; On                                                                            ; --            ; --                                       ; --               ;
 ; USE_SIGNALTAP_FILE                  ; test_bj_stap.stp                                                              ; --            ; --                                       ; --               ;
@@ -161,11 +161,11 @@ refer to the applicable agreement for further details.
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis ; 00:00:48     ; 4.2                     ; 5379 MB             ; 00:02:54                           ;
-; Fitter               ; 00:02:43     ; 1.4                     ; 8672 MB             ; 00:15:31                           ;
-; Assembler            ; 00:00:10     ; 1.0                     ; 4993 MB             ; 00:00:10                           ;
-; Timing Analyzer      ; 00:00:32     ; 2.2                     ; 6004 MB             ; 00:01:06                           ;
-; Total                ; 00:04:13     ; --                      ; --                  ; 00:19:41                           ;
+; Analysis & Synthesis ; 00:01:01     ; 3.8                     ; 5516 MB             ; 00:03:22                           ;
+; Fitter               ; 00:03:39     ; 1.4                     ; 8714 MB             ; 00:18:18                           ;
+; Assembler            ; 00:00:11     ; 1.0                     ; 5021 MB             ; 00:00:10                           ;
+; Timing Analyzer      ; 00:00:34     ; 2.6                     ; 6069 MB             ; 00:01:23                           ;
+; Total                ; 00:05:25     ; --                      ; --                  ; 00:23:13                           ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 

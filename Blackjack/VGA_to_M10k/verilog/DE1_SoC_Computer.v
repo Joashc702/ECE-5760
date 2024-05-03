@@ -93,6 +93,7 @@ module DE1_SoC_Computer (
 	VGA_R,
 	VGA_SYNC_N,
 	VGA_VS,
+	
 
 	////////////////////////////////////
 	// HPS Pins
@@ -1058,14 +1059,33 @@ Computer_System The_System (
 	.onchip_memory_seed_s1_writedata(sram_writedata_seed),               //                                       .writedata
 	.onchip_memory_seed_s1_byteenable(4'b1111),   
 	
-	.vga_pio_locked_export			(vga_pll_lock),           //       vga_pio_locked.export
-	.vga_pio_outclk0_clk				(vga_pll),              //      vga_pio_outclk0.clk
+	//.vga_pio_locked_export			(vga_pll_lock),           //       vga_pio_locked.export
+	//.vga_pio_outclk0_clk				(vga_pll),              //      vga_pio_outclk0.clk
 	.m10k_pll_locked_export			(M10k_pll_locked),          //      m10k_pll_locked.export
 	.m10k_pll_outclk0_clk			(M10k_pll),            //     m10k_pll_outclk0.clk
+	
+	
+	// VGA Subsystem
+	.vga_subsystem_vga_CLK    (VGA_CLK),                        //                      vga_subsystem_vga.CLK
+	.vga_subsystem_vga_HS     (VGA_HS),                     //                                       .HS
+	.vga_subsystem_vga_VS     (VGA_VS),                     //                                       .VS
+	.vga_subsystem_vga_BLANK  (VGA_BLANK_N),                   //                                       .BLANK
+	.vga_subsystem_vga_SYNC   (VGA_SYNC_N),                   //                                       .SYNC
+	.vga_subsystem_vga_R      (VGA_R),                    //                                       .R
+	.vga_subsystem_vga_G      (VGA_G),                     //                                       .G
+	.vga_subsystem_vga_B      (VGA_B),                     //                                       .B
+	.vga_subsystem_vga_pll_ref_clk_clk      (CLOCK2_50),      //          vga_subsystem_vga_pll_ref_clk.clk
+	.vga_subsystem_vga_pll_ref_reset_reset  (1'b0),       //        vga_subsystem_vga_pll_ref_reset.reset
+	
+	
 
 	// Global signals
 	.system_pll_ref_clk_clk					(CLOCK_50),
 	.system_pll_ref_reset_reset			(1'b0),
+	
+	// AV Config
+	.av_config_external_interface_SCLK							(FPGA_I2C_SCLK),
+	.av_config_external_interface_SDAT							(FPGA_I2C_SDAT),
 	
 	////////////////////////////////////
 	// HPS Side

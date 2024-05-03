@@ -1,5 +1,7 @@
 	component Computer_System is
 		port (
+			av_config_external_interface_SDAT             : inout std_logic                     := 'X';             -- SDAT
+			av_config_external_interface_SCLK             : out   std_logic;                                        -- SCLK
 			dealer_top_external_connection_export         : out   std_logic_vector(7 downto 0);                     -- export
 			draw_dealer_1_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
 			draw_dealer_2_external_connection_export      : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
@@ -99,12 +101,30 @@
 			output_random_test_external_connection_export : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			player_init_hand_external_connection_export   : out   std_logic_vector(7 downto 0);                     -- export
 			read_addr_test_external_connection_export     : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
+			sdram_wire_addr                               : out   std_logic_vector(12 downto 0);                    -- addr
+			sdram_wire_ba                                 : out   std_logic_vector(1 downto 0);                     -- ba
+			sdram_wire_cas_n                              : out   std_logic;                                        -- cas_n
+			sdram_wire_cke                                : out   std_logic;                                        -- cke
+			sdram_wire_cs_n                               : out   std_logic;                                        -- cs_n
+			sdram_wire_dq                                 : inout std_logic_vector(15 downto 0) := (others => 'X'); -- dq
+			sdram_wire_dqm                                : out   std_logic_vector(1 downto 0);                     -- dqm
+			sdram_wire_ras_n                              : out   std_logic;                                        -- ras_n
+			sdram_wire_we_n                               : out   std_logic;                                        -- we_n
 			shared_write_external_connection_export       : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
 			system_pll_ref_clk_clk                        : in    std_logic                     := 'X';             -- clk
 			system_pll_ref_reset_reset                    : in    std_logic                     := 'X';             -- reset
+			system_pll_sdram_clk_clk                      : out   std_logic;                                        -- clk
 			test_3_external_connection_export             : in    std_logic_vector(7 downto 0)  := (others => 'X'); -- export
-			vga_pio_locked_export                         : out   std_logic;                                        -- export
-			vga_pio_outclk0_clk                           : out   std_logic;                                        -- clk
+			vga_subsystem_vga_CLK                         : out   std_logic;                                        -- CLK
+			vga_subsystem_vga_HS                          : out   std_logic;                                        -- HS
+			vga_subsystem_vga_VS                          : out   std_logic;                                        -- VS
+			vga_subsystem_vga_BLANK                       : out   std_logic;                                        -- BLANK
+			vga_subsystem_vga_SYNC                        : out   std_logic;                                        -- SYNC
+			vga_subsystem_vga_R                           : out   std_logic_vector(7 downto 0);                     -- R
+			vga_subsystem_vga_G                           : out   std_logic_vector(7 downto 0);                     -- G
+			vga_subsystem_vga_B                           : out   std_logic_vector(7 downto 0);                     -- B
+			vga_subsystem_vga_pll_ref_clk_clk             : in    std_logic                     := 'X';             -- clk
+			vga_subsystem_vga_pll_ref_reset_reset         : in    std_logic                     := 'X';             -- reset
 			which_simulation_external_connection_export   : out   std_logic_vector(7 downto 0)                      -- export
 		);
 	end component Computer_System;

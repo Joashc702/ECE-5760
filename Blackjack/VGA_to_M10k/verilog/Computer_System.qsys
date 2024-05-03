@@ -25,6 +25,22 @@
          type = "boolean";
       }
    }
+   element AV_Config
+   {
+      datum _sortIndex
+      {
+         value = "25";
+         type = "int";
+      }
+   }
+   element AV_Config.avalon_av_config_slave
+   {
+      datum baseAddress
+      {
+         value = "12288";
+         type = "String";
+      }
+   }
    element Onchip_SRAM
    {
       datum _sortIndex
@@ -33,12 +49,76 @@
          type = "int";
       }
    }
+   element Onchip_SRAM.s2
+   {
+      datum baseAddress
+      {
+         value = "67108864";
+         type = "String";
+      }
+   }
+   element Pixel_DMA_Addr_Translation
+   {
+      datum _sortIndex
+      {
+         value = "23";
+         type = "int";
+      }
+   }
+   element Pixel_DMA_Addr_Translation.slave
+   {
+      datum baseAddress
+      {
+         value = "12320";
+         type = "String";
+      }
+   }
+   element SDRAM
+   {
+      datum _sortIndex
+      {
+         value = "22";
+         type = "int";
+      }
+   }
+   element SDRAM.s1
+   {
+      datum baseAddress
+      {
+         value = "0";
+         type = "String";
+      }
+   }
    element System_PLL
    {
       datum _sortIndex
       {
          value = "0";
          type = "int";
+      }
+   }
+   element VGA_Subsystem
+   {
+      datum _sortIndex
+      {
+         value = "24";
+         type = "int";
+      }
+   }
+   element VGA_Subsystem.char_buffer_control_slave
+   {
+      datum baseAddress
+      {
+         value = "12336";
+         type = "String";
+      }
+   }
+   element VGA_Subsystem.char_buffer_slave
+   {
+      datum baseAddress
+      {
+         value = "150994944";
+         type = "String";
       }
    }
    element clock_bridge_0
@@ -205,7 +285,7 @@
    {
       datum baseAddress
       {
-         value = "16384";
+         value = "83886080";
          type = "String";
       }
    }
@@ -335,6 +415,11 @@
  <parameter name="useTestBenchNamingPattern" value="false" />
  <instanceScript></instanceScript>
  <interface
+   name="av_config_external_interface"
+   internal="AV_Config.external_interface"
+   type="conduit"
+   dir="end" />
+ <interface
    name="dealer_top_external_connection"
    internal="dealer_top.external_connection"
    type="conduit"
@@ -411,6 +496,7 @@
    internal="read_addr_test.external_connection"
    type="conduit"
    dir="end" />
+ <interface name="sdram_wire" internal="SDRAM.wire" type="conduit" dir="end" />
  <interface
    name="shared_write_external_connection"
    internal="shared_write.external_connection"
@@ -427,20 +513,32 @@
    type="reset"
    dir="end" />
  <interface
+   name="system_pll_sdram_clk"
+   internal="System_PLL.sdram_clk"
+   type="clock"
+   dir="start" />
+ <interface
    name="test_3_external_connection"
    internal="test_3.external_connection"
    type="conduit"
    dir="end" />
+ <interface name="vga_pio_locked" internal="vga_pio.locked" />
+ <interface name="vga_pio_outclk0" internal="vga_pio.outclk0" />
  <interface
-   name="vga_pio_locked"
-   internal="vga_pio.locked"
+   name="vga_subsystem_vga"
+   internal="VGA_Subsystem.vga"
    type="conduit"
    dir="end" />
  <interface
-   name="vga_pio_outclk0"
-   internal="vga_pio.outclk0"
+   name="vga_subsystem_vga_pll_ref_clk"
+   internal="VGA_Subsystem.vga_pll_ref_clk"
    type="clock"
-   dir="start" />
+   dir="end" />
+ <interface
+   name="vga_subsystem_vga_pll_ref_reset"
+   internal="VGA_Subsystem.vga_pll_ref_reset"
+   type="reset"
+   dir="end" />
  <interface
    name="which_simulation_external_connection"
    internal="which_simulation.external_connection"
@@ -977,6 +1075,28 @@
   <parameter name="use_default_mpu_clk" value="true" />
  </module>
  <module
+   name="AV_Config"
+   kind="altera_up_avalon_audio_and_video_config"
+   version="18.0"
+   enabled="1">
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="100000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="audio_in" value="Microphone to ADC" />
+  <parameter name="bit_length" value="32" />
+  <parameter name="board" value="DE1-SoC" />
+  <parameter name="d5m_resolution" value="2592 x 1944" />
+  <parameter name="dac_enable" value="true" />
+  <parameter name="data_format" value="Left Justified" />
+  <parameter name="device">On-Board Peripherals</parameter>
+  <parameter name="eai" value="true" />
+  <parameter name="exposure" value="false" />
+  <parameter name="line_in_bypass" value="false" />
+  <parameter name="mic_attenuation" value="-6dB" />
+  <parameter name="mic_bypass" value="false" />
+  <parameter name="sampling_rate" value="48 kHz" />
+  <parameter name="video_format" value="NTSC" />
+ </module>
+ <module
    name="Onchip_SRAM"
    kind="altera_avalon_onchip_memory2"
    version="18.1"
@@ -1009,6 +1129,42 @@
   <parameter name="writable" value="true" />
  </module>
  <module
+   name="Pixel_DMA_Addr_Translation"
+   kind="altera_up_avalon_video_dma_ctrl_addr_trans"
+   version="18.0"
+   enabled="1">
+  <parameter name="ADDRESS_TRANSLATION_MASK" value="3221225472" />
+ </module>
+ <module
+   name="SDRAM"
+   kind="altera_avalon_new_sdram_controller"
+   version="18.1"
+   enabled="1">
+  <parameter name="TAC" value="5.5" />
+  <parameter name="TMRD" value="3" />
+  <parameter name="TRCD" value="20.0" />
+  <parameter name="TRFC" value="70.0" />
+  <parameter name="TRP" value="20.0" />
+  <parameter name="TWR" value="14.0" />
+  <parameter name="casLatency" value="3" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="columnWidth" value="10" />
+  <parameter name="componentName" value="$${FILENAME}_SDRAM" />
+  <parameter name="dataWidth" value="16" />
+  <parameter name="generateSimulationModel" value="true" />
+  <parameter name="initNOPDelay" value="0.0" />
+  <parameter name="initRefreshCommands" value="2" />
+  <parameter name="masteredTristateBridgeSlave" value="0" />
+  <parameter name="model">single_Micron_MT48LC4M32B2_7_chip</parameter>
+  <parameter name="numberOfBanks" value="4" />
+  <parameter name="numberOfChipSelects" value="1" />
+  <parameter name="pinsSharedViaTriState" value="false" />
+  <parameter name="powerUpDelay" value="100.0" />
+  <parameter name="refreshPeriod" value="15.625" />
+  <parameter name="registerDataIn" value="true" />
+  <parameter name="rowWidth" value="13" />
+ </module>
+ <module
    name="System_PLL"
    kind="altera_up_avalon_sys_sdram_pll"
    version="18.0"
@@ -1023,6 +1179,21 @@
   <parameter name="gui_outclk" value="100.0" />
   <parameter name="gui_refclk" value="50.0" />
   <parameter name="other_boards" value="None" />
+ </module>
+ <module name="VGA_Subsystem" kind="VGA_Subsystem" version="1.0" enabled="1">
+  <parameter name="AUTO_DEVICE" value="5CSEMA5F31C6" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="6" />
+  <parameter name="AUTO_GENERATION_ID" value="0" />
+  <parameter name="AUTO_PIXEL_DMA_MASTER_ADDRESS_MAP"><![CDATA[<address-map><slave name='SDRAM.s1' start='0x0' end='0x4000000' /></address-map>]]></parameter>
+  <parameter name="AUTO_PIXEL_DMA_MASTER_ADDRESS_WIDTH" value="AddressWidth = 26" />
+  <parameter name="AUTO_SYS_CLK_CLOCK_DOMAIN" value="9" />
+  <parameter name="AUTO_SYS_CLK_CLOCK_RATE" value="100000000" />
+  <parameter name="AUTO_SYS_CLK_RESET_DOMAIN" value="9" />
+  <parameter name="AUTO_UNIQUE_ID">$${FILENAME}_VGA_Subsystem</parameter>
+  <parameter name="AUTO_VGA_PLL_REF_CLK_CLOCK_DOMAIN" value="5" />
+  <parameter name="AUTO_VGA_PLL_REF_CLK_CLOCK_RATE" value="0" />
+  <parameter name="AUTO_VGA_PLL_REF_CLK_RESET_DOMAIN" value="5" />
  </module>
  <module
    name="clock_bridge_0"
@@ -1499,7 +1670,7 @@
   <parameter name="simDrivenValue" value="0" />
   <parameter name="width" value="8" />
  </module>
- <module name="vga_pio" kind="altera_pll" version="18.1" enabled="1">
+ <module name="vga_pio" kind="altera_pll" version="18.1" enabled="0">
   <parameter name="debug_print_output" value="false" />
   <parameter name="debug_use_rbc_taf_method" value="false" />
   <parameter name="device" value="5CSEMA5F31C6" />
@@ -1724,7 +1895,16 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_axi_master"
-   end="Onchip_SRAM.s2">
+   end="VGA_Subsystem.char_buffer_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x09000000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_axi_master"
+   end="SDRAM.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0000" />
   <parameter name="defaultConnection" value="false" />
@@ -1733,9 +1913,36 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_axi_master"
+   end="Onchip_SRAM.s2">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x04000000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_axi_master"
    end="onchip_memory_seed.s2">
   <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x4000" />
+  <parameter name="baseAddress" value="0x05000000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="AV_Config.avalon_av_config_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x3000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="VGA_Subsystem.char_buffer_control_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x3030" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1865,6 +2072,38 @@
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="Pixel_DMA_Addr_Translation.slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x3020" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="Pixel_DMA_Addr_Translation.master"
+   end="VGA_Subsystem.pixel_dma_control_slave">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="VGA_Subsystem.pixel_dma_master"
+   end="SDRAM.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="clock"
+   version="18.1"
+   start="clock_bridge_1.out_clk"
+   end="onchip_memory_seed.clk1" />
+ <connection
    kind="clock"
    version="18.1"
    start="clock_bridge_0.out_clk"
@@ -1872,8 +2111,8 @@
  <connection
    kind="clock"
    version="18.1"
-   start="clock_bridge_1.out_clk"
-   end="onchip_memory_seed.clk1" />
+   start="clock_bridge_0.out_clk"
+   end="onchip_memory_seed.clk2" />
  <connection
    kind="clock"
    version="18.1"
@@ -1948,12 +2187,22 @@
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
+   end="SDRAM.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="AV_Config.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
    end="Onchip_SRAM.clk2" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="onchip_memory_seed.clk2" />
+   end="Pixel_DMA_Addr_Translation.clock" />
  <connection
    kind="clock"
    version="18.1"
@@ -1990,6 +2239,11 @@
    start="System_PLL.sys_clk"
    end="m10k_pll.refclk" />
  <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="VGA_Subsystem.sys_clk" />
+ <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
@@ -2073,6 +2327,21 @@
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
+   end="SDRAM.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="Pixel_DMA_Addr_Translation.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="AV_Config.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
    end="Onchip_SRAM.reset1" />
  <connection
    kind="reset"
@@ -2089,6 +2358,11 @@
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
    end="onchip_memory_seed.reset2" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="VGA_Subsystem.sys_reset" />
  <connection
    kind="reset"
    version="18.1"
@@ -2173,6 +2447,21 @@
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
+   end="SDRAM.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="Pixel_DMA_Addr_Translation.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="AV_Config.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
    end="Onchip_SRAM.reset1" />
  <connection
    kind="reset"
@@ -2189,6 +2478,11 @@
    version="18.1"
    start="System_PLL.reset_source"
    end="onchip_memory_seed.reset2" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="VGA_Subsystem.sys_reset" />
  <interconnectRequirement for="$system" name="qsys_mm.clockCrossingAdapter" value="HANDSHAKE" />
  <interconnectRequirement for="$system" name="qsys_mm.enableEccProtection" value="FALSE" />
  <interconnectRequirement for="$system" name="qsys_mm.insertDefaultSlave" value="FALSE" />
