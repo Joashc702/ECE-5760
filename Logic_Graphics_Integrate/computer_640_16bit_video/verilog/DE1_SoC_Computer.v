@@ -540,7 +540,7 @@ always @(posedge CLOCK_50) begin
 end
 */
 
-parameter [9:0] num_simul = 2;//half of the number of columns
+parameter [9:0] num_simul = 100;//half of the number of columns
 wire [7:0] output_random [num_simul-1:0] /*synthesis keep */; 
 //wire [63:0] seed_samples [5:0];
 //wire init_done;
@@ -608,11 +608,6 @@ reg [1:0] player_result[num_simul-1:0];
 // Send back to the arm and verify
 //assign shared_write = output_random[0];
 
-assign test_1 = player_hands[0];
-assign test_2 = player_hands[1];
-assign test_3 = dealer_hands[0]; //input to the arm
-assign shared_write = dealer_hands[1];
-
 reg [10:0] num_wins;
 reg [10:0] num_ties;
 reg [10:0] result_counter;
@@ -672,13 +667,19 @@ wire [5:0] lfsr_test_6 [num_simul - 1: 0];
 
 wire [5:0] lfsr_test_7 [num_simul - 1: 0] /*synthesis keep */;
 
-assign draw_dealer_1[0] = player_init_hand_pio;
-assign draw_dealer_2[0] = dealer_top_pio;
-assign draw_dealer_3[0] = num_wins;
+assign draw_dealer_1[0] = {4'b0, drum_state[0]};
+assign draw_dealer_2[0] = {7'b0, shared_mem_done};
+assign draw_dealer_3[0] = num_wins[7:0];
 
-assign draw_player_1[0] = num_ties;
-assign draw_player_2[0] = result_counter;
-assign draw_player_3[0] = lfsr_test_6[0];
+assign draw_player_1[0] = num_ties[7:0];
+assign draw_player_2[0] = result_counter[7:0];
+assign draw_player_3[0] = player_result[0];
+
+
+assign test_1 = player_hands[0];
+assign test_2 = prob_result[1];
+assign test_3 = 8'd1; //input to the arm
+assign shared_write = prob_result[0];
 
 
 reg prob_result [num_simul - 1: 0];

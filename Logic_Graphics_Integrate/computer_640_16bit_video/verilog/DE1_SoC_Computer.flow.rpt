@@ -1,5 +1,5 @@
 Flow report for DE1_SoC_Computer
-Thu May 02 19:54:36 2024
+Fri May 03 19:08:48 2024
 Quartus Prime Version 18.1.0 Build 625 09/12/2018 SJ Lite Edition
 
 
@@ -40,18 +40,18 @@ refer to the applicable agreement for further details.
 +-------------------------------------------------------------------------------+
 ; Flow Summary                                                                  ;
 +---------------------------------+---------------------------------------------+
-; Flow Status                     ; Successful - Thu May 02 19:54:06 2024       ;
+; Flow Status                     ; Successful - Fri May 03 19:08:02 2024       ;
 ; Quartus Prime Version           ; 18.1.0 Build 625 09/12/2018 SJ Lite Edition ;
 ; Revision Name                   ; DE1_SoC_Computer                            ;
 ; Top-level Entity Name           ; DE1_SoC_Computer                            ;
 ; Family                          ; Cyclone V                                   ;
 ; Device                          ; 5CSEMA5F31C6                                ;
 ; Timing Models                   ; Final                                       ;
-; Logic utilization (in ALMs)     ; 4,971 / 32,070 ( 16 % )                     ;
-; Total registers                 ; 6507                                        ;
+; Logic utilization (in ALMs)     ; 23,981 / 32,070 ( 75 % )                    ;
+; Total registers                 ; 24613                                       ;
 ; Total pins                      ; 368 / 457 ( 81 % )                          ;
 ; Total virtual pins              ; 0                                           ;
-; Total block memory bits         ; 167,296 / 4,065,280 ( 4 % )                 ;
+; Total block memory bits         ; 368,000 / 4,065,280 ( 9 % )                 ;
 ; Total DSP Blocks                ; 6 / 87 ( 7 % )                              ;
 ; Total HSSI RX PCSs              ; 0                                           ;
 ; Total HSSI PMA RX Deserializers ; 0                                           ;
@@ -67,7 +67,7 @@ refer to the applicable agreement for further details.
 +-------------------+---------------------+
 ; Option            ; Setting             ;
 +-------------------+---------------------+
-; Start date & time ; 05/02/2024 19:47:46 ;
+; Start date & time ; 05/03/2024 18:55:39 ;
 ; Main task         ; Compilation         ;
 ; Revision Name     ; DE1_SoC_Computer    ;
 +-------------------+---------------------+
@@ -78,7 +78,7 @@ refer to the applicable agreement for further details.
 +-------------------------------------+-------------------------------------------------------------------------------+---------------+------------------------------------------+------------+
 ; Assignment Name                     ; Value                                                                         ; Default Value ; Entity Name                              ; Section Id ;
 +-------------------------------------+-------------------------------------------------------------------------------+---------------+------------------------------------------+------------+
-; COMPILER_SIGNATURE_ID               ; 211267926428516.171469366314532                                               ; --            ; --                                       ; --         ;
+; COMPILER_SIGNATURE_ID               ; 211267926428516.171477693605840                                               ; --            ; --                                       ; --         ;
 ; HPS_ISW_FILE                        ; Computer_System/synthesis/submodules/sequencer/alt_types.pre.h                ; --            ; Computer_System_ARM_A9_HPS_hps_io_border ; --         ;
 ; HPS_ISW_FILE                        ; Computer_System/synthesis/submodules/sequencer/emif.pre.xml                   ; --            ; Computer_System_ARM_A9_HPS_hps_io_border ; --         ;
 ; HPS_ISW_FILE                        ; Computer_System/synthesis/submodules/sequencer/sdram_io.pre.h                 ; --            ; Computer_System_ARM_A9_HPS_hps_io_border ; --         ;
@@ -131,11 +131,11 @@ refer to the applicable agreement for further details.
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 ; Module Name          ; Elapsed Time ; Average Processors Used ; Peak Virtual Memory ; Total CPU Time (on all processors) ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
-; Analysis & Synthesis ; 00:00:46     ; 5.2                     ; 5346 MB             ; 00:03:26                           ;
-; Fitter               ; 00:02:51     ; 1.4                     ; 8697 MB             ; 00:17:03                           ;
-; Assembler            ; 00:00:10     ; 1.0                     ; 4969 MB             ; 00:00:09                           ;
-; Timing Analyzer      ; 00:00:29     ; 2.5                     ; 5990 MB             ; 00:00:59                           ;
-; Total                ; 00:04:16     ; --                      ; --                  ; 00:21:37                           ;
+; Analysis & Synthesis ; 00:02:43     ; 2.5                     ; 6404 MB             ; 00:04:32                           ;
+; Fitter               ; 00:06:45     ; 1.6                     ; 9066 MB             ; 00:35:42                           ;
+; Assembler            ; 00:00:17     ; 1.0                     ; 5226 MB             ; 00:00:14                           ;
+; Timing Analyzer      ; 00:00:45     ; 4.2                     ; 6458 MB             ; 00:02:46                           ;
+; Total                ; 00:10:30     ; --                      ; --                  ; 00:43:14                           ;
 +----------------------+--------------+-------------------------+---------------------+------------------------------------+
 
 
