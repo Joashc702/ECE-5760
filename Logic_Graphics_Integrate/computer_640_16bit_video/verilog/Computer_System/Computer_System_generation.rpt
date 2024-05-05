@@ -1,5 +1,5 @@
 Info: Starting: Create block symbol file (.bsf)
-Info: qsys-generate "C:\Users\hh759\Downloads\computer_640_16bit_video_18_1 (1)\computer_640_16bit_video\verilog\Computer_System.qsys" --block-symbol-file --output-directory="C:\Users\hh759\Downloads\computer_640_16bit_video_18_1 (1)\computer_640_16bit_video\verilog\Computer_System" --family="Cyclone V" --part=5CSEMA5F31C6
+Info: qsys-generate C:\Users\hh759\Desktop\Logic_Graphics_Integrate\computer_640_16bit_video\verilog\Computer_System.qsys --block-symbol-file --output-directory=C:\Users\hh759\Desktop\Logic_Graphics_Integrate\computer_640_16bit_video\verilog\Computer_System --family="Cyclone V" --part=5CSEMA5F31C6
 Progress: Loading verilog/Computer_System.qsys
 Progress: Reading input file
 Progress: Adding ARM_A9_HPS [altera_hps 18.1]
@@ -43,38 +43,48 @@ Progress: Parameterizing connections
 Progress: Validating
 Progress: Done reading input file
 Progress: Parameterizing module VGA_Subsystem
+Progress: Adding card_eight [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_eight
+Progress: Adding card_five [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_five
+Progress: Adding card_four [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_four
+Progress: Adding card_nine [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_nine
+Progress: Adding card_one [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_one
+Progress: Adding card_seven [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_seven
+Progress: Adding card_six [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_six
+Progress: Adding card_ten [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_ten
+Progress: Adding card_three [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_three
+Progress: Adding card_two [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_two
 Progress: Adding clock_bridge_0 [altera_clock_bridge 18.1]
 Progress: Parameterizing module clock_bridge_0
 Progress: Adding clock_bridge_1 [altera_clock_bridge 18.1]
 Progress: Parameterizing module clock_bridge_1
 Progress: Adding dealer_top [altera_avalon_pio 18.1]
 Progress: Parameterizing module dealer_top
-Progress: Adding draw_dealer_1 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_dealer_1
-Progress: Adding draw_dealer_2 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_dealer_2
-Progress: Adding draw_dealer_3 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_dealer_3
-Progress: Adding draw_player_1 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_player_1
-Progress: Adding draw_player_2 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_player_2
-Progress: Adding draw_player_3 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_player_3
+Progress: Adding dealer_top_1 [altera_avalon_pio 18.1]
+Progress: Parameterizing module dealer_top_1
+Progress: Adding dealer_top_2 [altera_avalon_pio 18.1]
+Progress: Parameterizing module dealer_top_2
+Progress: Adding dealer_top_3 [altera_avalon_pio 18.1]
+Progress: Parameterizing module dealer_top_3
 Progress: Adding init_done [altera_avalon_pio 18.1]
 Progress: Parameterizing module init_done
 Progress: Adding m10k_pll [altera_pll 18.1]
 Progress: Parameterizing module m10k_pll
-Progress: Adding output_random_test [altera_avalon_pio 18.1]
-Progress: Parameterizing module output_random_test
+Progress: Adding num_ties [altera_avalon_pio 18.1]
+Progress: Parameterizing module num_ties
+Progress: Adding num_wins [altera_avalon_pio 18.1]
+Progress: Parameterizing module num_wins
 Progress: Adding player_init_hand [altera_avalon_pio 18.1]
 Progress: Parameterizing module player_init_hand
-Progress: Adding read_addr_test [altera_avalon_pio 18.1]
-Progress: Parameterizing module read_addr_test
-Progress: Adding shared_write [altera_avalon_pio 18.1]
-Progress: Parameterizing module shared_write
-Progress: Adding test_3 [altera_avalon_pio 18.1]
-Progress: Parameterizing module test_3
 Progress: Building connections
 Progress: Parameterizing connections
 Progress: Validating
@@ -91,18 +101,23 @@ Info: Computer_System.VGA_Subsystem.VGA_Char_Buffer: Character Resolution: 80 x 
 Info: Computer_System.VGA_Subsystem.VGA_Controller: Video Output Stream: Format: 640 x 480 with Color: 10 (bits) x 3 (planes) converted to 8 (bits) per color plane
 Info: Computer_System.VGA_Subsystem.VGA_Pixel_RGB_Resampler: RGB Resampling: 16 (bits) x 1 (planes) -> 10 (bits) x 3 (planes)
 Warning: Computer_System.VGA_Subsystem.VGA_Pixel_RGB_Resampler: VGA_Pixel_RGB_Resampler.avalon_rgb_slave must be connected to an Avalon-MM master
-Info: Computer_System.draw_dealer_1: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.draw_dealer_2: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.draw_dealer_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.draw_player_1: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.draw_player_2: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.draw_player_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_eight: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_five: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_four: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_nine: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_one: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_seven: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_six: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_ten: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_three: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_two: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.dealer_top_1: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.dealer_top_2: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.dealer_top_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Info: Computer_System.m10k_pll: The legal reference clock frequency is 5.0 MHz..800.0 MHz
 Info: Computer_System.m10k_pll: Able to implement PLL with user settings
-Info: Computer_System.output_random_test: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.read_addr_test: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.shared_write: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.test_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.num_ties: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.num_wins: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Warning: Computer_System.: You have exported the interface Onchip_SRAM_cards.s1 but not its associated clock interface.  Export the driver of Onchip_SRAM_cards.clk1
 Warning: Computer_System.: You have exported the interface Onchip_SRAM_cards.s1 but not its associated reset interface.  Export the driver(s) of Onchip_SRAM_cards.reset1
 Warning: Computer_System.: You have exported the interface Onchip_SRAM_seed.s1 but not its associated clock interface.  Export the driver of Onchip_SRAM_seed.clk1
@@ -111,7 +126,7 @@ Info: qsys-generate succeeded.
 Info: Finished: Create block symbol file (.bsf)
 Info: 
 Info: Starting: Create HDL design files for synthesis
-Info: qsys-generate "C:\Users\hh759\Downloads\computer_640_16bit_video_18_1 (1)\computer_640_16bit_video\verilog\Computer_System.qsys" --synthesis=VERILOG --output-directory="C:\Users\hh759\Downloads\computer_640_16bit_video_18_1 (1)\computer_640_16bit_video\verilog\Computer_System\synthesis" --family="Cyclone V" --part=5CSEMA5F31C6
+Info: qsys-generate C:\Users\hh759\Desktop\Logic_Graphics_Integrate\computer_640_16bit_video\verilog\Computer_System.qsys --synthesis=VERILOG --output-directory=C:\Users\hh759\Desktop\Logic_Graphics_Integrate\computer_640_16bit_video\verilog\Computer_System\synthesis --family="Cyclone V" --part=5CSEMA5F31C6
 Progress: Loading verilog/Computer_System.qsys
 Progress: Reading input file
 Progress: Adding ARM_A9_HPS [altera_hps 18.1]
@@ -132,38 +147,48 @@ Progress: Adding System_PLL [altera_up_avalon_sys_sdram_pll 18.0]
 Progress: Parameterizing module System_PLL
 Progress: Adding VGA_Subsystem [VGA_Subsystem 1.0]
 Progress: Parameterizing module VGA_Subsystem
+Progress: Adding card_eight [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_eight
+Progress: Adding card_five [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_five
+Progress: Adding card_four [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_four
+Progress: Adding card_nine [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_nine
+Progress: Adding card_one [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_one
+Progress: Adding card_seven [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_seven
+Progress: Adding card_six [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_six
+Progress: Adding card_ten [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_ten
+Progress: Adding card_three [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_three
+Progress: Adding card_two [altera_avalon_pio 18.1]
+Progress: Parameterizing module card_two
 Progress: Adding clock_bridge_0 [altera_clock_bridge 18.1]
 Progress: Parameterizing module clock_bridge_0
 Progress: Adding clock_bridge_1 [altera_clock_bridge 18.1]
 Progress: Parameterizing module clock_bridge_1
 Progress: Adding dealer_top [altera_avalon_pio 18.1]
 Progress: Parameterizing module dealer_top
-Progress: Adding draw_dealer_1 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_dealer_1
-Progress: Adding draw_dealer_2 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_dealer_2
-Progress: Adding draw_dealer_3 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_dealer_3
-Progress: Adding draw_player_1 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_player_1
-Progress: Adding draw_player_2 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_player_2
-Progress: Adding draw_player_3 [altera_avalon_pio 18.1]
-Progress: Parameterizing module draw_player_3
+Progress: Adding dealer_top_1 [altera_avalon_pio 18.1]
+Progress: Parameterizing module dealer_top_1
+Progress: Adding dealer_top_2 [altera_avalon_pio 18.1]
+Progress: Parameterizing module dealer_top_2
+Progress: Adding dealer_top_3 [altera_avalon_pio 18.1]
+Progress: Parameterizing module dealer_top_3
 Progress: Adding init_done [altera_avalon_pio 18.1]
 Progress: Parameterizing module init_done
 Progress: Adding m10k_pll [altera_pll 18.1]
 Progress: Parameterizing module m10k_pll
-Progress: Adding output_random_test [altera_avalon_pio 18.1]
-Progress: Parameterizing module output_random_test
+Progress: Adding num_ties [altera_avalon_pio 18.1]
+Progress: Parameterizing module num_ties
+Progress: Adding num_wins [altera_avalon_pio 18.1]
+Progress: Parameterizing module num_wins
 Progress: Adding player_init_hand [altera_avalon_pio 18.1]
 Progress: Parameterizing module player_init_hand
-Progress: Adding read_addr_test [altera_avalon_pio 18.1]
-Progress: Parameterizing module read_addr_test
-Progress: Adding shared_write [altera_avalon_pio 18.1]
-Progress: Parameterizing module shared_write
-Progress: Adding test_3 [altera_avalon_pio 18.1]
-Progress: Parameterizing module test_3
 Progress: Building connections
 Progress: Parameterizing connections
 Progress: Validating
@@ -180,18 +205,23 @@ Info: Computer_System.VGA_Subsystem.VGA_Char_Buffer: Character Resolution: 80 x 
 Info: Computer_System.VGA_Subsystem.VGA_Controller: Video Output Stream: Format: 640 x 480 with Color: 10 (bits) x 3 (planes) converted to 8 (bits) per color plane
 Info: Computer_System.VGA_Subsystem.VGA_Pixel_RGB_Resampler: RGB Resampling: 16 (bits) x 1 (planes) -> 10 (bits) x 3 (planes)
 Warning: Computer_System.VGA_Subsystem.VGA_Pixel_RGB_Resampler: VGA_Pixel_RGB_Resampler.avalon_rgb_slave must be connected to an Avalon-MM master
-Info: Computer_System.draw_dealer_1: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.draw_dealer_2: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.draw_dealer_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.draw_player_1: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.draw_player_2: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.draw_player_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_eight: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_five: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_four: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_nine: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_one: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_seven: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_six: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_ten: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_three: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.card_two: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.dealer_top_1: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.dealer_top_2: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.dealer_top_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Info: Computer_System.m10k_pll: The legal reference clock frequency is 5.0 MHz..800.0 MHz
 Info: Computer_System.m10k_pll: Able to implement PLL with user settings
-Info: Computer_System.output_random_test: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.read_addr_test: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.shared_write: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
-Info: Computer_System.test_3: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.num_ties: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
+Info: Computer_System.num_wins: PIO inputs are not hardwired in test bench. Undefined values will be read from PIO inputs during simulation.
 Warning: Computer_System.: You have exported the interface Onchip_SRAM_cards.s1 but not its associated clock interface.  Export the driver of Onchip_SRAM_cards.clk1
 Warning: Computer_System.: You have exported the interface Onchip_SRAM_cards.s1 but not its associated reset interface.  Export the driver(s) of Onchip_SRAM_cards.reset1
 Warning: Computer_System.: You have exported the interface Onchip_SRAM_seed.s1 but not its associated clock interface.  Export the driver of Onchip_SRAM_seed.clk1
@@ -212,33 +242,29 @@ Info: ARM_A9_HPS: "Computer_System" instantiated altera_hps "ARM_A9_HPS"
 Info: AV_Config: Starting Generation of Audio and Video Config
 Info: AV_Config: "Computer_System" instantiated altera_up_avalon_audio_and_video_config "AV_Config"
 Info: Onchip_SRAM_cards: Starting RTL generation for module 'Computer_System_Onchip_SRAM_cards'
-Info: Onchip_SRAM_cards:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=Computer_System_Onchip_SRAM_cards --dir=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0003_Onchip_SRAM_cards_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0003_Onchip_SRAM_cards_gen//Computer_System_Onchip_SRAM_cards_component_configuration.pl  --do_build_sim=0  ]
+Info: Onchip_SRAM_cards:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=Computer_System_Onchip_SRAM_cards --dir=C:/Users/hh759/AppData/Local/Temp/alt9847_5423574245169130311.dir/0003_Onchip_SRAM_cards_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9847_5423574245169130311.dir/0003_Onchip_SRAM_cards_gen//Computer_System_Onchip_SRAM_cards_component_configuration.pl  --do_build_sim=0  ]
 Info: Onchip_SRAM_cards: Done RTL generation for module 'Computer_System_Onchip_SRAM_cards'
 Info: Onchip_SRAM_cards: "Computer_System" instantiated altera_avalon_onchip_memory2 "Onchip_SRAM_cards"
 Info: Onchip_SRAM_seed: Starting RTL generation for module 'Computer_System_Onchip_SRAM_seed'
-Info: Onchip_SRAM_seed:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=Computer_System_Onchip_SRAM_seed --dir=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0004_Onchip_SRAM_seed_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0004_Onchip_SRAM_seed_gen//Computer_System_Onchip_SRAM_seed_component_configuration.pl  --do_build_sim=0  ]
+Info: Onchip_SRAM_seed:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2 -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_onchip_memory2/generate_rtl.pl --name=Computer_System_Onchip_SRAM_seed --dir=C:/Users/hh759/AppData/Local/Temp/alt9847_5423574245169130311.dir/0004_Onchip_SRAM_seed_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9847_5423574245169130311.dir/0004_Onchip_SRAM_seed_gen//Computer_System_Onchip_SRAM_seed_component_configuration.pl  --do_build_sim=0  ]
 Info: Onchip_SRAM_seed: Done RTL generation for module 'Computer_System_Onchip_SRAM_seed'
 Info: Onchip_SRAM_seed: "Computer_System" instantiated altera_avalon_onchip_memory2 "Onchip_SRAM_seed"
 Info: Pixel_DMA_Addr_Translation: "Computer_System" instantiated altera_up_avalon_video_dma_ctrl_addr_trans "Pixel_DMA_Addr_Translation"
 Info: SDRAM: Starting RTL generation for module 'Computer_System_SDRAM'
-Info: SDRAM:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_new_sdram_controller -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_new_sdram_controller/generate_rtl.pl --name=Computer_System_SDRAM --dir=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0006_SDRAM_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0006_SDRAM_gen//Computer_System_SDRAM_component_configuration.pl  --do_build_sim=0  ]
+Info: SDRAM:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_new_sdram_controller -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_new_sdram_controller/generate_rtl.pl --name=Computer_System_SDRAM --dir=C:/Users/hh759/AppData/Local/Temp/alt9847_5423574245169130311.dir/0006_SDRAM_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9847_5423574245169130311.dir/0006_SDRAM_gen//Computer_System_SDRAM_component_configuration.pl  --do_build_sim=0  ]
 Info: SDRAM: Done RTL generation for module 'Computer_System_SDRAM'
 Info: SDRAM: "Computer_System" instantiated altera_avalon_new_sdram_controller "SDRAM"
 Info: System_PLL: "Computer_System" instantiated altera_up_avalon_sys_sdram_pll "System_PLL"
 Info: VGA_Subsystem: "Computer_System" instantiated VGA_Subsystem "VGA_Subsystem"
+Info: card_eight: Starting RTL generation for module 'Computer_System_card_eight'
+Info: card_eight:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_card_eight --dir=C:/Users/hh759/AppData/Local/Temp/alt9847_5423574245169130311.dir/0007_card_eight_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9847_5423574245169130311.dir/0007_card_eight_gen//Computer_System_card_eight_component_configuration.pl  --do_build_sim=0  ]
+Info: card_eight: Done RTL generation for module 'Computer_System_card_eight'
+Info: card_eight: "Computer_System" instantiated altera_avalon_pio "card_eight"
 Info: dealer_top: Starting RTL generation for module 'Computer_System_dealer_top'
-Info: dealer_top:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_dealer_top --dir=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0007_dealer_top_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0007_dealer_top_gen//Computer_System_dealer_top_component_configuration.pl  --do_build_sim=0  ]
+Info: dealer_top:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_dealer_top --dir=C:/Users/hh759/AppData/Local/Temp/alt9847_5423574245169130311.dir/0008_dealer_top_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9847_5423574245169130311.dir/0008_dealer_top_gen//Computer_System_dealer_top_component_configuration.pl  --do_build_sim=0  ]
 Info: dealer_top: Done RTL generation for module 'Computer_System_dealer_top'
 Info: dealer_top: "Computer_System" instantiated altera_avalon_pio "dealer_top"
-Info: draw_dealer_1: Starting RTL generation for module 'Computer_System_draw_dealer_1'
-Info: draw_dealer_1:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_draw_dealer_1 --dir=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0008_draw_dealer_1_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0008_draw_dealer_1_gen//Computer_System_draw_dealer_1_component_configuration.pl  --do_build_sim=0  ]
-Info: draw_dealer_1: Done RTL generation for module 'Computer_System_draw_dealer_1'
-Info: draw_dealer_1: "Computer_System" instantiated altera_avalon_pio "draw_dealer_1"
 Info: m10k_pll: "Computer_System" instantiated altera_pll "m10k_pll"
-Info: output_random_test: Starting RTL generation for module 'Computer_System_output_random_test'
-Info: output_random_test:   Generation command is [exec C:/programs/intelfpga/18.1/quartus/bin64/perl/bin/perl.exe -I C:/programs/intelfpga/18.1/quartus/bin64/perl/lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/europa -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin/perl_lib -I C:/programs/intelfpga/18.1/quartus/sopc_builder/bin -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/common -I C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio -- C:/programs/intelfpga/18.1/quartus/../ip/altera/sopc_builder_ip/altera_avalon_pio/generate_rtl.pl --name=Computer_System_output_random_test --dir=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0010_output_random_test_gen/ --quartus_dir=C:/programs/intelfpga/18.1/quartus --verilog --config=C:/Users/hh759/AppData/Local/Temp/alt9845_4657180867931301949.dir/0010_output_random_test_gen//Computer_System_output_random_test_component_configuration.pl  --do_build_sim=0  ]
-Info: output_random_test: Done RTL generation for module 'Computer_System_output_random_test'
-Info: output_random_test: "Computer_System" instantiated altera_avalon_pio "output_random_test"
 Info: avalon_st_adapter: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_001: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_002: Inserting error_adapter: error_adapter_0
@@ -260,6 +286,11 @@ Info: avalon_st_adapter_012: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_013: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_014: Inserting error_adapter: error_adapter_0
 Info: avalon_st_adapter_015: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_016: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_017: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_018: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_019: Inserting error_adapter: error_adapter_0
+Info: avalon_st_adapter_020: Inserting error_adapter: error_adapter_0
 Info: mm_interconnect_1: "Computer_System" instantiated altera_mm_interconnect "mm_interconnect_1"
 Info: mm_interconnect_2: "Computer_System" instantiated altera_mm_interconnect "mm_interconnect_2"
 Info: irq_mapper: "Computer_System" instantiated altera_irq_mapper "irq_mapper"
@@ -295,27 +326,27 @@ Info: router_003: "mm_interconnect_0" instantiated altera_merlin_router "router_
 Info: router_004: "mm_interconnect_0" instantiated altera_merlin_router "router_004"
 Info: router_005: "mm_interconnect_0" instantiated altera_merlin_router "router_005"
 Info: ARM_A9_HPS_h2f_axi_master_wr_limiter: "mm_interconnect_0" instantiated altera_merlin_traffic_limiter "ARM_A9_HPS_h2f_axi_master_wr_limiter"
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_avalon_sc_fifo.v
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_avalon_sc_fifo.v
 Info: VGA_Subsystem_char_buffer_slave_burst_adapter: "mm_interconnect_0" instantiated altera_merlin_burst_adapter "VGA_Subsystem_char_buffer_slave_burst_adapter"
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_address_alignment.sv
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_avalon_st_pipeline_base.v
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_address_alignment.sv
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_avalon_st_pipeline_base.v
 Info: cmd_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux"
 Info: cmd_demux_002: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "cmd_demux_002"
 Info: cmd_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux"
 Info: cmd_mux_001: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux_001"
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
 Info: cmd_mux_002: "mm_interconnect_0" instantiated altera_merlin_multiplexer "cmd_mux_002"
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
 Info: rsp_demux: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux"
 Info: rsp_demux_001: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux_001"
 Info: rsp_demux_002: "mm_interconnect_0" instantiated altera_merlin_demultiplexer "rsp_demux_002"
 Info: rsp_mux: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux"
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
 Info: rsp_mux_002: "mm_interconnect_0" instantiated altera_merlin_multiplexer "rsp_mux_002"
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
 Info: ARM_A9_HPS_h2f_axi_master_wr_to_VGA_Subsystem_char_buffer_slave_cmd_width_adapter: "mm_interconnect_0" instantiated altera_merlin_width_adapter "ARM_A9_HPS_h2f_axi_master_wr_to_VGA_Subsystem_char_buffer_slave_cmd_width_adapter"
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_address_alignment.sv
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_burst_uncompressor.sv
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_address_alignment.sv
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_burst_uncompressor.sv
 Info: avalon_st_adapter: "mm_interconnect_0" instantiated altera_avalon_st_adapter "avalon_st_adapter"
 Info: avalon_st_adapter_001: "mm_interconnect_0" instantiated altera_avalon_st_adapter "avalon_st_adapter_001"
 Info: avalon_st_adapter_002: "mm_interconnect_0" instantiated altera_avalon_st_adapter "avalon_st_adapter_002"
@@ -323,15 +354,15 @@ Info: router: "mm_interconnect_1" instantiated altera_merlin_router "router"
 Info: router_002: "mm_interconnect_1" instantiated altera_merlin_router "router_002"
 Info: cmd_demux: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "cmd_demux"
 Info: cmd_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "cmd_mux"
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
 Info: rsp_demux: "mm_interconnect_1" instantiated altera_merlin_demultiplexer "rsp_demux"
 Info: rsp_mux: "mm_interconnect_1" instantiated altera_merlin_multiplexer "rsp_mux"
-Info: Reusing file C:/Users/hh759/Downloads/computer_640_16bit_video_18_1 (1)/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
+Info: Reusing file C:/Users/hh759/Desktop/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/Computer_System/synthesis/submodules/altera_merlin_arbitrator.sv
 Info: border: "hps_io" instantiated altera_interface_generator "border"
 Info: video_pll: "VGA_PLL" instantiated altera_pll "video_pll"
 Info: error_adapter_0: "avalon_st_adapter" instantiated error_adapter "error_adapter_0"
 Info: error_adapter_0: "avalon_st_adapter_001" instantiated error_adapter "error_adapter_0"
 Info: error_adapter_0: "avalon_st_adapter_002" instantiated error_adapter "error_adapter_0"
-Info: Computer_System: Done "Computer_System" with 68 modules, 152 files
+Info: Computer_System: Done "Computer_System" with 67 modules, 151 files
 Info: qsys-generate succeeded.
 Info: Finished: Create HDL design files for synthesis

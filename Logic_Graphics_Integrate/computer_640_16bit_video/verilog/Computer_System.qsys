@@ -179,6 +179,166 @@
          type = "boolean";
       }
    }
+   element card_eight
+   {
+      datum _sortIndex
+      {
+         value = "24";
+         type = "int";
+      }
+   }
+   element card_eight.s1
+   {
+      datum baseAddress
+      {
+         value = "304";
+         type = "String";
+      }
+   }
+   element card_five
+   {
+      datum _sortIndex
+      {
+         value = "21";
+         type = "int";
+      }
+   }
+   element card_five.s1
+   {
+      datum baseAddress
+      {
+         value = "256";
+         type = "String";
+      }
+   }
+   element card_four
+   {
+      datum _sortIndex
+      {
+         value = "20";
+         type = "int";
+      }
+   }
+   element card_four.s1
+   {
+      datum baseAddress
+      {
+         value = "144";
+         type = "String";
+      }
+   }
+   element card_nine
+   {
+      datum _sortIndex
+      {
+         value = "25";
+         type = "int";
+      }
+   }
+   element card_nine.s1
+   {
+      datum baseAddress
+      {
+         value = "320";
+         type = "String";
+      }
+   }
+   element card_one
+   {
+      datum _sortIndex
+      {
+         value = "17";
+         type = "int";
+      }
+   }
+   element card_one.s1
+   {
+      datum baseAddress
+      {
+         value = "80";
+         type = "String";
+      }
+   }
+   element card_seven
+   {
+      datum _sortIndex
+      {
+         value = "23";
+         type = "int";
+      }
+   }
+   element card_seven.s1
+   {
+      datum baseAddress
+      {
+         value = "288";
+         type = "String";
+      }
+   }
+   element card_six
+   {
+      datum _sortIndex
+      {
+         value = "22";
+         type = "int";
+      }
+   }
+   element card_six.s1
+   {
+      datum baseAddress
+      {
+         value = "272";
+         type = "String";
+      }
+   }
+   element card_ten
+   {
+      datum _sortIndex
+      {
+         value = "26";
+         type = "int";
+      }
+   }
+   element card_ten.s1
+   {
+      datum baseAddress
+      {
+         value = "336";
+         type = "String";
+      }
+   }
+   element card_three
+   {
+      datum _sortIndex
+      {
+         value = "19";
+         type = "int";
+      }
+   }
+   element card_three.s1
+   {
+      datum baseAddress
+      {
+         value = "128";
+         type = "String";
+      }
+   }
+   element card_two
+   {
+      datum _sortIndex
+      {
+         value = "18";
+         type = "int";
+      }
+   }
+   element card_two.s1
+   {
+      datum baseAddress
+      {
+         value = "112";
+         type = "String";
+      }
+   }
    element clock_bridge_0
    {
       datum _sortIndex
@@ -211,99 +371,51 @@
          type = "String";
       }
    }
-   element draw_dealer_1
+   element dealer_top_1
    {
       datum _sortIndex
       {
-         value = "18";
+         value = "27";
          type = "int";
       }
    }
-   element draw_dealer_1.s1
+   element dealer_top_1.s1
    {
       datum baseAddress
       {
-         value = "112";
+         value = "352";
          type = "String";
       }
    }
-   element draw_dealer_2
+   element dealer_top_2
    {
       datum _sortIndex
       {
-         value = "19";
+         value = "28";
          type = "int";
       }
    }
-   element draw_dealer_2.s1
+   element dealer_top_2.s1
    {
       datum baseAddress
       {
-         value = "128";
+         value = "368";
          type = "String";
       }
    }
-   element draw_dealer_3
+   element dealer_top_3
    {
       datum _sortIndex
       {
-         value = "20";
+         value = "29";
          type = "int";
       }
    }
-   element draw_dealer_3.s1
+   element dealer_top_3.s1
    {
       datum baseAddress
       {
-         value = "144";
-         type = "String";
-      }
-   }
-   element draw_player_1
-   {
-      datum _sortIndex
-      {
-         value = "21";
-         type = "int";
-      }
-   }
-   element draw_player_1.s1
-   {
-      datum baseAddress
-      {
-         value = "256";
-         type = "String";
-      }
-   }
-   element draw_player_2
-   {
-      datum _sortIndex
-      {
-         value = "22";
-         type = "int";
-      }
-   }
-   element draw_player_2.s1
-   {
-      datum baseAddress
-      {
-         value = "272";
-         type = "String";
-      }
-   }
-   element draw_player_3
-   {
-      datum _sortIndex
-      {
-         value = "23";
-         type = "int";
-      }
-   }
-   element draw_player_3.s1
-   {
-      datum baseAddress
-      {
-         value = "288";
+         value = "384";
          type = "String";
       }
    }
@@ -331,19 +443,35 @@
          type = "int";
       }
    }
-   element output_random_test
+   element num_ties
    {
       datum _sortIndex
       {
-         value = "17";
+         value = "16";
          type = "int";
       }
    }
-   element output_random_test.s1
+   element num_ties.s1
    {
       datum baseAddress
       {
-         value = "80";
+         value = "64";
+         type = "String";
+      }
+   }
+   element num_wins
+   {
+      datum _sortIndex
+      {
+         value = "15";
+         type = "int";
+      }
+   }
+   element num_wins.s1
+   {
+      datum baseAddress
+      {
+         value = "48";
          type = "String";
       }
    }
@@ -353,54 +481,6 @@
       {
          value = "12";
          type = "int";
-      }
-   }
-   element read_addr_test
-   {
-      datum _sortIndex
-      {
-         value = "16";
-         type = "int";
-      }
-   }
-   element read_addr_test.s1
-   {
-      datum baseAddress
-      {
-         value = "64";
-         type = "String";
-      }
-   }
-   element shared_write
-   {
-      datum _sortIndex
-      {
-         value = "15";
-         type = "int";
-      }
-   }
-   element shared_write.s1
-   {
-      datum baseAddress
-      {
-         value = "48";
-         type = "String";
-      }
-   }
-   element test_3
-   {
-      datum _sortIndex
-      {
-         value = "24";
-         type = "int";
-      }
-   }
-   element test_3.s1
-   {
-      datum baseAddress
-      {
-         value = "304";
-         type = "String";
       }
    }
 }
@@ -430,38 +510,73 @@
    type="conduit"
    dir="end" />
  <interface
+   name="card_eight_external_connection"
+   internal="card_eight.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="card_five_external_connection"
+   internal="card_five.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="card_four_external_connection"
+   internal="card_four.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="card_nine_external_connection"
+   internal="card_nine.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="card_one_external_connection"
+   internal="card_one.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="card_seven_external_connection"
+   internal="card_seven.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="card_six_external_connection"
+   internal="card_six.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="card_ten_external_connection"
+   internal="card_ten.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="card_three_external_connection"
+   internal="card_three.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="card_two_external_connection"
+   internal="card_two.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="dealer_top_1_external_connection"
+   internal="dealer_top_1.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="dealer_top_2_external_connection"
+   internal="dealer_top_2.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="dealer_top_3_external_connection"
+   internal="dealer_top_3.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
    name="dealer_top_external_connection"
    internal="dealer_top.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
-   name="draw_dealer_1_external_connection"
-   internal="draw_dealer_1.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
-   name="draw_dealer_2_external_connection"
-   internal="draw_dealer_2.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
-   name="draw_dealer_3_external_connection"
-   internal="draw_dealer_3.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
-   name="draw_player_1_external_connection"
-   internal="draw_player_1.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
-   name="draw_player_2_external_connection"
-   internal="draw_player_2.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
-   name="draw_player_3_external_connection"
-   internal="draw_player_3.external_connection"
    type="conduit"
    dir="end" />
  <interface name="hps_io" internal="ARM_A9_HPS.hps_io" type="conduit" dir="end" />
@@ -482,6 +597,16 @@
    dir="start" />
  <interface name="memory" internal="ARM_A9_HPS.memory" type="conduit" dir="end" />
  <interface
+   name="num_ties_external_connection"
+   internal="num_ties.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="num_wins_external_connection"
+   internal="num_wins.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
    name="onchip_sram_cards_s1"
    internal="Onchip_SRAM_cards.s1"
    type="avalon"
@@ -492,18 +617,8 @@
    type="avalon"
    dir="end" />
  <interface
-   name="output_random_test_external_connection"
-   internal="output_random_test.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
    name="player_init_hand_external_connection"
    internal="player_init_hand.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
-   name="read_addr_test_external_connection"
-   internal="read_addr_test.external_connection"
    type="conduit"
    dir="end" />
  <interface name="sdram" internal="SDRAM.wire" type="conduit" dir="end" />
@@ -513,11 +628,6 @@
    type="clock"
    dir="start" />
  <interface
-   name="shared_write_external_connection"
-   internal="shared_write.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
    name="system_pll_ref_clk"
    internal="System_PLL.ref_clk"
    type="clock"
@@ -526,11 +636,6 @@
    name="system_pll_ref_reset"
    internal="System_PLL.ref_reset"
    type="reset"
-   dir="end" />
- <interface
-   name="test_3_external_connection"
-   internal="test_3.external_connection"
-   type="conduit"
    dir="end" />
  <interface name="vga" internal="VGA_Subsystem.vga" type="conduit" dir="end" />
  <interface
@@ -1258,6 +1363,146 @@
   <parameter name="AUTO_VGA_PLL_REF_CLK_CLOCK_RATE" value="0" />
   <parameter name="AUTO_VGA_PLL_REF_CLK_RESET_DOMAIN" value="5" />
  </module>
+ <module name="card_eight" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="card_five" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="card_four" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="card_nine" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="card_one" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="card_seven" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="card_six" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="card_ten" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="card_three" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="card_two" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
  <module
    name="clock_bridge_0"
    kind="altera_clock_bridge"
@@ -1291,7 +1536,7 @@
   <parameter name="width" value="8" />
  </module>
  <module
-   name="draw_dealer_1"
+   name="dealer_top_1"
    kind="altera_avalon_pio"
    version="18.1"
    enabled="1">
@@ -1306,10 +1551,10 @@
   <parameter name="resetValue" value="0" />
   <parameter name="simDoTestBenchWiring" value="false" />
   <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="8" />
+  <parameter name="width" value="32" />
  </module>
  <module
-   name="draw_dealer_2"
+   name="dealer_top_2"
    kind="altera_avalon_pio"
    version="18.1"
    enabled="1">
@@ -1324,10 +1569,10 @@
   <parameter name="resetValue" value="0" />
   <parameter name="simDoTestBenchWiring" value="false" />
   <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="8" />
+  <parameter name="width" value="32" />
  </module>
  <module
-   name="draw_dealer_3"
+   name="dealer_top_3"
    kind="altera_avalon_pio"
    version="18.1"
    enabled="1">
@@ -1342,61 +1587,7 @@
   <parameter name="resetValue" value="0" />
   <parameter name="simDoTestBenchWiring" value="false" />
   <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="8" />
- </module>
- <module
-   name="draw_player_1"
-   kind="altera_avalon_pio"
-   version="18.1"
-   enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="100000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="8" />
- </module>
- <module
-   name="draw_player_2"
-   kind="altera_avalon_pio"
-   version="18.1"
-   enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="100000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="8" />
- </module>
- <module
-   name="draw_player_3"
-   kind="altera_avalon_pio"
-   version="18.1"
-   enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="100000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="8" />
+  <parameter name="width" value="32" />
  </module>
  <module name="init_done" kind="altera_avalon_pio" version="18.1" enabled="1">
   <parameter name="bitClearingEdgeCapReg" value="false" />
@@ -1615,11 +1806,21 @@
   <parameter name="gui_switchover_mode">Automatic Switchover</parameter>
   <parameter name="gui_use_locked" value="true" />
  </module>
- <module
-   name="output_random_test"
-   kind="altera_avalon_pio"
-   version="18.1"
-   enabled="1">
+ <module name="num_ties" kind="altera_avalon_pio" version="18.1" enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module name="num_wins" kind="altera_avalon_pio" version="18.1" enabled="1">
   <parameter name="bitClearingEdgeCapReg" value="false" />
   <parameter name="bitModifyingOutReg" value="false" />
   <parameter name="captureEdge" value="false" />
@@ -1643,56 +1844,6 @@
   <parameter name="captureEdge" value="false" />
   <parameter name="clockRate" value="100000000" />
   <parameter name="direction" value="Output" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="8" />
- </module>
- <module
-   name="read_addr_test"
-   kind="altera_avalon_pio"
-   version="18.1"
-   enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="100000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="8" />
- </module>
- <module
-   name="shared_write"
-   kind="altera_avalon_pio"
-   version="18.1"
-   enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="100000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="8" />
- </module>
- <module name="test_3" kind="altera_avalon_pio" version="18.1" enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="100000000" />
-  <parameter name="direction" value="Input" />
   <parameter name="edgeType" value="RISING" />
   <parameter name="generateIRQ" value="false" />
   <parameter name="irqType" value="LEVEL" />
@@ -1795,7 +1946,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="shared_write.s1">
+   end="num_wins.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0030" />
   <parameter name="defaultConnection" value="false" />
@@ -1804,7 +1955,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="read_addr_test.s1">
+   end="num_ties.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0040" />
   <parameter name="defaultConnection" value="false" />
@@ -1813,7 +1964,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="output_random_test.s1">
+   end="card_one.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0050" />
   <parameter name="defaultConnection" value="false" />
@@ -1822,7 +1973,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="draw_dealer_1.s1">
+   end="card_two.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0070" />
   <parameter name="defaultConnection" value="false" />
@@ -1831,7 +1982,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="draw_dealer_2.s1">
+   end="card_three.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0080" />
   <parameter name="defaultConnection" value="false" />
@@ -1840,7 +1991,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="draw_dealer_3.s1">
+   end="card_four.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0090" />
   <parameter name="defaultConnection" value="false" />
@@ -1849,7 +2000,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="draw_player_1.s1">
+   end="card_five.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0100" />
   <parameter name="defaultConnection" value="false" />
@@ -1858,7 +2009,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="draw_player_2.s1">
+   end="card_six.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0110" />
   <parameter name="defaultConnection" value="false" />
@@ -1867,7 +2018,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="draw_player_3.s1">
+   end="card_seven.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0120" />
   <parameter name="defaultConnection" value="false" />
@@ -1876,9 +2027,54 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="test_3.s1">
+   end="card_eight.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0130" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="card_nine.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0140" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="card_ten.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0150" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="dealer_top_1.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0160" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="dealer_top_2.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0170" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection
+   kind="avalon"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_lw_axi_master"
+   end="dealer_top_3.s1">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0180" />
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
@@ -1947,52 +2143,77 @@
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="shared_write.clk" />
+   end="num_wins.clk" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="read_addr_test.clk" />
+   end="num_ties.clk" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="output_random_test.clk" />
+   end="card_one.clk" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="draw_dealer_1.clk" />
+   end="card_two.clk" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="draw_dealer_2.clk" />
+   end="card_three.clk" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="draw_dealer_3.clk" />
+   end="card_four.clk" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="draw_player_1.clk" />
+   end="card_five.clk" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="draw_player_2.clk" />
+   end="card_six.clk" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="draw_player_3.clk" />
+   end="card_seven.clk" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="test_3.clk" />
+   end="card_eight.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="card_nine.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="card_ten.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="dealer_top_1.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="dealer_top_2.clk" />
+ <connection
+   kind="clock"
+   version="18.1"
+   start="System_PLL.sys_clk"
+   end="dealer_top_3.clk" />
  <connection
    kind="clock"
    version="18.1"
@@ -2087,52 +2308,77 @@
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="shared_write.reset" />
+   end="num_wins.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="read_addr_test.reset" />
+   end="num_ties.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="output_random_test.reset" />
+   end="card_one.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="draw_dealer_1.reset" />
+   end="card_two.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="draw_dealer_2.reset" />
+   end="card_three.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="draw_dealer_3.reset" />
+   end="card_four.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="draw_player_1.reset" />
+   end="card_five.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="draw_player_2.reset" />
+   end="card_six.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="draw_player_3.reset" />
+   end="card_seven.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="test_3.reset" />
+   end="card_eight.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="card_nine.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="card_ten.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="dealer_top_1.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="dealer_top_2.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="ARM_A9_HPS.h2f_reset"
+   end="dealer_top_3.reset" />
  <connection
    kind="reset"
    version="18.1"
@@ -2202,52 +2448,77 @@
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="shared_write.reset" />
+   end="num_wins.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="read_addr_test.reset" />
+   end="num_ties.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="output_random_test.reset" />
+   end="card_one.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="draw_dealer_1.reset" />
+   end="card_two.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="draw_dealer_2.reset" />
+   end="card_three.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="draw_dealer_3.reset" />
+   end="card_four.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="draw_player_1.reset" />
+   end="card_five.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="draw_player_2.reset" />
+   end="card_six.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="draw_player_3.reset" />
+   end="card_seven.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="test_3.reset" />
+   end="card_eight.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="card_nine.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="card_ten.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="dealer_top_1.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="dealer_top_2.reset" />
+ <connection
+   kind="reset"
+   version="18.1"
+   start="System_PLL.reset_source"
+   end="dealer_top_3.reset" />
  <connection
    kind="reset"
    version="18.1"

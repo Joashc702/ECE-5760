@@ -2,6 +2,17 @@
 module Computer_System (
 	av_config_SDAT,
 	av_config_SCLK,
+	card_eight_external_connection_export,
+	card_five_external_connection_export,
+	card_four_external_connection_export,
+	card_nine_external_connection_export,
+	card_one_external_connection_export,
+	card_seven_external_connection_export,
+	card_six_external_connection_export,
+	card_ten_external_connection_export,
+	card_three_external_connection_export,
+	card_two_external_connection_export,
+	dealer_top_external_connection_export,
 	hps_io_hps_io_emac1_inst_TX_CLK,
 	hps_io_hps_io_emac1_inst_TXD0,
 	hps_io_hps_io_emac1_inst_TXD1,
@@ -58,6 +69,9 @@ module Computer_System (
 	hps_io_hps_io_gpio_inst_GPIO53,
 	hps_io_hps_io_gpio_inst_GPIO54,
 	hps_io_hps_io_gpio_inst_GPIO61,
+	init_done_external_connection_export,
+	m10k_pll_locked_export,
+	m10k_pll_outclk0_clk,
 	memory_mem_a,
 	memory_mem_ba,
 	memory_mem_ck,
@@ -74,6 +88,23 @@ module Computer_System (
 	memory_mem_odt,
 	memory_mem_dm,
 	memory_oct_rzqin,
+	num_ties_external_connection_export,
+	num_wins_external_connection_export,
+	onchip_sram_cards_s1_address,
+	onchip_sram_cards_s1_clken,
+	onchip_sram_cards_s1_chipselect,
+	onchip_sram_cards_s1_write,
+	onchip_sram_cards_s1_readdata,
+	onchip_sram_cards_s1_writedata,
+	onchip_sram_cards_s1_byteenable,
+	onchip_sram_seed_s1_address,
+	onchip_sram_seed_s1_clken,
+	onchip_sram_seed_s1_chipselect,
+	onchip_sram_seed_s1_write,
+	onchip_sram_seed_s1_readdata,
+	onchip_sram_seed_s1_writedata,
+	onchip_sram_seed_s1_byteenable,
+	player_init_hand_external_connection_export,
 	sdram_addr,
 	sdram_ba,
 	sdram_cas_n,
@@ -96,38 +127,23 @@ module Computer_System (
 	vga_B,
 	vga_pll_ref_clk_clk,
 	vga_pll_ref_reset_reset,
-	m10k_pll_outclk0_clk,
-	m10k_pll_locked_export,
-	onchip_sram_cards_s1_address,
-	onchip_sram_cards_s1_clken,
-	onchip_sram_cards_s1_chipselect,
-	onchip_sram_cards_s1_write,
-	onchip_sram_cards_s1_readdata,
-	onchip_sram_cards_s1_writedata,
-	onchip_sram_cards_s1_byteenable,
-	onchip_sram_seed_s1_address,
-	onchip_sram_seed_s1_clken,
-	onchip_sram_seed_s1_chipselect,
-	onchip_sram_seed_s1_write,
-	onchip_sram_seed_s1_readdata,
-	onchip_sram_seed_s1_writedata,
-	onchip_sram_seed_s1_byteenable,
-	player_init_hand_external_connection_export,
-	dealer_top_external_connection_export,
-	init_done_external_connection_export,
-	shared_write_external_connection_export,
-	read_addr_test_external_connection_export,
-	output_random_test_external_connection_export,
-	draw_dealer_1_external_connection_export,
-	draw_dealer_2_external_connection_export,
-	draw_dealer_3_external_connection_export,
-	draw_player_1_external_connection_export,
-	draw_player_2_external_connection_export,
-	draw_player_3_external_connection_export,
-	test_3_external_connection_export);	
+	dealer_top_1_external_connection_export,
+	dealer_top_2_external_connection_export,
+	dealer_top_3_external_connection_export);	
 
 	inout		av_config_SDAT;
 	output		av_config_SCLK;
+	input	[31:0]	card_eight_external_connection_export;
+	input	[31:0]	card_five_external_connection_export;
+	input	[31:0]	card_four_external_connection_export;
+	input	[31:0]	card_nine_external_connection_export;
+	input	[31:0]	card_one_external_connection_export;
+	input	[31:0]	card_seven_external_connection_export;
+	input	[31:0]	card_six_external_connection_export;
+	input	[31:0]	card_ten_external_connection_export;
+	input	[31:0]	card_three_external_connection_export;
+	input	[31:0]	card_two_external_connection_export;
+	output	[7:0]	dealer_top_external_connection_export;
 	output		hps_io_hps_io_emac1_inst_TX_CLK;
 	output		hps_io_hps_io_emac1_inst_TXD0;
 	output		hps_io_hps_io_emac1_inst_TXD1;
@@ -184,6 +200,9 @@ module Computer_System (
 	inout		hps_io_hps_io_gpio_inst_GPIO53;
 	inout		hps_io_hps_io_gpio_inst_GPIO54;
 	inout		hps_io_hps_io_gpio_inst_GPIO61;
+	output	[7:0]	init_done_external_connection_export;
+	output		m10k_pll_locked_export;
+	output		m10k_pll_outclk0_clk;
 	output	[14:0]	memory_mem_a;
 	output	[2:0]	memory_mem_ba;
 	output		memory_mem_ck;
@@ -200,6 +219,23 @@ module Computer_System (
 	output		memory_mem_odt;
 	output	[3:0]	memory_mem_dm;
 	input		memory_oct_rzqin;
+	input	[31:0]	num_ties_external_connection_export;
+	input	[31:0]	num_wins_external_connection_export;
+	input	[8:0]	onchip_sram_cards_s1_address;
+	input		onchip_sram_cards_s1_clken;
+	input		onchip_sram_cards_s1_chipselect;
+	input		onchip_sram_cards_s1_write;
+	output	[31:0]	onchip_sram_cards_s1_readdata;
+	input	[31:0]	onchip_sram_cards_s1_writedata;
+	input	[3:0]	onchip_sram_cards_s1_byteenable;
+	input	[11:0]	onchip_sram_seed_s1_address;
+	input		onchip_sram_seed_s1_clken;
+	input		onchip_sram_seed_s1_chipselect;
+	input		onchip_sram_seed_s1_write;
+	output	[31:0]	onchip_sram_seed_s1_readdata;
+	input	[31:0]	onchip_sram_seed_s1_writedata;
+	input	[3:0]	onchip_sram_seed_s1_byteenable;
+	output	[7:0]	player_init_hand_external_connection_export;
 	output	[12:0]	sdram_addr;
 	output	[1:0]	sdram_ba;
 	output		sdram_cas_n;
@@ -222,33 +258,7 @@ module Computer_System (
 	output	[7:0]	vga_B;
 	input		vga_pll_ref_clk_clk;
 	input		vga_pll_ref_reset_reset;
-	output		m10k_pll_outclk0_clk;
-	output		m10k_pll_locked_export;
-	input	[8:0]	onchip_sram_cards_s1_address;
-	input		onchip_sram_cards_s1_clken;
-	input		onchip_sram_cards_s1_chipselect;
-	input		onchip_sram_cards_s1_write;
-	output	[31:0]	onchip_sram_cards_s1_readdata;
-	input	[31:0]	onchip_sram_cards_s1_writedata;
-	input	[3:0]	onchip_sram_cards_s1_byteenable;
-	input	[11:0]	onchip_sram_seed_s1_address;
-	input		onchip_sram_seed_s1_clken;
-	input		onchip_sram_seed_s1_chipselect;
-	input		onchip_sram_seed_s1_write;
-	output	[31:0]	onchip_sram_seed_s1_readdata;
-	input	[31:0]	onchip_sram_seed_s1_writedata;
-	input	[3:0]	onchip_sram_seed_s1_byteenable;
-	output	[7:0]	player_init_hand_external_connection_export;
-	output	[7:0]	dealer_top_external_connection_export;
-	output	[7:0]	init_done_external_connection_export;
-	input	[7:0]	shared_write_external_connection_export;
-	input	[7:0]	read_addr_test_external_connection_export;
-	input	[31:0]	output_random_test_external_connection_export;
-	input	[7:0]	draw_dealer_1_external_connection_export;
-	input	[7:0]	draw_dealer_2_external_connection_export;
-	input	[7:0]	draw_dealer_3_external_connection_export;
-	input	[7:0]	draw_player_1_external_connection_export;
-	input	[7:0]	draw_player_2_external_connection_export;
-	input	[7:0]	draw_player_3_external_connection_export;
-	input	[7:0]	test_3_external_connection_export;
+	input	[31:0]	dealer_top_1_external_connection_export;
+	input	[31:0]	dealer_top_2_external_connection_export;
+	input	[31:0]	dealer_top_3_external_connection_export;
 endmodule
