@@ -11,6 +11,7 @@
 		.card_ten_external_connection_export         (<connected-to-card_ten_external_connection_export>),         //         card_ten_external_connection.export
 		.card_three_external_connection_export       (<connected-to-card_three_external_connection_export>),       //       card_three_external_connection.export
 		.card_two_external_connection_export         (<connected-to-card_two_external_connection_export>),         //         card_two_external_connection.export
+		.dealer_top_3_external_connection_export     (<connected-to-dealer_top_3_external_connection_export>),     //     dealer_top_3_external_connection.export
 		.dealer_top_external_connection_export       (<connected-to-dealer_top_external_connection_export>),       //       dealer_top_external_connection.export
 		.hps_io_hps_io_emac1_inst_TX_CLK             (<connected-to-hps_io_hps_io_emac1_inst_TX_CLK>),             //                               hps_io.hps_io_emac1_inst_TX_CLK
 		.hps_io_hps_io_emac1_inst_TXD0               (<connected-to-hps_io_hps_io_emac1_inst_TXD0>),               //                                     .hps_io_emac1_inst_TXD0
@@ -126,8 +127,7 @@
 		.vga_B                                       (<connected-to-vga_B>),                                       //                                     .B
 		.vga_pll_ref_clk_clk                         (<connected-to-vga_pll_ref_clk_clk>),                         //                      vga_pll_ref_clk.clk
 		.vga_pll_ref_reset_reset                     (<connected-to-vga_pll_ref_reset_reset>),                     //                    vga_pll_ref_reset.reset
-		.dealer_top_1_external_connection_export     (<connected-to-dealer_top_1_external_connection_export>),     //     dealer_top_1_external_connection.export
-		.dealer_top_2_external_connection_export     (<connected-to-dealer_top_2_external_connection_export>),     //     dealer_top_2_external_connection.export
-		.dealer_top_3_external_connection_export     (<connected-to-dealer_top_3_external_connection_export>)      //     dealer_top_3_external_connection.export
+		.finish_simuls_external_connection_export    (<connected-to-finish_simuls_external_connection_export>),    //    finish_simuls_external_connection.export
+		.mem_start_point_external_connection_export  (<connected-to-mem_start_point_external_connection_export>)   //  mem_start_point_external_connection.export
 	);
 

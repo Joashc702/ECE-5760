@@ -486,7 +486,7 @@ always @(posedge CLOCK_50) begin
 	end
 	if (init_done == 8'd1) begin
 		if (sram_state == 4'd0) begin
-			if (read_addr_init < 10'd260) begin
+			if (read_addr_init < 10'd256) begin
 				sram_address <= read_addr_init;
 				sram_state <= 4'd1;
 				data_ready <= 1'd0;
@@ -505,14 +505,10 @@ always @(posedge CLOCK_50) begin
 	end
 end
 
-parameter [9:0] num_simul = 70;//half of the number of columns  85 is the max
-parameter [9:0] num_internal_simul = 5;
+parameter [9:0] num_simul = 60;//half of the number of columns  85 is the max
+//parameter [9:0] num_internal_simul = 5;
 wire [7:0] output_random [num_simul-1:0] /*synthesis keep */; 
-//wire [63:0] seed_samples [5:0];
-//wire init_done;
 
-//reg [2:0] read_write_offset;
-//reg [7:0] write_addr_inter;
 
 wire unsigned [3:0] q [num_simul-1:0];
 reg unsigned  [3:0] d [num_simul-1:0];
@@ -572,6 +568,13 @@ assign draw_player_3[0] = seed_test[1];
 reg [1:0] player_result[num_simul-1:0];
 reg all_simul_done [num_simul - 1:0];
 
+wire [31:0] simul_complete;
+reg interm_simul_complete;
+assign simul_complete = interm_simul_complete;
+
+wire [31:0] mem_start;
+
+
 // Send back to the arm and verify
 //assign shared_write = output_random[0];
 
@@ -580,7 +583,7 @@ reg [12:0] num_wins_net;
 reg [12:0] num_ties [num_simul - 1: 0];
 reg [12:0] num_ties_net;
 reg [12:0] result_counter;
-reg [12:0] internal_simuls;
+//reg [12:0] internal_simuls;
 
 reg checked_card [num_simul - 1:0] /*synthesis keep */;
 always @(posedge CLOCK_50) begin
@@ -598,10 +601,12 @@ always @(posedge CLOCK_50) begin
 		val_card_eight[num_simul] <= 13'd0;
 		val_card_nine[num_simul] <= 13'd0;
 		val_card_ten[num_simul] <= 13'd0;
-		internal_simuls <= 13'd0;
+		//internal_simuls <= 13'd0;
+		interm_simul_complete <= 1'd0;
 	end
 	else begin
 		if (result_counter == num_simul) begin
+			interm_simul_complete <= 1'd1;
 			//result_counter <= 13'd7000;
 			// Hard code in C to tell it's 7000 simuls
 		end
@@ -717,17 +722,17 @@ reg prob_result [num_simul - 1: 0];
 wire [31:0] num_ties_pio;
 wire [31:0] num_wins_pio;
 
-wire [31:0] dealer_top_1_pio;
-wire [31:0] dealer_top_2_pio;
+//wire [31:0] dealer_top_1_pio;
+//wire [31:0] dealer_top_2_pio;
 wire [31:0] dealer_top_3_pio;
 reg [3:0] dealer_show [num_simul-1: 0];
 
-assign dealer_top_1_pio = dealer_show[0];
-assign dealer_top_2_pio = dealer_show[1];
-assign dealer_top_3_pio = result_counter;
+//assign dealer_top_1_pio = dealer_show[0];
+//assign dealer_top_2_pio = dealer_show[1];
+assign dealer_top_3_pio = mem_start;
 
-assign num_wins_pio = num_wins_net[7:0];
-assign num_ties_pio = num_ties_net[7:0];   
+assign num_wins_pio = num_wins_net[12:0];
+assign num_ties_pio = num_ties_net[12:0];   
 
 reg [12:0] val_card_one [num_simul: 0];
 reg [12:0] val_card_two [num_simul: 0];
@@ -764,6 +769,8 @@ assign val_card_seven_pio = val_card_seven[num_simul];
 assign val_card_eight_pio = val_card_eight[num_simul];
 assign val_card_nine_pio = val_card_nine[num_simul];
 assign val_card_ten_pio = val_card_ten[num_simul];
+//assign val_card_nine_pio = output_random[0];
+//assign val_card_ten_pio = result_counter;
 
 //assign val_card_four_pio = num_wins[0];
 //assign val_card_five_pio = num_wins[1];
@@ -906,8 +913,10 @@ generate
 	
 		M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
 		Search_hit_card card_check( .picked_card(hit_card_reg), 
+									.mem_start(mem_start),
 									.card(output_random[i]), // TODO we don't want generated number all the time
 									.picked(picked));
+									
 									
 		always @ (posedge CLOCK_50) begin
 			if (init_done == 8'd0) begin // reset conditions
@@ -960,7 +969,7 @@ generate
 				// STATE 1: Dealer's card
 				else if (drum_state[i] == 4'd1) begin //initiate dealers cards
 					simul_count <= simul_count+ 10'd1;
-					if ((output_random[i] < 8'd3) || (output_random[i] >= 8'd52)) begin
+					if ((output_random[i] < mem_start[7:0]) || (output_random[i] >= 8'd255)) begin
 						drum_state[i] <= 4'd1;
 					end
 					else begin
@@ -1111,7 +1120,7 @@ generate
 					//if (i == 0) begin
 					//	test_simul_count <= simul_count;
 					//end
-					if (simul_count <= 10'd11) begin 
+					if (simul_count < 10'd100) begin 
 						drum_state[i] <= 4'd1;
 						hit_card_reg <= 256'd0;
 						card_itr[i] <= 5'd0;				
@@ -1307,11 +1316,16 @@ Computer_System The_System (
 	.hps_io_hps_io_usb1_inst_DIR		(HPS_USB_DIR),
 	.hps_io_hps_io_usb1_inst_NXT		(HPS_USB_NXT),
 	
-	// counting render time
+	
+	// all simuls are done and let HPS know
+	.finish_simuls_external_connection_export(simul_complete),    //    finish_simuls_external_connection.export
+	
+	// since decks change as cards being dealt, so memory starting points should change to indicate the deck size is reducing
+	.mem_start_point_external_connection_export(mem_start),  //  mem_start_point_external_connection.export,    //    finish_simuls_external_connection.export
 	
 	// wires for init dealer/player pios
-	.dealer_top_1_external_connection_export(dealer_top_1_pio),     //     dealer_top_1_external_connection.export
-	.dealer_top_2_external_connection_export(dealer_top_2_pio),     //     dealer_top_2_external_connection.export
+	//.dealer_top_1_external_connection_export(dealer_top_1_pio),     //     dealer_top_1_external_connection.export
+	//.dealer_top_2_external_connection_export(dealer_top_2_pio),     //     dealer_top_2_external_connection.export
 	.dealer_top_3_external_connection_export(dealer_top_3_pio),     //     dealer_top_3_external_connection.export
 	.dealer_top_external_connection_export(dealer_top_pio),
 	.player_init_hand_external_connection_export(player_init_hand_pio),
@@ -1616,11 +1630,12 @@ endmodule
 ////////////	Mandelbrot Set Visualizer	    //////////////
 //////////////////////////////////////////////////////////////
 
-module Search_hit_card(picked_card, card, picked);
+module Search_hit_card(picked_card, mem_start, card, picked);
 	//input clock;
 	//input [3:0] picked_cards_arr [11:0];
 	input [255:0] picked_card;
 	input [7:0]card;
+	input [31:0] mem_start;
 	//reg picked_inter;
 	output picked;
     //reg [2:0] check_state; 
@@ -1655,7 +1670,7 @@ module Search_hit_card(picked_card, card, picked);
 					(picked_cards_arr[4] == card) || (picked_cards_arr[5] == card) || (picked_cards_arr[6] == card) || (picked_cards_arr[7] == card) || 
 					(picked_cards_arr[8] == card) || (picked_cards_arr[9] == card) || (picked_cards_arr[10] == card) || (picked_cards_arr[11] == card);*/
 					
-	assign picked = (card < 8'd3 || card >= 8'd52 || (((picked_card) & (1 << card)) >> card));
+	assign picked = (card < mem_start[7:0] || card >= 8'd255 || (((picked_card) & (1 << card)) >> card));
 	
 endmodule
 
@@ -1672,7 +1687,7 @@ module rand6(rand_out, seed_in, clock_in, reset_in);
 			interm_rand <= seed_in;
 		end
 		else begin
-			interm_rand <= {interm_rand[6], interm_rand[5], interm_rand[4], interm_rand[3], interm_rand[2], interm_rand[1], interm_rand[7]^interm_rand[5]^interm_rand[4]^interm_rand[3]};
+			interm_rand <= {interm_rand[6], interm_rand[5], interm_rand[4], interm_rand[3], interm_rand[2], interm_rand[1], interm_rand[0], interm_rand[7]^interm_rand[5]^interm_rand[4]^interm_rand[3]};
 		end
 	end
 	assign rand_out = interm_rand;

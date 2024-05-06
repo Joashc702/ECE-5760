@@ -371,38 +371,6 @@
          type = "String";
       }
    }
-   element dealer_top_1
-   {
-      datum _sortIndex
-      {
-         value = "27";
-         type = "int";
-      }
-   }
-   element dealer_top_1.s1
-   {
-      datum baseAddress
-      {
-         value = "352";
-         type = "String";
-      }
-   }
-   element dealer_top_2
-   {
-      datum _sortIndex
-      {
-         value = "28";
-         type = "int";
-      }
-   }
-   element dealer_top_2.s1
-   {
-      datum baseAddress
-      {
-         value = "368";
-         type = "String";
-      }
-   }
    element dealer_top_3
    {
       datum _sortIndex
@@ -416,6 +384,22 @@
       datum baseAddress
       {
          value = "384";
+         type = "String";
+      }
+   }
+   element finish_simuls
+   {
+      datum _sortIndex
+      {
+         value = "27";
+         type = "int";
+      }
+   }
+   element finish_simuls.s1
+   {
+      datum baseAddress
+      {
+         value = "352";
          type = "String";
       }
    }
@@ -441,6 +425,22 @@
       {
          value = "7";
          type = "int";
+      }
+   }
+   element mem_start_point
+   {
+      datum _sortIndex
+      {
+         value = "28";
+         type = "int";
+      }
+   }
+   element mem_start_point.s1
+   {
+      datum baseAddress
+      {
+         value = "368";
+         type = "String";
       }
    }
    element num_ties
@@ -560,16 +560,6 @@
    type="conduit"
    dir="end" />
  <interface
-   name="dealer_top_1_external_connection"
-   internal="dealer_top_1.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
-   name="dealer_top_2_external_connection"
-   internal="dealer_top_2.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
    name="dealer_top_3_external_connection"
    internal="dealer_top_3.external_connection"
    type="conduit"
@@ -577,6 +567,11 @@
  <interface
    name="dealer_top_external_connection"
    internal="dealer_top.external_connection"
+   type="conduit"
+   dir="end" />
+ <interface
+   name="finish_simuls_external_connection"
+   internal="finish_simuls.external_connection"
    type="conduit"
    dir="end" />
  <interface name="hps_io" internal="ARM_A9_HPS.hps_io" type="conduit" dir="end" />
@@ -595,6 +590,11 @@
    internal="m10k_pll.outclk0"
    type="clock"
    dir="start" />
+ <interface
+   name="mem_start_point_external_connection"
+   internal="mem_start_point.external_connection"
+   type="conduit"
+   dir="end" />
  <interface name="memory" internal="ARM_A9_HPS.memory" type="conduit" dir="end" />
  <interface
    name="num_ties_external_connection"
@@ -1536,43 +1536,25 @@
   <parameter name="width" value="8" />
  </module>
  <module
-   name="dealer_top_1"
-   kind="altera_avalon_pio"
-   version="18.1"
-   enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="100000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="32" />
- </module>
- <module
-   name="dealer_top_2"
-   kind="altera_avalon_pio"
-   version="18.1"
-   enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="100000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="32" />
- </module>
- <module
    name="dealer_top_3"
+   kind="altera_avalon_pio"
+   version="18.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Input" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
+ </module>
+ <module
+   name="finish_simuls"
    kind="altera_avalon_pio"
    version="18.1"
    enabled="1">
@@ -1805,6 +1787,24 @@
   <parameter name="gui_switchover_delay" value="0" />
   <parameter name="gui_switchover_mode">Automatic Switchover</parameter>
   <parameter name="gui_use_locked" value="true" />
+ </module>
+ <module
+   name="mem_start_point"
+   kind="altera_avalon_pio"
+   version="18.1"
+   enabled="1">
+  <parameter name="bitClearingEdgeCapReg" value="false" />
+  <parameter name="bitModifyingOutReg" value="false" />
+  <parameter name="captureEdge" value="false" />
+  <parameter name="clockRate" value="100000000" />
+  <parameter name="direction" value="Output" />
+  <parameter name="edgeType" value="RISING" />
+  <parameter name="generateIRQ" value="false" />
+  <parameter name="irqType" value="LEVEL" />
+  <parameter name="resetValue" value="0" />
+  <parameter name="simDoTestBenchWiring" value="false" />
+  <parameter name="simDrivenValue" value="0" />
+  <parameter name="width" value="32" />
  </module>
  <module name="num_ties" kind="altera_avalon_pio" version="18.1" enabled="1">
   <parameter name="bitClearingEdgeCapReg" value="false" />
@@ -2054,7 +2054,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="dealer_top_1.s1">
+   end="finish_simuls.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0160" />
   <parameter name="defaultConnection" value="false" />
@@ -2063,7 +2063,7 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="dealer_top_2.s1">
+   end="mem_start_point.s1">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x0170" />
   <parameter name="defaultConnection" value="false" />
@@ -2203,12 +2203,12 @@
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="dealer_top_1.clk" />
+   end="finish_simuls.clk" />
  <connection
    kind="clock"
    version="18.1"
    start="System_PLL.sys_clk"
-   end="dealer_top_2.clk" />
+   end="mem_start_point.clk" />
  <connection
    kind="clock"
    version="18.1"
@@ -2368,12 +2368,12 @@
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="dealer_top_1.reset" />
+   end="finish_simuls.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="dealer_top_2.reset" />
+   end="mem_start_point.reset" />
  <connection
    kind="reset"
    version="18.1"
@@ -2508,12 +2508,12 @@
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="dealer_top_1.reset" />
+   end="finish_simuls.reset" />
  <connection
    kind="reset"
    version="18.1"
    start="System_PLL.reset_source"
-   end="dealer_top_2.reset" />
+   end="mem_start_point.reset" />
  <connection
    kind="reset"
    version="18.1"

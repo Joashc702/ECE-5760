@@ -12,6 +12,7 @@
 			card_ten_external_connection_export         : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			card_three_external_connection_export       : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			card_two_external_connection_export         : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
+			dealer_top_3_external_connection_export     : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
 			dealer_top_external_connection_export       : out   std_logic_vector(7 downto 0);                     -- export
 			hps_io_hps_io_emac1_inst_TX_CLK             : out   std_logic;                                        -- hps_io_emac1_inst_TX_CLK
 			hps_io_hps_io_emac1_inst_TXD0               : out   std_logic;                                        -- hps_io_emac1_inst_TXD0
@@ -127,9 +128,8 @@
 			vga_B                                       : out   std_logic_vector(7 downto 0);                     -- B
 			vga_pll_ref_clk_clk                         : in    std_logic                     := 'X';             -- clk
 			vga_pll_ref_reset_reset                     : in    std_logic                     := 'X';             -- reset
-			dealer_top_1_external_connection_export     : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
-			dealer_top_2_external_connection_export     : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
-			dealer_top_3_external_connection_export     : in    std_logic_vector(31 downto 0) := (others => 'X')  -- export
+			finish_simuls_external_connection_export    : in    std_logic_vector(31 downto 0) := (others => 'X'); -- export
+			mem_start_point_external_connection_export  : out   std_logic_vector(31 downto 0)                     -- export
 		);
 	end component Computer_System;
 
@@ -147,6 +147,7 @@
 			card_ten_external_connection_export         => CONNECTED_TO_card_ten_external_connection_export,         --         card_ten_external_connection.export
 			card_three_external_connection_export       => CONNECTED_TO_card_three_external_connection_export,       --       card_three_external_connection.export
 			card_two_external_connection_export         => CONNECTED_TO_card_two_external_connection_export,         --         card_two_external_connection.export
+			dealer_top_3_external_connection_export     => CONNECTED_TO_dealer_top_3_external_connection_export,     --     dealer_top_3_external_connection.export
 			dealer_top_external_connection_export       => CONNECTED_TO_dealer_top_external_connection_export,       --       dealer_top_external_connection.export
 			hps_io_hps_io_emac1_inst_TX_CLK             => CONNECTED_TO_hps_io_hps_io_emac1_inst_TX_CLK,             --                               hps_io.hps_io_emac1_inst_TX_CLK
 			hps_io_hps_io_emac1_inst_TXD0               => CONNECTED_TO_hps_io_hps_io_emac1_inst_TXD0,               --                                     .hps_io_emac1_inst_TXD0
@@ -262,8 +263,7 @@
 			vga_B                                       => CONNECTED_TO_vga_B,                                       --                                     .B
 			vga_pll_ref_clk_clk                         => CONNECTED_TO_vga_pll_ref_clk_clk,                         --                      vga_pll_ref_clk.clk
 			vga_pll_ref_reset_reset                     => CONNECTED_TO_vga_pll_ref_reset_reset,                     --                    vga_pll_ref_reset.reset
-			dealer_top_1_external_connection_export     => CONNECTED_TO_dealer_top_1_external_connection_export,     --     dealer_top_1_external_connection.export
-			dealer_top_2_external_connection_export     => CONNECTED_TO_dealer_top_2_external_connection_export,     --     dealer_top_2_external_connection.export
-			dealer_top_3_external_connection_export     => CONNECTED_TO_dealer_top_3_external_connection_export      --     dealer_top_3_external_connection.export
+			finish_simuls_external_connection_export    => CONNECTED_TO_finish_simuls_external_connection_export,    --    finish_simuls_external_connection.export
+			mem_start_point_external_connection_export  => CONNECTED_TO_mem_start_point_external_connection_export   --  mem_start_point_external_connection.export
 		);
 
