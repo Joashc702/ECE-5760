@@ -426,7 +426,7 @@ vga_driver DUT   (	.clock(vga_pll),
 // SRAM variables
 wire [31:0] sram_readdata;
 reg [31:0] data_buffer, sram_writedata;
-reg [8:0] sram_address; // (52*6)*4
+reg [8:0] sram_address; // (52*6) needs 9 bits
 reg sram_write;
 wire sram_clken = 1'b1;
 wire sram_chipselect = 1'b1;
@@ -434,7 +434,7 @@ wire sram_chipselect = 1'b1;
 reg [3:0] sram_state_seed = 4'd0;
 wire [31:0] sram_readdata_seed;
 reg [31:0] data_buffer_seed, sram_writedata_seed;
-reg [10:0] sram_address_seed; // (52*6)*4
+reg [10:0] sram_address_seed; // only 2000 random numbers are stored
 reg sram_write_seed;
 wire sram_clken_seed = 1'b1;
 wire sram_chipselect_seed = 1'b1;
@@ -478,7 +478,7 @@ always @(posedge CLOCK_50) begin
 		end
 	end
 end
-
+/////////////////////////////////////////////////////////////////////////////////////////
 always @(posedge CLOCK_50) begin
 	if (init_done == 8'd0) begin
 		read_addr_init <= 10'b0;
@@ -486,7 +486,7 @@ always @(posedge CLOCK_50) begin
 	end
 	if (init_done == 8'd1) begin
 		if (sram_state == 4'd0) begin
-			if (read_addr_init < 10'd52) begin
+			if (read_addr_init < 10'd260) begin
 				sram_address <= read_addr_init;
 				sram_state <= 4'd1;
 				data_ready <= 1'd0;
@@ -498,56 +498,21 @@ always @(posedge CLOCK_50) begin
 			sram_state <= 4'd2;
 		end else if (sram_state == 4'd2) begin
 			data_buffer <= sram_readdata;
-			read_addr_init <= read_addr_init + 1;
+			read_addr_init <= read_addr_init + 10'd1;
 			sram_state <= 4'd0;
 			data_ready <= 1'd1;
 		end
 	end
 end
-// SRAM SM -> sharing data btwn FPGA and ARM
-/*
-always @(posedge CLOCK_50) begin
-	if (sram_state == 4'd0) begin 
-		sram_address <= 9'd0; // FPGA manipulates memory at addr 0
-		sram_write <= 1'b0;
-		sram_state <= 4'd1;
-	end
-	if (sram_state == 4'd1) begin // buffer state
-		sram_state <= 4'd2;
-	end
-	if (sram_state == 4'd2) begin
-		data_buffer <= sram_readdata;
-		sram_write <= 1'b0;
-		sram_state <= 4'd3;
-	end
-	if (sram_state == 4'd3) begin
-		if (data_buffer > 32'd0) begin // FPGA memory manipulation
-			sram_write <= 1'b1;
-			sram_address <= 9'd1;
-			sram_writedata <= (data_buffer + 32'd1);
-			sram_state <= 4'd4;
-		end
-		else begin
-			sram_state <= 4'd0;
-		end
-	end
-	if (sram_state == 4'd4) begin // signal back to HPS
-		sram_write <= 1'b1;
-		sram_address <= 9'd0; // indicate written
-		sram_writedata <= 32'd0;
-		sram_state <= 4'd0;
-	end
-end
-*/
 
-parameter [9:0] num_simul = 3;//half of the number of columns  85 is the max
+parameter [9:0] num_simul = 70;//half of the number of columns  85 is the max
 parameter [9:0] num_internal_simul = 5;
-wire [5:0] output_random [num_simul-1:0] /*synthesis keep */; 
+wire [7:0] output_random [num_simul-1:0] /*synthesis keep */; 
 //wire [63:0] seed_samples [5:0];
 //wire init_done;
 
-reg [2:0] read_write_offset;
-reg [7:0] write_addr_inter;
+//reg [2:0] read_write_offset;
+//reg [7:0] write_addr_inter;
 
 wire unsigned [3:0] q [num_simul-1:0];
 reg unsigned  [3:0] d [num_simul-1:0];
@@ -605,52 +570,46 @@ assign draw_player_3[0] = seed_test[1];
 */
 
 reg [1:0] player_result[num_simul-1:0];
+reg all_simul_done [num_simul - 1:0];
 
 // Send back to the arm and verify
 //assign shared_write = output_random[0];
 
-reg [10:0] num_wins;
-reg [10:0] num_ties;
-reg [10:0] result_counter;
-reg [10:0] internal_simuls;
+reg [12:0] num_wins [num_simul - 1: 0];
+reg [12:0] num_wins_net;
+reg [12:0] num_ties [num_simul - 1: 0];
+reg [12:0] num_ties_net;
+reg [12:0] result_counter;
+reg [12:0] internal_simuls;
 
 reg checked_card [num_simul - 1:0] /*synthesis keep */;
 always @(posedge CLOCK_50) begin
 	if (init_done == 8'd0) begin
-		num_wins <= 11'd0;
-		num_ties <= 11'd0;
-		result_counter <= 11'd0;
-		val_card_one[num_simul] <= 11'd0;
-		val_card_two[num_simul] <= 11'd0;
-		val_card_three[num_simul] <= 11'd0; 
-		val_card_four[num_simul] <= 11'd0;
-		val_card_five[num_simul] <= 11'd0;
-		val_card_six[num_simul] <= 11'd0;
-		val_card_seven[num_simul] <= 11'd0;
-		val_card_eight[num_simul] <= 11'd0;
-		val_card_nine[num_simul] <= 11'd0;
-		val_card_ten[num_simul] <= 11'd0;
-		internal_simuls <= 11'd0;
+		num_wins_net <= 13'd0;
+		num_ties_net <= 13'd0;
+		result_counter <= 13'd0;
+		val_card_one[num_simul] <= 13'd0;
+		val_card_two[num_simul] <= 13'd0;
+		val_card_three[num_simul] <= 13'd0; 
+		val_card_four[num_simul] <= 13'd0;
+		val_card_five[num_simul] <= 13'd0;
+		val_card_six[num_simul] <= 13'd0;
+		val_card_seven[num_simul] <= 13'd0;
+		val_card_eight[num_simul] <= 13'd0;
+		val_card_nine[num_simul] <= 13'd0;
+		val_card_ten[num_simul] <= 13'd0;
+		internal_simuls <= 13'd0;
 	end
 	else begin
-		if (internal_simuls == num_internal_simul) begin
-			internal_simuls <= 11'd5;
+		if (result_counter == num_simul) begin
+			//result_counter <= 13'd7000;
+			// Hard code in C to tell it's 7000 simuls
 		end
-		else if (result_counter == num_simul && internal_simuls < num_internal_simul) begin
-			result_counter <= 11'd0;
-			internal_simuls <= internal_simuls + 11'd1;
-			//result_counter <= 11'd0;
-		end
-		else begin 
-			if (prob_result[result_counter] == 1'd1 /*&& checked_card[result_counter] == 1'd0*/) begin
-				if (player_result[result_counter] == 2'd1) begin
-					num_wins <= num_wins + 11'd1;
-				end
-				else if (player_result[result_counter] == 2'd2) begin
-					num_ties <= num_ties + 11'd1;
-				end
-				/*checked_card[result_counter] <= 1'd1;*/
-				result_counter <= result_counter + 11'd1;
+		else begin
+			if (all_simul_done[result_counter] == 1'd1) begin
+				num_wins_net <= num_wins_net + num_wins[result_counter];
+				num_ties_net <= num_ties_net + num_ties[result_counter];
+				result_counter <= result_counter + 13'd1;
 				
 				val_card_one[num_simul] <= val_card_one[result_counter] + val_card_one[num_simul];
 				val_card_two[num_simul] <= val_card_two[result_counter] + val_card_two[num_simul];
@@ -662,11 +621,47 @@ always @(posedge CLOCK_50) begin
 				val_card_eight[num_simul] <= val_card_eight[result_counter] + val_card_eight[num_simul];
 				val_card_nine[num_simul] <= val_card_nine[result_counter] + val_card_nine[num_simul];
 				val_card_ten[num_simul] <= val_card_ten[result_counter] + val_card_ten[num_simul];
+				
 			end else begin
 				result_counter <= result_counter;
 			end
-			
 		end
+		
+//		if (internal_simuls == num_internal_simul) begin
+//			internal_simuls <= 11'd5;
+//		end
+//		else if (result_counter == num_simul && internal_simuls < num_internal_simul) begin
+//			result_counter <= 11'd0;
+//			internal_simuls <= internal_simuls + 11'd1;
+//			//result_counter <= 11'd0;
+//		end
+//		else begin 
+//			if ([result_counter] == 1'd1 /*&& checked_card[result_counter] == 1'd0*/) begin
+//				if (player_result[result_counter] == 2'd1) begin
+//					//num_wins <= num_wins + 11'd1;
+//				end
+//				else if (player_result[result_counter] == 2'd2) begin
+//					//num_ties <= num_ties + 11'd1;
+//				end
+//				/*checked_card[result_counter] <= 1'd1;*/
+//				result_counter <= result_counter + 11'd1;
+//				
+//				val_card_one[num_simul] <= val_card_one[result_counter] + val_card_one[num_simul];
+//				val_card_two[num_simul] <= val_card_two[result_counter] + val_card_two[num_simul];
+//				val_card_three[num_simul] <= val_card_three[result_counter] + val_card_three[num_simul];
+//				val_card_four[num_simul] <= val_card_four[result_counter] + val_card_four[num_simul];
+//				val_card_five[num_simul] <= val_card_five[result_counter] + val_card_five[num_simul];
+//				val_card_six[num_simul] <= val_card_six[result_counter] + val_card_six[num_simul];
+//				val_card_seven[num_simul] <= val_card_seven[result_counter] + val_card_seven[num_simul];
+//				val_card_eight[num_simul] <= val_card_eight[result_counter] + val_card_eight[num_simul];
+//				val_card_nine[num_simul] <= val_card_nine[result_counter] + val_card_nine[num_simul];
+//				val_card_ten[num_simul] <= val_card_ten[result_counter] + val_card_ten[num_simul];
+//				prob_result[result_counter] == 1'd0;
+//			end else begin
+//				result_counter <= result_counter;
+//			end
+//			
+//		end
 	end
 	/*
 	if (shared_write) begin
@@ -715,7 +710,7 @@ assign test_3 = val_card_eight[num_simul];
 		
 
 reg prob_result [num_simul - 1: 0];
-wire [4:0] result_record_test;
+//wire [4:0] result_record_test;
 //assign result_record_test = {prob_result[0], prob_result[1], prob_result[2], prob_result[3], prob_result[4]};
 
 
@@ -729,21 +724,21 @@ reg [3:0] dealer_show [num_simul-1: 0];
 
 assign dealer_top_1_pio = dealer_show[0];
 assign dealer_top_2_pio = dealer_show[1];
-assign dealer_top_3_pio = dealer_show[2];
+assign dealer_top_3_pio = result_counter;
 
-assign num_wins_pio = num_wins[7:0];
-assign num_ties_pio = num_ties[7:0];   
+assign num_wins_pio = num_wins_net[7:0];
+assign num_ties_pio = num_ties_net[7:0];   
 
-reg [10:0] val_card_one [num_simul: 0];
-reg [10:0] val_card_two [num_simul: 0];
-reg [10:0] val_card_three [num_simul: 0];
-reg [10:0] val_card_four [num_simul: 0];
-reg [10:0] val_card_five [num_simul: 0];
-reg [10:0] val_card_six [num_simul: 0];
-reg [10:0] val_card_seven [num_simul: 0];
-reg [10:0] val_card_eight [num_simul: 0];
-reg [10:0] val_card_nine [num_simul: 0];
-reg [10:0] val_card_ten [num_simul: 0];
+reg [12:0] val_card_one [num_simul: 0];
+reg [12:0] val_card_two [num_simul: 0];
+reg [12:0] val_card_three [num_simul: 0];
+reg [12:0] val_card_four [num_simul: 0];
+reg [12:0] val_card_five [num_simul: 0];
+reg [12:0] val_card_six [num_simul: 0];
+reg [12:0] val_card_seven [num_simul: 0];
+reg [12:0] val_card_eight [num_simul: 0];
+reg [12:0] val_card_nine [num_simul: 0];
+reg [12:0] val_card_ten [num_simul: 0];
 
 
 wire [31:0] val_card_one_pio;
@@ -765,69 +760,75 @@ assign val_card_three_pio = val_card_three[num_simul];
 assign val_card_four_pio = val_card_four[num_simul];
 assign val_card_five_pio = val_card_five[num_simul];
 assign val_card_six_pio = val_card_six[num_simul];
-//assign val_card_seven_pio = val_card_seven[num_simul];
-//assign val_card_eight_pio = val_card_eight[num_simul];
-//assign val_card_nine_pio = val_card_nine[num_simul];
-//assign val_card_ten_pio = val_card_ten[num_simul];
-assign val_card_seven_pio = drum_state[0];
-assign val_card_eight_pio = test_simul_count;
-assign val_card_nine_pio = result_counter;
-assign val_card_ten_pio = internal_simuls;
+assign val_card_seven_pio = val_card_seven[num_simul];
+assign val_card_eight_pio = val_card_eight[num_simul];
+assign val_card_nine_pio = val_card_nine[num_simul];
+assign val_card_ten_pio = val_card_ten[num_simul];
 
-reg [10:0] val_card[num_simul - 1: 0];
+//assign val_card_four_pio = num_wins[0];
+//assign val_card_five_pio = num_wins[1];
+//assign val_card_six_pio = all_simul_done[1];
+//assign val_card_seven_pio = drum_state[0];
+//assign val_card_eight_pio = test_simul_count;
+//assign val_card_nine_pio = result_counter;
+//assign val_card_ten_pio = all_simul_done[1];
+
+reg [3:0] val_card[num_simul - 1: 0];
 
 
-reg [9:0] test_simul_count;
+//reg [9:0] test_simul_count;
 
 genvar i;
 generate 
 	for (i = 0; i < num_simul; i = i+1) begin: initCols  
-		//rand127 random_num(.rand_out(output_random[i]), .seed_in(64'h54555555 ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
+		//rand127 random_num(.rand_out([i]), .seed_in(64'h54555555 ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
 		reg [3:0] array_hit_card [11:0]; // track index of card
 		reg [255:0] hit_card_reg;
 		reg [3:0] drawn_card_val [11:0]; // track the value of card being drawn
 		reg [3:0] dealer_card;
-		wire [5:0] output_random_vals[5:0];
+		wire [7:0] output_random_vals[7:0];
 		wire picked; 
 		reg [9:0] simul_count; 
 		// reg internal_state;
 		
 		//assign hit_card_reg = ;
 		
-		reg [5:0] seed_in [2:0];
+		reg [7:0] seed_in [3:0];
 		//assign seed_in[0] = (data_ready_seed == 1'd1 && read_addr_init_seed == i*3) ? data_buffer_seed : 6'd0;
 		//assign seed_in[1] = (data_ready_seed == 1'd1 && read_addr_init_seed == (i*3) + 1) ? data_buffer_seed : 6'd0;
 		//assign seed_in[2] = (data_ready_seed == 1'd1 && read_addr_init_seed == (i*3) + 2) ? data_buffer_seed : 6'd0;
-		assign seed_test[i] = seed_in[0];
+		//assign seed_test[i] = seed_in[0];
 		reg internal_reset_1;
 		reg internal_reset_2;
 		reg internal_reset_3;
+		reg internal_reset_4;
+		//reg [10:0] num_wins_internal;
 		
 		always @(posedge CLOCK_50) begin
 			if (init_done == 8'd0) begin
-				val_card_one[i] <= 11'd0;
-				val_card_two[i] <= 11'd0;
-				val_card_three[i] <= 11'd0; 
-				val_card_four[i] <= 11'd0;
-				val_card_five[i] <= 11'd0;
-				val_card_six[i] <= 11'd0;
-				val_card_seven[i] <= 11'd0;
-				val_card_eight[i] <= 11'd0;
-				val_card_nine[i] <= 11'd0;
-				val_card_ten[i] <= 11'd0;
+				val_card_one[i] <= 13'd0;
+				val_card_two[i] <= 13'd0;
+				val_card_three[i] <= 13'd0; 
+				val_card_four[i] <= 13'd0;
+				val_card_five[i] <= 13'd0;
+				val_card_six[i] <= 13'd0;
+				val_card_seven[i] <= 13'd0;
+				val_card_eight[i] <= 13'd0;
+				val_card_nine[i] <= 13'd0;
+				val_card_ten[i] <= 13'd0;
 			end
-			else if (drum_state[i] >= 4'd13)begin
+			else begin
 				case(val_card[i])
-						4'd1: val_card_one[i] <= val_card_one[i] + 11'd1;
-						4'd2: val_card_two[i] <= val_card_two[i] + 11'd1;
-						4'd3: val_card_three[i] <= val_card_three[i] + 11'd1;
-						4'd4: val_card_four[i] <= val_card_four[i] + 11'd1;
-						4'd5: val_card_five[i] <= val_card_five[i] + 11'd1;
-						4'd6: val_card_six[i] <= val_card_six[i] + 11'd1;
-						4'd7: val_card_seven[i] <= val_card_seven[i] + 11'd1;
-						4'd8: val_card_eight[i] <= val_card_eight[i] + 11'd1;
-						4'd9: val_card_nine[i] <= val_card_nine[i] + 11'd1;
-						4'd10: val_card_ten[i] <= val_card_ten[i] + 11'd1;
+						4'd1: val_card_one[i] <= val_card_one[i] + 13'd1;
+						4'd2: val_card_two[i] <= val_card_two[i] + 13'd1;
+						4'd3: val_card_three[i] <= val_card_three[i] + 13'd1;
+						4'd4: val_card_four[i] <= val_card_four[i] + 13'd1;
+						4'd5: val_card_five[i] <= val_card_five[i] + 13'd1;
+						4'd6: val_card_six[i] <= val_card_six[i] + 13'd1;
+						4'd7: val_card_seven[i] <= val_card_seven[i] + 13'd1;
+						4'd8: val_card_eight[i] <= val_card_eight[i] + 13'd1;
+						4'd9: val_card_nine[i] <= val_card_nine[i] + 13'd1;
+						4'd10: val_card_ten[i] <= val_card_ten[i] + 13'd1;
 						default: val_card_ten[i] <= val_card_ten[i];
 				endcase
 			end
@@ -836,16 +837,18 @@ generate
 		
 		always @(posedge CLOCK_50) begin
 			if (init_done == 8'd0) begin
-				seed_in[0] <= 6'd0;
-				seed_in[1] <= 6'd0;
-				seed_in[2] <= 6'd0;
+				seed_in[0] <= 8'd0;
+				seed_in[1] <= 8'd0;
+				seed_in[2] <= 8'd0;
+				seed_in[3] <= 8'd0;
 				internal_reset_1 <= 1'd0;
 				internal_reset_2 <= 1'd0;
 				internal_reset_3 <= 1'd0;
+				internal_reset_4 <= 1'd0;
 
 			end
 			if (~seed_init && init_done == 8'd1) begin
-				if ((data_ready_seed == 1'd1 && sram_address_seed == i*3)) begin
+				if ((data_ready_seed == 1'd1 && sram_address_seed == i*4)) begin
 					seed_in[0] <= data_buffer_seed;
 					internal_reset_1 <= 1'd1;
 				end
@@ -853,7 +856,7 @@ generate
 					internal_reset_1 <= 1'd0;
 				end
 				
-				if ((data_ready_seed == 1'd1 && sram_address_seed == (i*3 + 1))) begin
+				if ((data_ready_seed == 1'd1 && sram_address_seed == (i*4 + 1))) begin
 					seed_in[1] <= data_buffer_seed;
 					internal_reset_2 <= 1'd1;
 				end
@@ -861,12 +864,19 @@ generate
 					internal_reset_2 <= 1'd0;
 				end
 				
-				if ((data_ready_seed == 1'd1 && sram_address_seed == (i*3 + 2))) begin
+				if ((data_ready_seed == 1'd1 && sram_address_seed == (i*4 + 2))) begin
 					seed_in[2] <= data_buffer_seed;
 					internal_reset_3 <= 1'd1;
 				end
 				if (internal_reset_3 == 1'd1) begin
 					internal_reset_3 <= 1'd0;
+				end
+				if ((data_ready_seed == 1'd1 && sram_address_seed == (i*4 + 3))) begin
+					seed_in[3] <= data_buffer_seed;
+					internal_reset_4 <= 1'd1;
+				end
+				if (internal_reset_4 == 1'd1) begin
+					internal_reset_4 <= 1'd0;
 				end
 			end
 		end
@@ -881,7 +891,7 @@ generate
 		
 
 		//assign lfsr_test_1[i] = output_random[i];
-		assign output_random[i] = {output_random_vals[5][0],output_random_vals[4][0],output_random_vals[3][0],output_random_vals[2][0],output_random_vals[1][0],output_random_vals[0][0]} ;
+		assign output_random[i] = {output_random_vals[7][0], output_random_vals[6][0], output_random_vals[5][0],output_random_vals[4][0],output_random_vals[3][0],output_random_vals[2][0],output_random_vals[1][0],output_random_vals[0][0]} ;
 		//assign lfsr_test_7[i] = output_random[i];
 		//rand127 random_num(.rand_out(output_random), .seed_in(64'h54555555), .clock_in(clk_50), .reset_in(reset));
 			
@@ -891,6 +901,8 @@ generate
 		rand6 random_num_4(.rand_out(output_random_vals[3]), .seed_in(seed_in[0] ^ seed_in[1]), .clock_in(CLOCK_50), .reset_in(internal_reset_2));
 		rand6 random_num_5(.rand_out(output_random_vals[4]), .seed_in(seed_in[1] ^ seed_in[2]), .clock_in(CLOCK_50), .reset_in(internal_reset_3));
 		rand6 random_num_6(.rand_out(output_random_vals[5]), .seed_in(seed_in[2] ^ seed_in[0]), .clock_in(CLOCK_50), .reset_in(internal_reset_3));
+		rand6 random_num_7(.rand_out(output_random_vals[6]), .seed_in(seed_in[1] ^ seed_in[3]), .clock_in(CLOCK_50), .reset_in(internal_reset_4));
+		rand6 random_num_8(.rand_out(output_random_vals[7]), .seed_in(seed_in[2] ^ seed_in[3]), .clock_in(CLOCK_50), .reset_in(internal_reset_4));
 	
 		M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
 		Search_hit_card card_check( .picked_card(hit_card_reg), 
@@ -924,10 +936,13 @@ generate
 				test_draw_player_3[i] <= 8'd0;
 				*/
 				prob_result[i] <= 1'd0;
-				val_card[i] <= 11'd0;
+				val_card[i] <= 4'd0;
 				card_val_count[i] <= 1'd0;
 				dealer_show[i]<= 4'd0;
 				
+				all_simul_done[i] <= 1'd0;
+				num_wins[i] <= 13'd0;
+				num_ties[i] <= 13'd0;
 			end
 			else begin
 				// STATE 0: Initialization
@@ -991,12 +1006,13 @@ generate
 						drum_state[i] <= 4'd5;
 					end
 					
-					//if (card_val_count[i] == 1'd1) begin
-						//val_card[i] <= 11'd0;
-					//end
+					if (card_val_count[i] == 1'd1) begin
+						val_card[i] <= 4'd0;
+					end
 				end 
 				// STATE 6: Buffer state
 				else if (drum_state[i] == 4'd6) begin
+					val_card[i] <= 4'd0; // make sure again val_card to be zero
 					drum_state[i] <= 4'd7;
 				end
 				// STATE 7: Player playing til stand
@@ -1076,30 +1092,26 @@ generate
 						player_result[i] <= 2'd2;
 						tie_check[i] <= 1'd1;
 						drum_state[i] <= 4'd12;
+						num_ties[i]<=num_ties[i] + 13'd1;
 					end
 					else if (((player_hands[i] > dealer_hands[i]) && player_hands[i] <= 5'd21 && dealer_hands[i] < 5'd21) || (dealer_hands[i] > 5'd21)) begin
 						player_result[i] <= 2'd1;
 						drum_state[i] <= 4'd12;
+						num_wins[i]<=num_wins[i] + 13'd1;
 					end
 					prob_result[i] <= 1'd1;
 				end
 
 				// STATE 12: signal the result calculation being done
-				else if (drum_state[i] == 4'd12) begin 
-					drum_state[i] <= 4'd13;
-			
-				end
-				// STATE 12: signal the result calculation being done
-				else if (drum_state[i] == 4'd13) begin 
-					drum_state[i] <= 4'd14;
-			
+				else if (drum_state[i] == 4'd12) begin
+					drum_state[i] <= 4'd13;	
 				end
 				// STATE 13: rerun the whole FSM to increase the simulations for Monte Carlo
-				else if (drum_state[i] == 4'd14) begin
-					if (i == 0) begin
-						test_simul_count <= simul_count;
-					end
-					if (simul_count <= 10'd5) begin 
+				else if (drum_state[i] == 4'd13) begin
+					//if (i == 0) begin
+					//	test_simul_count <= simul_count;
+					//end
+					if (simul_count <= 10'd11) begin 
 						drum_state[i] <= 4'd1;
 						hit_card_reg <= 256'd0;
 						card_itr[i] <= 5'd0;				
@@ -1108,13 +1120,15 @@ generate
 						player_hands[i] <= player_init_hand_pio;
 						dealer_hands[i] <= dealer_top_pio;
 						
-						val_card[i] <= 11'd0;
+						val_card[i] <= 4'd0;
 						card_val_count[i] <= 1'd0;
 					end
 					else begin 
-						val_card[i] <= 11'd0;
+						val_card[i] <= 4'd0;
 						card_val_count[i] <= 1'd0;
-						drum_state[i] <= 4'd14;
+						drum_state[i] <= 4'd13;
+						//num_wins[i] <= num_wins_internal;
+						all_simul_done[i] <= 1'd1;
 					end
 				end
 			end
@@ -1646,11 +1660,11 @@ module Search_hit_card(picked_card, card, picked);
 endmodule
 
 module rand6(rand_out, seed_in, clock_in, reset_in);
-	output wire [5:0] rand_out;
+	output wire [7:0] rand_out;
 	input wire clock_in, reset_in;
-	input wire [5:0] seed_in;
+	input wire [7:0] seed_in;
 	
-	reg [5:0] interm_rand;
+	reg [7:0] interm_rand;
 	
 	always @(posedge clock_in)
 	begin
@@ -1658,7 +1672,7 @@ module rand6(rand_out, seed_in, clock_in, reset_in);
 			interm_rand <= seed_in;
 		end
 		else begin
-			interm_rand <= {interm_rand[4], interm_rand[3], interm_rand[2], interm_rand[1], interm_rand[0], interm_rand[5]^interm_rand[4]};
+			interm_rand <= {interm_rand[6], interm_rand[5], interm_rand[4], interm_rand[3], interm_rand[2], interm_rand[1], interm_rand[7]^interm_rand[5]^interm_rand[4]^interm_rand[3]};
 		end
 	end
 	assign rand_out = interm_rand;
