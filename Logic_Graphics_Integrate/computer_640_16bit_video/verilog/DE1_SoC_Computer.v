@@ -826,7 +826,7 @@ generate
 			end
 			else begin
 				case(val_card[i])
-						4'd1: val_card_one[i] <= val_card_one[i] + 13'd1;
+						4'd11: val_card_one[i] <= val_card_one[i] + 13'd1;
 						4'd2: val_card_two[i] <= val_card_two[i] + 13'd1;
 						4'd3: val_card_three[i] <= val_card_three[i] + 13'd1;
 						4'd4: val_card_four[i] <= val_card_four[i] + 13'd1;
