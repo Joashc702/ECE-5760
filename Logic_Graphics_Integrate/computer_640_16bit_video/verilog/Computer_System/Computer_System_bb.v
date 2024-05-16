@@ -12,8 +12,8 @@ module Computer_System (
 	card_ten_external_connection_export,
 	card_three_external_connection_export,
 	card_two_external_connection_export,
-	dealer_top_3_external_connection_export,
 	dealer_top_external_connection_export,
+	finish_simuls_external_connection_export,
 	hps_io_hps_io_emac1_inst_TX_CLK,
 	hps_io_hps_io_emac1_inst_TXD0,
 	hps_io_hps_io_emac1_inst_TXD1,
@@ -73,6 +73,7 @@ module Computer_System (
 	init_done_external_connection_export,
 	m10k_pll_locked_export,
 	m10k_pll_outclk0_clk,
+	mem_start_point_external_connection_export,
 	memory_mem_a,
 	memory_mem_ba,
 	memory_mem_ck,
@@ -127,9 +128,7 @@ module Computer_System (
 	vga_G,
 	vga_B,
 	vga_pll_ref_clk_clk,
-	vga_pll_ref_reset_reset,
-	finish_simuls_external_connection_export,
-	mem_start_point_external_connection_export);	
+	vga_pll_ref_reset_reset);	
 
 	inout		av_config_SDAT;
 	output		av_config_SCLK;
@@ -143,8 +142,8 @@ module Computer_System (
 	input	[31:0]	card_ten_external_connection_export;
 	input	[31:0]	card_three_external_connection_export;
 	input	[31:0]	card_two_external_connection_export;
-	input	[31:0]	dealer_top_3_external_connection_export;
 	output	[7:0]	dealer_top_external_connection_export;
+	input	[31:0]	finish_simuls_external_connection_export;
 	output		hps_io_hps_io_emac1_inst_TX_CLK;
 	output		hps_io_hps_io_emac1_inst_TXD0;
 	output		hps_io_hps_io_emac1_inst_TXD1;
@@ -204,6 +203,7 @@ module Computer_System (
 	output	[7:0]	init_done_external_connection_export;
 	output		m10k_pll_locked_export;
 	output		m10k_pll_outclk0_clk;
+	output	[31:0]	mem_start_point_external_connection_export;
 	output	[14:0]	memory_mem_a;
 	output	[2:0]	memory_mem_ba;
 	output		memory_mem_ck;
@@ -259,6 +259,4 @@ module Computer_System (
 	output	[7:0]	vga_B;
 	input		vga_pll_ref_clk_clk;
 	input		vga_pll_ref_reset_reset;
-	input	[31:0]	finish_simuls_external_connection_export;
-	output	[31:0]	mem_start_point_external_connection_export;
 endmodule

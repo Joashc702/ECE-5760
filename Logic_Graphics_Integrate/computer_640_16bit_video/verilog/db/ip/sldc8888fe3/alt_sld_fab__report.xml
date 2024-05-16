@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2024.05.09.12:35:49"
+ date="2024.05.16.17:38:20"
  outputDirectory="C:/Users/hh759/Documents/GitHub/ECE-5760/Logic_Graphics_Integrate/computer_640_16bit_video/verilog/db/ip/sldc8888fe3/">
  <perimeter>
   <parameter
@@ -78,25 +78,25 @@
   </sourceFiles>
   <childSourceFiles>
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_instrumentation_fabric/alt_sld_fab_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_instrumentation_fabric/alt_sld_fab_hw.tcl" />
    <file
-       path="C:/intelFPGA_lite/18.1/ip/altera/sld/core/altera_instrumentation_fabric/com.altera.superfabric.jar" />
+       path="C:/programs/intelFPGA/18.1/ip/altera/sld/core/altera_instrumentation_fabric/com.altera.superfabric.jar" />
    <file
-       path="C:/intelFPGA_lite/18.1/quartus/sopc_builder/model/lib/com.altera.utilities.jar" />
+       path="C:/programs/intelFPGA/18.1/quartus/sopc_builder/model/lib/com.altera.utilities.jar" />
    <file
-       path="C:/intelFPGA_lite/18.1/quartus/sopc_builder/model/lib/hamcrest-all-1.3.jar" />
+       path="C:/programs/intelFPGA/18.1/quartus/sopc_builder/model/lib/hamcrest-all-1.3.jar" />
    <file
-       path="C:/intelFPGA_lite/18.1/quartus/sopc_builder/model/lib/commons-lang3-3.1.jar" />
+       path="C:/programs/intelFPGA/18.1/quartus/sopc_builder/model/lib/commons-lang3-3.1.jar" />
    <file
-       path="C:/intelFPGA_lite/18.1/quartus/sopc_builder/model/lib/javasysmon.jar" />
+       path="C:/programs/intelFPGA/18.1/quartus/sopc_builder/model/lib/javasysmon.jar" />
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_super_splitter/altera_super_splitter_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_super_splitter/altera_super_splitter_hw.tcl" />
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_super_splitter/altera_sld_splitter_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_super_splitter/altera_sld_splitter_hw.tcl" />
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/jtag/altera_sld_jtag_hub/altera_sld_jtag_hub_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/jtag/altera_sld_jtag_hub/altera_sld_jtag_hub_hw.tcl" />
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_connection_identification_hub/altera_connection_identification_hub_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_connection_identification_hub/altera_connection_identification_hub_hw.tcl" />
   </childSourceFiles>
   <messages>
    <message level="Debug" culprit="alt_sld_fab">queue size: 0 starting:alt_sld_fab "alt_sld_fab"</message>
@@ -190,27 +190,27 @@
   </childGeneratedFiles>
   <sourceFiles>
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_instrumentation_fabric/alt_sld_fab_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_instrumentation_fabric/alt_sld_fab_hw.tcl" />
    <file
-       path="C:/intelFPGA_lite/18.1/ip/altera/sld/core/altera_instrumentation_fabric/com.altera.superfabric.jar" />
+       path="C:/programs/intelFPGA/18.1/ip/altera/sld/core/altera_instrumentation_fabric/com.altera.superfabric.jar" />
    <file
-       path="C:/intelFPGA_lite/18.1/quartus/sopc_builder/model/lib/com.altera.utilities.jar" />
+       path="C:/programs/intelFPGA/18.1/quartus/sopc_builder/model/lib/com.altera.utilities.jar" />
    <file
-       path="C:/intelFPGA_lite/18.1/quartus/sopc_builder/model/lib/hamcrest-all-1.3.jar" />
+       path="C:/programs/intelFPGA/18.1/quartus/sopc_builder/model/lib/hamcrest-all-1.3.jar" />
    <file
-       path="C:/intelFPGA_lite/18.1/quartus/sopc_builder/model/lib/commons-lang3-3.1.jar" />
+       path="C:/programs/intelFPGA/18.1/quartus/sopc_builder/model/lib/commons-lang3-3.1.jar" />
    <file
-       path="C:/intelFPGA_lite/18.1/quartus/sopc_builder/model/lib/javasysmon.jar" />
+       path="C:/programs/intelFPGA/18.1/quartus/sopc_builder/model/lib/javasysmon.jar" />
   </sourceFiles>
   <childSourceFiles>
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_super_splitter/altera_super_splitter_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_super_splitter/altera_super_splitter_hw.tcl" />
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_super_splitter/altera_sld_splitter_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_super_splitter/altera_sld_splitter_hw.tcl" />
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/jtag/altera_sld_jtag_hub/altera_sld_jtag_hub_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/jtag/altera_sld_jtag_hub/altera_sld_jtag_hub_hw.tcl" />
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_connection_identification_hub/altera_connection_identification_hub_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_connection_identification_hub/altera_connection_identification_hub_hw.tcl" />
   </childSourceFiles>
   <instantiator instantiator="alt_sld_fab" as="alt_sld_fab" />
   <messages>
@@ -261,7 +261,7 @@
   <childGeneratedFiles/>
   <sourceFiles>
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_super_splitter/altera_super_splitter_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_super_splitter/altera_super_splitter_hw.tcl" />
   </sourceFiles>
   <childSourceFiles/>
   <instantiator instantiator="alt_sld_fab_alt_sld_fab" as="presplit" />
@@ -291,7 +291,7 @@
   <childGeneratedFiles/>
   <sourceFiles>
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_super_splitter/altera_sld_splitter_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_super_splitter/altera_sld_splitter_hw.tcl" />
   </sourceFiles>
   <childSourceFiles/>
   <instantiator instantiator="alt_sld_fab_alt_sld_fab" as="splitter" />
@@ -332,7 +332,7 @@
   <childGeneratedFiles/>
   <sourceFiles>
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/jtag/altera_sld_jtag_hub/altera_sld_jtag_hub_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/jtag/altera_sld_jtag_hub/altera_sld_jtag_hub_hw.tcl" />
   </sourceFiles>
   <childSourceFiles/>
   <instantiator instantiator="alt_sld_fab_alt_sld_fab" as="sldfabric" />
@@ -360,7 +360,7 @@
   <childGeneratedFiles/>
   <sourceFiles>
    <file
-       path="C:/intelfpga_lite/18.1/ip/altera/sld/core/altera_connection_identification_hub/altera_connection_identification_hub_hw.tcl" />
+       path="C:/programs/intelfpga/18.1/ip/altera/sld/core/altera_connection_identification_hub/altera_connection_identification_hub_hw.tcl" />
   </sourceFiles>
   <childSourceFiles/>
   <instantiator instantiator="alt_sld_fab_alt_sld_fab" as="ident" />

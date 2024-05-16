@@ -16,7 +16,6 @@ module Computer_System (
 		input  wire [31:0] card_ten_external_connection_export,         //         card_ten_external_connection.export
 		input  wire [31:0] card_three_external_connection_export,       //       card_three_external_connection.export
 		input  wire [31:0] card_two_external_connection_export,         //         card_two_external_connection.export
-		input  wire [31:0] dealer_top_3_external_connection_export,     //     dealer_top_3_external_connection.export
 		output wire [7:0]  dealer_top_external_connection_export,       //       dealer_top_external_connection.export
 		input  wire [31:0] finish_simuls_external_connection_export,    //    finish_simuls_external_connection.export
 		output wire        hps_io_hps_io_emac1_inst_TX_CLK,             //                               hps_io.hps_io_emac1_inst_TX_CLK
@@ -136,7 +135,7 @@ module Computer_System (
 		input  wire        vga_pll_ref_reset_reset                      //                    vga_pll_ref_reset.reset
 	);
 
-	wire          system_pll_sys_clk_clk;                                               // System_PLL:sys_clk_clk -> [ARM_A9_HPS:f2h_axi_clk, ARM_A9_HPS:h2f_axi_clk, ARM_A9_HPS:h2f_lw_axi_clk, AV_Config:clk, Onchip_SRAM_cards:clk, Onchip_SRAM_cards:clk2, Onchip_SRAM_seed:clk, Onchip_SRAM_seed:clk2, Pixel_DMA_Addr_Translation:clk, SDRAM:clk, VGA_Subsystem:sys_clk_clk, card_eight:clk, card_five:clk, card_four:clk, card_nine:clk, card_one:clk, card_seven:clk, card_six:clk, card_ten:clk, card_three:clk, card_two:clk, dealer_top:clk, dealer_top_3:clk, finish_simuls:clk, init_done:clk, m10k_pll:refclk, mem_start_point:clk, mm_interconnect_0:System_PLL_sys_clk_clk, mm_interconnect_1:System_PLL_sys_clk_clk, mm_interconnect_2:System_PLL_sys_clk_clk, num_ties:clk, num_wins:clk, player_init_hand:clk, rst_controller:clk, rst_controller_003:clk]
+	wire          system_pll_sys_clk_clk;                                               // System_PLL:sys_clk_clk -> [ARM_A9_HPS:f2h_axi_clk, ARM_A9_HPS:h2f_axi_clk, ARM_A9_HPS:h2f_lw_axi_clk, AV_Config:clk, Onchip_SRAM_cards:clk, Onchip_SRAM_cards:clk2, Onchip_SRAM_seed:clk, Onchip_SRAM_seed:clk2, Pixel_DMA_Addr_Translation:clk, SDRAM:clk, VGA_Subsystem:sys_clk_clk, card_eight:clk, card_five:clk, card_four:clk, card_nine:clk, card_one:clk, card_seven:clk, card_six:clk, card_ten:clk, card_three:clk, card_two:clk, dealer_top:clk, finish_simuls:clk, init_done:clk, m10k_pll:refclk, mem_start_point:clk, mm_interconnect_0:System_PLL_sys_clk_clk, mm_interconnect_1:System_PLL_sys_clk_clk, mm_interconnect_2:System_PLL_sys_clk_clk, num_ties:clk, num_wins:clk, player_init_hand:clk, rst_controller:clk, rst_controller_003:clk]
 	wire    [1:0] arm_a9_hps_h2f_axi_master_awburst;                                    // ARM_A9_HPS:h2f_AWBURST -> mm_interconnect_0:ARM_A9_HPS_h2f_axi_master_awburst
 	wire    [3:0] arm_a9_hps_h2f_axi_master_arlen;                                      // ARM_A9_HPS:h2f_ARLEN -> mm_interconnect_0:ARM_A9_HPS_h2f_axi_master_arlen
 	wire   [15:0] arm_a9_hps_h2f_axi_master_wstrb;                                      // ARM_A9_HPS:h2f_WSTRB -> mm_interconnect_0:ARM_A9_HPS_h2f_axi_master_wstrb
@@ -306,8 +305,6 @@ module Computer_System (
 	wire    [1:0] mm_interconnect_1_mem_start_point_s1_address;                         // mm_interconnect_1:mem_start_point_s1_address -> mem_start_point:address
 	wire          mm_interconnect_1_mem_start_point_s1_write;                           // mm_interconnect_1:mem_start_point_s1_write -> mem_start_point:write_n
 	wire   [31:0] mm_interconnect_1_mem_start_point_s1_writedata;                       // mm_interconnect_1:mem_start_point_s1_writedata -> mem_start_point:writedata
-	wire   [31:0] mm_interconnect_1_dealer_top_3_s1_readdata;                           // dealer_top_3:readdata -> mm_interconnect_1:dealer_top_3_s1_readdata
-	wire    [1:0] mm_interconnect_1_dealer_top_3_s1_address;                            // mm_interconnect_1:dealer_top_3_s1_address -> dealer_top_3:address
 	wire   [31:0] mm_interconnect_1_pixel_dma_addr_translation_slave_readdata;          // Pixel_DMA_Addr_Translation:slave_readdata -> mm_interconnect_1:Pixel_DMA_Addr_Translation_slave_readdata
 	wire          mm_interconnect_1_pixel_dma_addr_translation_slave_waitrequest;       // Pixel_DMA_Addr_Translation:slave_waitrequest -> mm_interconnect_1:Pixel_DMA_Addr_Translation_slave_waitrequest
 	wire    [1:0] mm_interconnect_1_pixel_dma_addr_translation_slave_address;           // mm_interconnect_1:Pixel_DMA_Addr_Translation_slave_address -> Pixel_DMA_Addr_Translation:slave_address
@@ -330,7 +327,7 @@ module Computer_System (
 	wire   [31:0] mm_interconnect_2_vga_subsystem_pixel_dma_control_slave_writedata;    // mm_interconnect_2:VGA_Subsystem_pixel_dma_control_slave_writedata -> VGA_Subsystem:pixel_dma_control_slave_writedata
 	wire   [31:0] arm_a9_hps_f2h_irq0_irq;                                              // irq_mapper:sender_irq -> ARM_A9_HPS:f2h_irq_p0
 	wire   [31:0] arm_a9_hps_f2h_irq1_irq;                                              // irq_mapper_001:sender_irq -> ARM_A9_HPS:f2h_irq_p1
-	wire          rst_controller_reset_out_reset;                                       // rst_controller:reset_out -> [AV_Config:reset, Onchip_SRAM_cards:reset, Onchip_SRAM_cards:reset2, Onchip_SRAM_seed:reset, Onchip_SRAM_seed:reset2, Pixel_DMA_Addr_Translation:reset, SDRAM:reset_n, card_eight:reset_n, card_five:reset_n, card_four:reset_n, card_nine:reset_n, card_one:reset_n, card_seven:reset_n, card_six:reset_n, card_ten:reset_n, card_three:reset_n, card_two:reset_n, dealer_top:reset_n, dealer_top_3:reset_n, finish_simuls:reset_n, init_done:reset_n, mem_start_point:reset_n, mm_interconnect_0:SDRAM_reset_reset_bridge_in_reset_reset, mm_interconnect_0:VGA_Subsystem_sys_reset_reset_bridge_in_reset_reset, mm_interconnect_1:AV_Config_reset_reset_bridge_in_reset_reset, mm_interconnect_1:VGA_Subsystem_sys_reset_reset_bridge_in_reset_reset, mm_interconnect_2:Pixel_DMA_Addr_Translation_reset_reset_bridge_in_reset_reset, mm_interconnect_2:VGA_Subsystem_sys_reset_reset_bridge_in_reset_reset, num_ties:reset_n, num_wins:reset_n, player_init_hand:reset_n, rst_translator:in_reset]
+	wire          rst_controller_reset_out_reset;                                       // rst_controller:reset_out -> [AV_Config:reset, Onchip_SRAM_cards:reset, Onchip_SRAM_cards:reset2, Onchip_SRAM_seed:reset, Onchip_SRAM_seed:reset2, Pixel_DMA_Addr_Translation:reset, SDRAM:reset_n, card_eight:reset_n, card_five:reset_n, card_four:reset_n, card_nine:reset_n, card_one:reset_n, card_seven:reset_n, card_six:reset_n, card_ten:reset_n, card_three:reset_n, card_two:reset_n, dealer_top:reset_n, finish_simuls:reset_n, init_done:reset_n, mem_start_point:reset_n, mm_interconnect_0:SDRAM_reset_reset_bridge_in_reset_reset, mm_interconnect_0:VGA_Subsystem_sys_reset_reset_bridge_in_reset_reset, mm_interconnect_1:AV_Config_reset_reset_bridge_in_reset_reset, mm_interconnect_1:VGA_Subsystem_sys_reset_reset_bridge_in_reset_reset, mm_interconnect_2:Pixel_DMA_Addr_Translation_reset_reset_bridge_in_reset_reset, mm_interconnect_2:VGA_Subsystem_sys_reset_reset_bridge_in_reset_reset, num_ties:reset_n, num_wins:reset_n, player_init_hand:reset_n, rst_translator:in_reset]
 	wire          rst_controller_reset_out_reset_req;                                   // rst_controller:reset_req -> [Onchip_SRAM_cards:reset_req, Onchip_SRAM_cards:reset_req2, Onchip_SRAM_seed:reset_req, Onchip_SRAM_seed:reset_req2, rst_translator:reset_req_in]
 	wire          arm_a9_hps_h2f_reset_reset;                                           // ARM_A9_HPS:h2f_rst_n -> [rst_controller:reset_in0, rst_controller_001:reset_in0, rst_controller_002:reset_in0, rst_controller_003:reset_in0]
 	wire          system_pll_reset_source_reset;                                        // System_PLL:reset_source_reset -> [rst_controller:reset_in1, rst_controller_001:reset_in1, rst_controller_002:reset_in1]
@@ -779,14 +776,6 @@ module Computer_System (
 		.out_port   (dealer_top_external_connection_export)       // external_connection.export
 	);
 
-	Computer_System_card_eight dealer_top_3 (
-		.clk      (system_pll_sys_clk_clk),                     //                 clk.clk
-		.reset_n  (~rst_controller_reset_out_reset),            //               reset.reset_n
-		.address  (mm_interconnect_1_dealer_top_3_s1_address),  //                  s1.address
-		.readdata (mm_interconnect_1_dealer_top_3_s1_readdata), //                    .readdata
-		.in_port  (dealer_top_3_external_connection_export)     // external_connection.export
-	);
-
 	Computer_System_card_eight finish_simuls (
 		.clk      (system_pll_sys_clk_clk),                      //                 clk.clk
 		.reset_n  (~rst_controller_reset_out_reset),             //               reset.reset_n
@@ -1004,8 +993,6 @@ module Computer_System (
 		.dealer_top_s1_readdata                                                   (mm_interconnect_1_dealer_top_s1_readdata),                             //                                                                   .readdata
 		.dealer_top_s1_writedata                                                  (mm_interconnect_1_dealer_top_s1_writedata),                            //                                                                   .writedata
 		.dealer_top_s1_chipselect                                                 (mm_interconnect_1_dealer_top_s1_chipselect),                           //                                                                   .chipselect
-		.dealer_top_3_s1_address                                                  (mm_interconnect_1_dealer_top_3_s1_address),                            //                                                    dealer_top_3_s1.address
-		.dealer_top_3_s1_readdata                                                 (mm_interconnect_1_dealer_top_3_s1_readdata),                           //                                                                   .readdata
 		.finish_simuls_s1_address                                                 (mm_interconnect_1_finish_simuls_s1_address),                           //                                                   finish_simuls_s1.address
 		.finish_simuls_s1_readdata                                                (mm_interconnect_1_finish_simuls_s1_readdata),                          //                                                                   .readdata
 		.init_done_s1_address                                                     (mm_interconnect_1_init_done_s1_address),                               //                                                       init_done_s1.address

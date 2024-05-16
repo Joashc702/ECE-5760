@@ -48,6 +48,11 @@
          value = "3";
          type = "int";
       }
+      datum sopceditor_expanded
+      {
+         value = "0";
+         type = "boolean";
+      }
    }
    element Onchip_SRAM.s1
    {
@@ -371,22 +376,6 @@
          type = "String";
       }
    }
-   element dealer_top_3
-   {
-      datum _sortIndex
-      {
-         value = "29";
-         type = "int";
-      }
-   }
-   element dealer_top_3.s1
-   {
-      datum baseAddress
-      {
-         value = "384";
-         type = "String";
-      }
-   }
    element finish_simuls
    {
       datum _sortIndex
@@ -557,11 +546,6 @@
  <interface
    name="card_two_external_connection"
    internal="card_two.external_connection"
-   type="conduit"
-   dir="end" />
- <interface
-   name="dealer_top_3_external_connection"
-   internal="dealer_top_3.external_connection"
    type="conduit"
    dir="end" />
  <interface
@@ -1536,24 +1520,6 @@
   <parameter name="width" value="8" />
  </module>
  <module
-   name="dealer_top_3"
-   kind="altera_avalon_pio"
-   version="18.1"
-   enabled="1">
-  <parameter name="bitClearingEdgeCapReg" value="false" />
-  <parameter name="bitModifyingOutReg" value="false" />
-  <parameter name="captureEdge" value="false" />
-  <parameter name="clockRate" value="100000000" />
-  <parameter name="direction" value="Input" />
-  <parameter name="edgeType" value="RISING" />
-  <parameter name="generateIRQ" value="false" />
-  <parameter name="irqType" value="LEVEL" />
-  <parameter name="resetValue" value="0" />
-  <parameter name="simDoTestBenchWiring" value="false" />
-  <parameter name="simDrivenValue" value="0" />
-  <parameter name="width" value="32" />
- </module>
- <module
    name="finish_simuls"
    kind="altera_avalon_pio"
    version="18.1"
@@ -2072,15 +2038,6 @@
    kind="avalon"
    version="18.1"
    start="ARM_A9_HPS.h2f_lw_axi_master"
-   end="dealer_top_3.s1">
-  <parameter name="arbitrationPriority" value="1" />
-  <parameter name="baseAddress" value="0x0180" />
-  <parameter name="defaultConnection" value="false" />
- </connection>
- <connection
-   kind="avalon"
-   version="18.1"
-   start="ARM_A9_HPS.h2f_lw_axi_master"
    end="Pixel_DMA_Addr_Translation.slave">
   <parameter name="arbitrationPriority" value="1" />
   <parameter name="baseAddress" value="0x3020" />
@@ -2209,11 +2166,6 @@
    version="18.1"
    start="System_PLL.sys_clk"
    end="mem_start_point.clk" />
- <connection
-   kind="clock"
-   version="18.1"
-   start="System_PLL.sys_clk"
-   end="dealer_top_3.clk" />
  <connection
    kind="clock"
    version="18.1"
@@ -2378,11 +2330,6 @@
    kind="reset"
    version="18.1"
    start="ARM_A9_HPS.h2f_reset"
-   end="dealer_top_3.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="ARM_A9_HPS.h2f_reset"
    end="Onchip_SRAM.reset1" />
  <connection
    kind="reset"
@@ -2514,11 +2461,6 @@
    version="18.1"
    start="System_PLL.reset_source"
    end="mem_start_point.reset" />
- <connection
-   kind="reset"
-   version="18.1"
-   start="System_PLL.reset_source"
-   end="dealer_top_3.reset" />
  <connection
    kind="reset"
    version="18.1"

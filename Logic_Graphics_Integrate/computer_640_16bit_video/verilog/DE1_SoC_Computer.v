@@ -724,12 +724,12 @@ wire [31:0] num_wins_pio;
 
 //wire [31:0] dealer_top_1_pio;
 //wire [31:0] dealer_top_2_pio;
-wire [31:0] dealer_top_3_pio;
+//wire [31:0] dealer_top_3_pio;
 reg [3:0] dealer_show [num_simul-1: 0];
 
 //assign dealer_top_1_pio = dealer_show[0];
 //assign dealer_top_2_pio = dealer_show[1];
-assign dealer_top_3_pio = mem_start;
+//assign dealer_top_3_pio = mem_start;
 
 assign num_wins_pio = num_wins_net[12:0];
 assign num_ties_pio = num_ties_net[12:0];   
@@ -1026,7 +1026,7 @@ generate
 				end
 				// STATE 7: Player playing til stand
 				else if (drum_state[i] == 4'd7) begin
-					if ((player_hands[i] == 5'd12 && drawn_card_val[0] >= 5'd4 && drawn_card_val[0] <= 5'd6) || (player_hands[i] >= 5'd13 && player_hands[i] < 5'd17 && drawn_card_val[0] >= 5'd2 && drawn_card_val[0] <= 5'd6) || (player_hands[i] >= 5'd17)) begin
+					if ((player_hands[i] == 5'd12 && dealer_top_pio >= 5'd4 && dealer_top_pio <= 5'd6) || (player_hands[i] >= 5'd13 && player_hands[i] < 5'd17 && dealer_top_pio >= 5'd2 && dealer_top_pio <= 5'd6) || (player_hands[i] >= 5'd17)) begin
 						drum_state[i] <= 4'd8; 
 					end
 					else begin
@@ -1326,7 +1326,7 @@ Computer_System The_System (
 	// wires for init dealer/player pios
 	//.dealer_top_1_external_connection_export(dealer_top_1_pio),     //     dealer_top_1_external_connection.export
 	//.dealer_top_2_external_connection_export(dealer_top_2_pio),     //     dealer_top_2_external_connection.export
-	.dealer_top_3_external_connection_export(dealer_top_3_pio),     //     dealer_top_3_external_connection.export
+	//.dealer_top_3_external_connection_export(dealer_top_3_pio),     //     dealer_top_3_external_connection.export
 	.dealer_top_external_connection_export(dealer_top_pio),
 	.player_init_hand_external_connection_export(player_init_hand_pio),
 	.init_done_external_connection_export(init_done),
