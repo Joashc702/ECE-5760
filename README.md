@@ -12,4 +12,4 @@ Lab 3: \
 
 Final Project (Blackjack): \
   main C code: Logic_Graphics_Integrate/blackjack_done.c \
-  top-level module Verilog:  
+  top-level module Verilog: Logic_Graphics_Integrate/computer_640_16bit_video/verilog/DE1_SoC_Computer.v
