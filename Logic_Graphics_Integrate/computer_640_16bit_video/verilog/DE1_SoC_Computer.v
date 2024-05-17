@@ -403,8 +403,6 @@ wire [7:0] dealer_top_pio;
 wire [7:0] player_init_hand_pio;
 //assign color_in_VGA = M10k_out[next_x[3:0]];
 
-// Instantiate VGA driver		
-
 // SRAM variables for the Card Value On-Chip SRAM
 wire [31:0] sram_readdata;
 reg [31:0] data_buffer, sram_writedata; //data buffer to lead read data
@@ -497,9 +495,11 @@ always @(posedge CLOCK_50) begin
 		end
 	end
 end
+/////////////////////////////////////////////////////////////////////////////////////////
 
 parameter [9:0] num_simul = 60;//number of parallel blocks simulating hands
 
+//Concatenated output random value of each parallel block
 wire [7:0] output_random [num_simul-1:0] /*synthesis keep */; 
 
 /*
