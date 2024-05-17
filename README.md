@@ -6,6 +6,10 @@ Lab 2: \
   main C code: mandelbrot_final_cleaned.c \
   top-level module Verilog: DE1_SoC_Computer_cleaned.v 
 
-Lab 3:
+Lab 3: \
   main C code: Lab3W3.c \
   top-level module Verilog: /drum_audio_synch/verilog/DE1_SoC_Computer.v 
+
+Final Project (Blackjack): \
+  main C code: Logic_Graphics_Integrate/blackjack_done.c \
+  top-level module Verilog:  
