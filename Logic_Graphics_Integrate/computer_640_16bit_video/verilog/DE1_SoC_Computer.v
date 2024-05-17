@@ -403,34 +403,17 @@ wire [7:0] dealer_top_pio;
 wire [7:0] player_init_hand_pio;
 //assign color_in_VGA = M10k_out[next_x[3:0]];
 
-// TODO after init_done: dealer pio needs to be assigned to dealer hands right away, player needs to go to player hands
-// TODO replace the init with values from SRAM memory
-
 // Instantiate VGA driver		
-/*			
-vga_driver DUT   (	.clock(vga_pll), 
-							.reset(pio_reset_external_connection_export[0] || ~KEY[0]),
-							.color_in(color_in_VGA),	// Pixel color (8-bit) from memory
-							.next_x(next_x),		// This (and next_y) used to specify memory read address
-							.next_y(next_y),		// This (and next_x) used to specify memory read address
-							.hsync(VGA_HS),
-							.vsync(VGA_VS),
-							.red(VGA_R),
-							.green(VGA_G),
-							.blue(VGA_B),
-							.sync(VGA_SYNC_N),
-							.clk(VGA_CLK),
-							.blank(VGA_BLANK_N)
-);*/
 
-// SRAM variables
+// SRAM variables for the Card Value On-Chip SRAM
 wire [31:0] sram_readdata;
-reg [31:0] data_buffer, sram_writedata;
+reg [31:0] data_buffer, sram_writedata; //data buffer to lead read data
 reg [8:0] sram_address; // (52*6) needs 9 bits
 reg sram_write;
 wire sram_clken = 1'b1;
 wire sram_chipselect = 1'b1;
 
+//SRAM variables for the Seed On-Chip SRAM
 reg [3:0] sram_state_seed = 4'd0;
 wire [31:0] sram_readdata_seed;
 reg [31:0] data_buffer_seed, sram_writedata_seed;
@@ -452,6 +435,11 @@ reg data_ready;
 reg data_ready_seed;
 wire [7:0] init_done /*synthesis keep */;
 
+/*
+Clocked-Logic that enforces a 2-cycle read for On-Chip SRAM reads and buffers seed values.
+At the end of each read, the logic signals a flag indicating values are ready to be accessed for updating
+appropriate random number generator modules with valid seeds. 
+*/
 always @(posedge CLOCK_50) begin
 	if (init_done == 8'd0) begin
 		read_addr_init_seed <= 11'd0;
@@ -460,7 +448,7 @@ always @(posedge CLOCK_50) begin
 	end
 	else if (init_done == 8'd1) begin
 		if (sram_state_seed == 4'd0) begin
-			if (read_addr_init_seed < 11'd2000) begin
+			if (read_addr_init_seed < 11'd2000) begin //read size memory limit
 				sram_address_seed <= read_addr_init_seed;
 				sram_state_seed <= 4'd1;
 				data_ready_seed <= 1'd0;
@@ -471,14 +459,19 @@ always @(posedge CLOCK_50) begin
 		end else if (sram_state_seed == 4'd1) begin // buffer state
 			sram_state_seed <= 4'd2;
 		end else if (sram_state_seed == 4'd2) begin
-			data_buffer_seed <= sram_readdata_seed;
+			data_buffer_seed <= sram_readdata_seed; //store new buffered values
 			read_addr_init_seed <= read_addr_init_seed + 11'd1;
 			sram_state_seed <= 4'd0;
-			data_ready_seed <= 1'd1;
+			data_ready_seed <= 1'd1; //value is available for reads
 		end
 	end
 end
 /////////////////////////////////////////////////////////////////////////////////////////
+/*
+Clocked-Logic that enforces a 2-cycle read within On-Chip SRAM reads 
+and buffers new card values. At the end of each read, the logic signals a flag indicating 
+values are ready to be copied by each parallel block. 
+*/
 always @(posedge CLOCK_50) begin
 	if (init_done == 8'd0) begin
 		read_addr_init <= 10'b0;
@@ -486,7 +479,7 @@ always @(posedge CLOCK_50) begin
 	end
 	if (init_done == 8'd1) begin
 		if (sram_state == 4'd0) begin
-			if (read_addr_init < 10'd256) begin
+			if (read_addr_init < 10'd256) begin //read size memory limit
 				sram_address <= read_addr_init;
 				sram_state <= 4'd1;
 				data_ready <= 1'd0;
@@ -497,19 +490,21 @@ always @(posedge CLOCK_50) begin
 		end else if (sram_state == 4'd1) begin // buffer state
 			sram_state <= 4'd2;
 		end else if (sram_state == 4'd2) begin
-			data_buffer <= sram_readdata;
+			data_buffer <= sram_readdata; //store new buffered values
 			read_addr_init <= read_addr_init + 10'd1;
 			sram_state <= 4'd0;
-			data_ready <= 1'd1;
+			data_ready <= 1'd1; //value is available for reads
 		end
 	end
 end
 
-parameter [9:0] num_simul = 60;//half of the number of columns  85 is the max
-//parameter [9:0] num_internal_simul = 5;
+parameter [9:0] num_simul = 60;//number of parallel blocks simulating hands
+
 wire [7:0] output_random [num_simul-1:0] /*synthesis keep */; 
 
-
+/*
+Shared M10k read and write data variables for card values. 
+*/
 wire unsigned [3:0] q [num_simul-1:0];
 reg unsigned  [3:0] d [num_simul-1:0];
 reg [9:0] write_addr [num_simul-1:0];
@@ -518,76 +513,30 @@ reg we[num_simul-1:0];
 
 reg [3:0] drum_state [num_simul-1:0];
 
-
 reg tie_check [num_simul-1:0];
-
-//Shared m10k
 
 reg write_init_done [num_simul-1:0] /*synthesis keep */;
 wire [4:0] shared_write;
-reg [4:0] card_itr [num_simul-1:0];
-//assign shared_write = {(write_init_done[4]), (write_init_done[3]), (write_init_done[2]), (write_init_done[1]), (write_init_done[0])};
+reg [4:0] card_itr [num_simul-1:0]; //keeps track of index of internal drawn card value array
 
-
-//wire [7:0] test_1; // output_random
-//wire [31:0] test_2; 
-//wire [7:0] test_3;
-
-//wire [7:0] draw_dealer_1[num_simul-1:0];
-//wire [7:0] draw_dealer_2[num_simul-1:0];
-//wire [7:0] draw_dealer_3[num_simul-1:0];
-
-//reg [7:0] test_draw_dealer_1[num_simul-1:0];
-//reg [7:0] test_draw_dealer_2[num_simul-1:0];
-//reg [7:0] test_draw_dealer_3[num_simul-1:0];
-
-
-//wire [7:0] draw_player_1[num_simul-1:0];
-//wire [7:0] draw_player_2[num_simul-1:0];
-//wire [7:0] draw_player_3[num_simul-1:0];
-
-//reg [7:0] test_draw_player_1[num_simul-1:0];
-//reg [7:0] test_draw_player_2[num_simul-1:0];
-//reg [7:0] test_draw_player_3[num_simul-1:0];
-
-
-//assign draw_dealer_1[0] = test_draw_dealer_1[0];
-//assign draw_dealer_2[0] = test_draw_dealer_2[0];
-
-/*
-assign draw_dealer_1[0] = seed_test[2];
-assign draw_dealer_2[0] = seed_init;
-//assign draw_dealer_3[0] = test_draw_dealer_3[0];
-assign draw_dealer_3[0] = output_random[0];
-//assign draw_player_1[0] = test_draw_player_1[0];
-assign draw_player_1[0] = lfsr_test[0];
-assign draw_player_2[0] = seed_test[3];
-assign draw_player_3[0] = seed_test[1];
-*/
-
-reg [1:0] player_result[num_simul-1:0];
+reg [1:0] player_result[num_simul-1:0]; //The fianl result of each player in each parallel block after multiple internal simulations
 reg all_simul_done [num_simul - 1:0];
 
-wire [31:0] simul_complete;
+wire [31:0] simul_complete; //Indicates if all internal simulations are completed to create synchronization between HPS and FPGA
 reg interm_simul_complete;
 assign simul_complete = interm_simul_complete;
 
 wire [31:0] mem_start;
 
-
-// Send back to the arm and verify
-//assign shared_write = output_random[0];
-
-reg [12:0] num_wins [num_simul - 1: 0];
-reg [12:0] num_wins_net;
-reg [12:0] num_ties [num_simul - 1: 0];
-reg [12:0] num_ties_net;
-reg [12:0] result_counter;
-//reg [12:0] internal_simuls;
+reg [12:0] num_wins [num_simul - 1: 0]; //Total Number of wins per parallel simulation
+reg [12:0] num_wins_net; //Total number of wins across all parallel block
+reg [12:0] num_ties [num_simul - 1: 0]; //Total number of ties per parallel simulation
+reg [12:0] num_ties_net; //Total number of ties across  all parallel block
+reg [12:0] result_counter; //Increment for sequentially processing each parallel block's appropriate results
 
 reg checked_card [num_simul - 1:0] /*synthesis keep */;
 always @(posedge CLOCK_50) begin
-	if (init_done == 8'd0) begin
+	if (init_done == 8'd0) begin //Reset register initializations
 		num_wins_net <= 13'd0;
 		num_ties_net <= 13'd0;
 		result_counter <= 13'd0;
@@ -607,16 +556,17 @@ always @(posedge CLOCK_50) begin
 	else begin
 		if (result_counter == num_simul) begin
 			interm_simul_complete <= 1'd1;
-			//result_counter <= 13'd7000;
-			// Hard code in C to tell it's 7000 simuls
 		end
 		else begin
 			if (all_simul_done[result_counter] == 1'd1) begin
 				num_wins_net <= num_wins_net + num_wins[result_counter];
 				num_ties_net <= num_ties_net + num_ties[result_counter];
-				result_counter <= result_counter + 13'd1;
-				
-				val_card_one[num_simul] <= val_card_one[result_counter] + val_card_one[num_simul];
+				result_counter <= result_counter + 13'd1; //Increments across all 60 simulations sequentially
+				/*
+				Increment net individual card counts based on individual card counts from each parallel 
+				block inside the generate statemen
+				*/
+				val_card_one[num_simul] <= val_card_one[result_counter] + val_card_one[num_simul]; //Increment for the Ace card
 				val_card_two[num_simul] <= val_card_two[result_counter] + val_card_two[num_simul];
 				val_card_three[num_simul] <= val_card_three[result_counter] + val_card_three[num_simul];
 				val_card_four[num_simul] <= val_card_four[result_counter] + val_card_four[num_simul];
@@ -628,112 +578,29 @@ always @(posedge CLOCK_50) begin
 				val_card_ten[num_simul] <= val_card_ten[result_counter] + val_card_ten[num_simul];
 				
 			end else begin
-				result_counter <= result_counter;
+				result_counter <= result_counter; //Hold until the simulation has completed before tallying result 
 			end
 		end
-		
-//		if (internal_simuls == num_internal_simul) begin
-//			internal_simuls <= 11'd5;
-//		end
-//		else if (result_counter == num_simul && internal_simuls < num_internal_simul) begin
-//			result_counter <= 11'd0;
-//			internal_simuls <= internal_simuls + 11'd1;
-//			//result_counter <= 11'd0;
-//		end
-//		else begin 
-//			if ([result_counter] == 1'd1 /*&& checked_card[result_counter] == 1'd0*/) begin
-//				if (player_result[result_counter] == 2'd1) begin
-//					//num_wins <= num_wins + 11'd1;
-//				end
-//				else if (player_result[result_counter] == 2'd2) begin
-//					//num_ties <= num_ties + 11'd1;
-//				end
-//				/*checked_card[result_counter] <= 1'd1;*/
-//				result_counter <= result_counter + 11'd1;
-//				
-//				val_card_one[num_simul] <= val_card_one[result_counter] + val_card_one[num_simul];
-//				val_card_two[num_simul] <= val_card_two[result_counter] + val_card_two[num_simul];
-//				val_card_three[num_simul] <= val_card_three[result_counter] + val_card_three[num_simul];
-//				val_card_four[num_simul] <= val_card_four[result_counter] + val_card_four[num_simul];
-//				val_card_five[num_simul] <= val_card_five[result_counter] + val_card_five[num_simul];
-//				val_card_six[num_simul] <= val_card_six[result_counter] + val_card_six[num_simul];
-//				val_card_seven[num_simul] <= val_card_seven[result_counter] + val_card_seven[num_simul];
-//				val_card_eight[num_simul] <= val_card_eight[result_counter] + val_card_eight[num_simul];
-//				val_card_nine[num_simul] <= val_card_nine[result_counter] + val_card_nine[num_simul];
-//				val_card_ten[num_simul] <= val_card_ten[result_counter] + val_card_ten[num_simul];
-//				prob_result[result_counter] == 1'd0;
-//			end else begin
-//				result_counter <= result_counter;
-//			end
-//			
-//		end
 	end
-	/*
-	if (shared_write) begin
-		if (result_counter <= num_simul - 1) begin
-			if (player_result[result_counter] == 2'd1) begin
-				num_wins <= num_wins + 11'd1;
-			end
-			else if (player_result[result_counter] == 2'd2) begin
-				num_ties <= num_ties + 11'd1;
-			end
-			result_counter <= result_counter + 11'd1;
-		end
-	end*/
 end
 
-
-reg [4:0] player_hands [num_simul - 1:0];
-reg [4:0] dealer_hands [num_simul - 1:0];
+reg [4:0] player_hands [num_simul - 1:0]; // Total player hands per individual simulation
+reg [4:0] dealer_hands [num_simul - 1:0]; //Net dealer hands per individual simulation
 
 wire [5:0] seed_test [num_simul - 1: 0];
-//wire [5:0] lfsr_test_1 [num_simul - 1: 0];
-//wire [5:0] lfsr_test_2 [num_simul - 1: 0];
-//wire [5:0] lfsr_test_3 [num_simul - 1: 0];
-//wire [5:0] lfsr_test_4 [num_simul - 1: 0];
-//wire [5:0] lfsr_test_5 [num_simul - 1: 0];
-//wire [5:0] lfsr_test_6 [num_simul - 1: 0];
-
-//wire [5:0] lfsr_test_7 [num_simul - 1: 0] /*synthesis keep */;
-
-
-//assign draw_dealer_3[0] = num_wins[7:0];
-//assign draw_player_1[0] = num_ties[7:0];
-
-/*assign shared_write = num_wins[7:0];
-assign test_1 = num_ties[7:0];
-
-assign test_2 = val_card_one[num_simul];
-assign draw_dealer_1[0] = val_card_two[num_simul];
-assign draw_dealer_2[0] = val_card_three[num_simul];
-assign draw_dealer_3[0] = val_card_four[num_simul];
-assign draw_player_1[0] = val_card_five[num_simul];
-assign draw_player_2[0] = val_card_six[num_simul];
-assign draw_player_3[0] = val_card_seven[num_simul];
-assign test_3 = val_card_eight[num_simul];
-*/
 		
-
 reg prob_result [num_simul - 1: 0];
-//wire [4:0] result_record_test;
-//assign result_record_test = {prob_result[0], prob_result[1], prob_result[2], prob_result[3], prob_result[4]};
-
 
 wire [31:0] num_ties_pio;
 wire [31:0] num_wins_pio;
 
-//wire [31:0] dealer_top_1_pio;
-//wire [31:0] dealer_top_2_pio;
-//wire [31:0] dealer_top_3_pio;
-reg [3:0] dealer_show [num_simul-1: 0];
-
-//assign dealer_top_1_pio = dealer_show[0];
-//assign dealer_top_2_pio = dealer_show[1];
-//assign dealer_top_3_pio = mem_start;
+reg [3:0] dealer_show [num_simul-1: 0]; //dealers first draw - shown card
 
 assign num_wins_pio = num_wins_net[12:0];
 assign num_ties_pio = num_ties_net[12:0];   
-
+/*
+Registers to track the tally count for each individual card in each parallel block.
+*/
 reg [12:0] val_card_one [num_simul: 0];
 reg [12:0] val_card_two [num_simul: 0];
 reg [12:0] val_card_three [num_simul: 0];
@@ -744,7 +611,6 @@ reg [12:0] val_card_seven [num_simul: 0];
 reg [12:0] val_card_eight [num_simul: 0];
 reg [12:0] val_card_nine [num_simul: 0];
 reg [12:0] val_card_ten [num_simul: 0];
-
 
 wire [31:0] val_card_one_pio;
 wire [31:0] val_card_two_pio;
@@ -769,50 +635,28 @@ assign val_card_seven_pio = val_card_seven[num_simul];
 assign val_card_eight_pio = val_card_eight[num_simul];
 assign val_card_nine_pio = val_card_nine[num_simul];
 assign val_card_ten_pio = val_card_ten[num_simul];
-//assign val_card_nine_pio = output_random[0];
-//assign val_card_ten_pio = result_counter;
-
-//assign val_card_four_pio = num_wins[0];
-//assign val_card_five_pio = num_wins[1];
-//assign val_card_six_pio = all_simul_done[1];
-//assign val_card_seven_pio = drum_state[0];
-//assign val_card_eight_pio = test_simul_count;
-//assign val_card_nine_pio = result_counter;
-//assign val_card_ten_pio = all_simul_done[1];
 
 reg [3:0] val_card[num_simul - 1: 0];
-
-
-//reg [9:0] test_simul_count;
 
 genvar i;
 generate 
 	for (i = 0; i < num_simul; i = i+1) begin: initCols  
-		//rand127 random_num(.rand_out([i]), .seed_in(64'h54555555 ^ i), .clock_in(CLOCK_50), .reset_in(((init_done == 8'd0) ? 1'd1 : 1'd0)));
 		reg [3:0] array_hit_card [11:0]; // track index of card
-		reg [255:0] hit_card_reg;
+		reg [255:0] hit_card_reg; //track through binary flags if uniquely mapped card index has already been drawn
 		reg [3:0] drawn_card_val [11:0]; // track the value of card being drawn
 		reg [3:0] dealer_card;
 		wire [7:0] output_random_vals[7:0];
 		wire picked; 
 		reg [9:0] simul_count; 
-		// reg internal_state;
-		
-		//assign hit_card_reg = ;
 		
 		reg [7:0] seed_in [3:0];
-		//assign seed_in[0] = (data_ready_seed == 1'd1 && read_addr_init_seed == i*3) ? data_buffer_seed : 6'd0;
-		//assign seed_in[1] = (data_ready_seed == 1'd1 && read_addr_init_seed == (i*3) + 1) ? data_buffer_seed : 6'd0;
-		//assign seed_in[2] = (data_ready_seed == 1'd1 && read_addr_init_seed == (i*3) + 2) ? data_buffer_seed : 6'd0;
-		//assign seed_test[i] = seed_in[0];
 		reg internal_reset_1;
 		reg internal_reset_2;
 		reg internal_reset_3;
 		reg internal_reset_4;
-		//reg [10:0] num_wins_internal;
 		
 		always @(posedge CLOCK_50) begin
-			if (init_done == 8'd0) begin
+			if (init_done == 8'd0) begin //Reset initialization logic for card counting
 				val_card_one[i] <= 13'd0;
 				val_card_two[i] <= 13'd0;
 				val_card_three[i] <= 13'd0; 
@@ -825,7 +669,7 @@ generate
 				val_card_ten[i] <= 13'd0;
 			end
 			else begin
-				case(val_card[i])
+				case(val_card[i])//depending on value attained on card for each simulation, the card count is incremented in each generate statement.
 						4'd11: val_card_one[i] <= val_card_one[i] + 13'd1;
 						4'd2: val_card_two[i] <= val_card_two[i] + 13'd1;
 						4'd3: val_card_three[i] <= val_card_three[i] + 13'd1;
@@ -840,10 +684,8 @@ generate
 				endcase
 			end
 		end
-		
-		
 		always @(posedge CLOCK_50) begin
-			if (init_done == 8'd0) begin
+			if (init_done == 8'd0) begin //Reset initilaization for all initial seeds and reset logic for each LFSR
 				seed_in[0] <= 8'd0;
 				seed_in[1] <= 8'd0;
 				seed_in[2] <= 8'd0;
@@ -854,13 +696,18 @@ generate
 				internal_reset_4 <= 1'd0;
 
 			end
+			/*
+			The following logic sequentially assings the 4 necessary seeds to generate an 8-bit value by 
+			synchronizing with the sequential seed processing clocked logic earlier with values assigned 
+			through a simple map based on existing generate statement index and seed index. 
+			*/
 			if (~seed_init && init_done == 8'd1) begin
 				if ((data_ready_seed == 1'd1 && sram_address_seed == i*4)) begin
 					seed_in[0] <= data_buffer_seed;
 					internal_reset_1 <= 1'd1;
 				end
 				if (internal_reset_1 == 1'd1) begin
-					internal_reset_1 <= 1'd0;
+					internal_reset_1 <= 1'd0; //Simulate a single cycle reset for seed to be picked by LFSR
 				end
 				
 				if ((data_ready_seed == 1'd1 && sram_address_seed == (i*4 + 1))) begin
@@ -868,7 +715,7 @@ generate
 					internal_reset_2 <= 1'd1;
 				end
 				if (internal_reset_2 == 1'd1) begin
-					internal_reset_2 <= 1'd0;
+					internal_reset_2 <= 1'd0; //Simulate a single cycle reset for seed to be picked by LFSR
 				end
 				
 				if ((data_ready_seed == 1'd1 && sram_address_seed == (i*4 + 2))) begin
@@ -876,32 +723,24 @@ generate
 					internal_reset_3 <= 1'd1;
 				end
 				if (internal_reset_3 == 1'd1) begin
-					internal_reset_3 <= 1'd0;
+					internal_reset_3 <= 1'd0; //Simulate a single cycle reset for seed to be picked by LFSR
 				end
 				if ((data_ready_seed == 1'd1 && sram_address_seed == (i*4 + 3))) begin
 					seed_in[3] <= data_buffer_seed;
 					internal_reset_4 <= 1'd1;
 				end
 				if (internal_reset_4 == 1'd1) begin
-					internal_reset_4 <= 1'd0;
+					internal_reset_4 <= 1'd0; //Simulate a single cycle reset for seed to be picked by LFSR
 				end
 			end
 		end
-		
-		//assign lfsr_test_1[i] = seed_in[0];
-		//assign lfsr_test_2[i] = seed_in[1];
-		//assign lfsr_test_3[i] = seed_in[2];
-		//assign lfsr_test_4[i] = (seed_in[0] ^ seed_in[1]);
-		//assign lfsr_test_5[i] = (seed_in[1] ^ seed_in[2]);
-		//assign lfsr_test_6[i] = (seed_in[2] ^ seed_in[0]);
-		
-		
-
-		//assign lfsr_test_1[i] = output_random[i];
+		//Concatentation of the first bits from all output random values to generate a complete random number
 		assign output_random[i] = {output_random_vals[7][0], output_random_vals[6][0], output_random_vals[5][0],output_random_vals[4][0],output_random_vals[3][0],output_random_vals[2][0],output_random_vals[1][0],output_random_vals[0][0]} ;
-		//assign lfsr_test_7[i] = output_random[i];
-		//rand127 random_num(.rand_out(output_random), .seed_in(64'h54555555), .clock_in(clk_50), .reset_in(reset));
-			
+		
+		/*
+		8 Independent LFSR's that individually generate random values. Each is controlled by a random seed with the last four seeds determined
+		through mathematical operations from the first few seeds. Each is reset through single cycle resets based on seed availability. 
+		*/
 		rand6 random_num(.rand_out(output_random_vals[0]), .seed_in(seed_in[0]), .clock_in(CLOCK_50), .reset_in(internal_reset_1));
 		rand6 random_num_2(.rand_out(output_random_vals[1]), .seed_in(seed_in[1]), .clock_in(CLOCK_50), .reset_in(internal_reset_2));
 		rand6 random_num_3(.rand_out(output_random_vals[2]), .seed_in(seed_in[2]), .clock_in(CLOCK_50), .reset_in(internal_reset_3));
@@ -910,11 +749,13 @@ generate
 		rand6 random_num_6(.rand_out(output_random_vals[5]), .seed_in(seed_in[2] ^ seed_in[0]), .clock_in(CLOCK_50), .reset_in(internal_reset_3));
 		rand6 random_num_7(.rand_out(output_random_vals[6]), .seed_in(seed_in[1] ^ seed_in[3]), .clock_in(CLOCK_50), .reset_in(internal_reset_4));
 		rand6 random_num_8(.rand_out(output_random_vals[7]), .seed_in(seed_in[2] ^ seed_in[3]), .clock_in(CLOCK_50), .reset_in(internal_reset_4));
-	
+		
+		//Internal Duplicate M10k for Card Value access
 		M10K_32_5 m10k_curr(.q(q[i]), .d(d[i]), .write_address(write_addr[i]), .read_address(read_addr[i]), .we(we[i]), .clk(CLOCK_50));
+		//Boolean logic to cross-check if a card has already been selected on a random draw
 		Search_hit_card card_check( .picked_card(hit_card_reg), 
 									.mem_start(mem_start),
-									.card(output_random[i]), // TODO we don't want generated number all the time
+									.card(output_random[i]), 
 									.picked(picked));
 									
 									
@@ -931,19 +772,9 @@ generate
 				
 				player_hands[i] <= player_init_hand_pio;
 				dealer_hands[i] <= dealer_top_pio;
-				//player_hands[i] <= 5'd0;
-				//dealer_hands[i] <= 5'd0;
 			
 				card_itr[i] <= 5'd0;
 				simul_count <= 10'd0;
-				/*test_draw_dealer_1[i] <= 8'd0;
-				test_draw_dealer_2[i] <= 8'd0;
-				test_draw_dealer_3[i] <= 8'd0;
-
-				test_draw_player_1[i] <= 8'd0;
-				test_draw_player_2[i] <= 8'd0;
-				test_draw_player_3[i] <= 8'd0;
-				*/
 				prob_result[i] <= 1'd0;
 				val_card[i] <= 4'd0;
 				card_val_count[i] <= 1'd0;
@@ -955,12 +786,12 @@ generate
 			end
 			else begin
 				// STATE 0: Initialization
-				if (drum_state[i] == 4'd0) begin // check if initialization has occurred
+				if (drum_state[i] == 4'd0) begin // check if initialization has occurred for each On-Chip SRAM
 					if (data_ready) begin
 						d[i] <= data_buffer[3:0];
 						write_addr[i] <= write_addr[i] + 10'b1;
 					end
-					if (shared_mem_done && seed_init) begin
+					if (shared_mem_done && seed_init) begin //Transitionly only when seeds and card values are initialized
 						drum_state[i] <= 4'd1;
 						write_init_done[i] <= 1'b1;
 
@@ -985,14 +816,10 @@ generate
 				end
 				// STATE 3: Get dealer hidden card
 				else if (drum_state[i] == 4'd3) begin
-					//array_hit_card[card_itr] <= output_random[i];
-				   /*if(card_itr[i] == 5'd0) begin
-						test_draw_dealer_1[i] <= q[i];
-					end*/
 					dealer_show[i] <= q[i];
-					drawn_card_val[card_itr[i]] <= q[i];
+					drawn_card_val[card_itr[i]] <= q[i]; //Read dealer's hidden card and update drawn cards
 					dealer_hands[i] <= dealer_hands[i] + q[i];
-					hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr[i]]);
+					hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr[i]]); //Assign as already chosen
 					card_itr[i] <= card_itr[i] + 5'd1;
 					drum_state[i] <= 4'd4;
 				end
@@ -1026,40 +853,31 @@ generate
 				end
 				// STATE 7: Player playing til stand
 				else if (drum_state[i] == 4'd7) begin
+					//Stand logic if applicable on current player and dealer hands
 					if ((player_hands[i] == 5'd12 && dealer_top_pio >= 5'd4 && dealer_top_pio <= 5'd6) || (player_hands[i] >= 5'd13 && player_hands[i] < 5'd17 && dealer_top_pio >= 5'd2 && dealer_top_pio <= 5'd6) || (player_hands[i] >= 5'd17)) begin
 						drum_state[i] <= 4'd8; 
 					end
 					else begin
 						drum_state[i] <= 4'd5;	//HIT	
-						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr[i]]);
-						
-						/*if (card_itr[i] == 5'd1) begin
-							test_draw_player_1[i] <= q[i];
-						end
-						else if (card_itr[i] == 5'd2) begin
-							test_draw_player_2[i]<= q[i];
-						end
-						else if (card_itr[i] == 5'd3) begin
-							test_draw_player_3[i]<= q[i];
-						end*/
+						hit_card_reg <= hit_card_reg | (1 << array_hit_card[card_itr[i]]); //assign card as chosen
 						if (card_val_count[i] == 1'd0) begin
 							val_card[i] <= q[i];
-							card_val_count[i] <= 1'd1;
+							card_val_count[i] <= 1'd1; //Increment count of individual card based on current draw value
 						end
 						
-						drawn_card_val[card_itr[i]] <= q[i];
+						drawn_card_val[card_itr[i]] <= q[i]; //Update player drawn cards 
 						card_itr[i] <= card_itr[i] + 5'd1;
 						player_hands[i] <= player_hands[i] + q[i];
 					end
 				end
 				// STATE 8: Dealer's turn
 				else if (drum_state[i] == 4'd8) begin
-					if (~picked) begin
+					if (~picked) begin //Assuming current output randomly generated value is not already chosen
 						read_addr[i] <= output_random[i];
 						array_hit_card[card_itr[i]] <= output_random[i];
 						drum_state[i] <= 4'd9;
 					end else begin
-						drum_state[i] <= 4'd8;
+						drum_state[i] <= 4'd8; //Re-pick if already chosen
 					end	
 				end
 				// STATE 9: Buffer state
@@ -1072,15 +890,9 @@ generate
 						drum_state[i] <= 4'd11; // Result
 					end
 					else begin
-						/*if(card_itr[i] == 5'd4) begin
-							test_draw_dealer_2[i] <= q[i];
-						end
-						else if(card_itr[i] == 5'd5) begin
-							test_draw_dealer_3[i] <= q[i];
-						end*/
 						
 						
-						drawn_card_val[card_itr[i]] <= q[i];
+						drawn_card_val[card_itr[i]] <= q[i]; //Dealer's draw card until stop condition met
 						card_itr[i] <= card_itr[i] + 5'd1;
 						dealer_hands[i] <= dealer_hands[i] + q[i];
 						drum_state[i] <= 4'd8 ;	//HIT	
@@ -1094,17 +906,17 @@ generate
 						drum_state[i] <= 4'd12;
 					end
 					else if (player_hands[i] < 5'd21 && dealer_hands[i] <= 5'd21 && player_hands[i] < dealer_hands[i]) begin
-						player_result[i] <= 2'd0;
+						player_result[i] <= 2'd0; //Loss
 						drum_state[i] <= 4'd12;
 					end
 					else if (player_hands[i] == dealer_hands[i]) begin
-						player_result[i] <= 2'd2;
+						player_result[i] <= 2'd2; //Tie
 						tie_check[i] <= 1'd1;
 						drum_state[i] <= 4'd12;
 						num_ties[i]<=num_ties[i] + 13'd1;
 					end
 					else if (((player_hands[i] > dealer_hands[i]) && player_hands[i] <= 5'd21 && dealer_hands[i] < 5'd21) || (dealer_hands[i] > 5'd21)) begin
-						player_result[i] <= 2'd1;
+						player_result[i] <= 2'd1; //Win
 						drum_state[i] <= 4'd12;
 						num_wins[i]<=num_wins[i] + 13'd1;
 					end
@@ -1117,11 +929,8 @@ generate
 				end
 				// STATE 13: rerun the whole FSM to increase the simulations for Monte Carlo
 				else if (drum_state[i] == 4'd13) begin
-					//if (i == 0) begin
-					//	test_simul_count <= simul_count;
-					//end
-					if (simul_count < 10'd100) begin 
-						drum_state[i] <= 4'd1;
+					if (simul_count < 10'd100) begin //Run 100 internal simulations
+						drum_state[i] <= 4'd1; //Cycle back to continue more internal simulations
 						hit_card_reg <= 256'd0;
 						card_itr[i] <= 5'd0;				
 						prob_result[i] <= 1'd0;
@@ -1132,11 +941,10 @@ generate
 						val_card[i] <= 4'd0;
 						card_val_count[i] <= 1'd0;
 					end
-					else begin 
+					else begin  //reset filled values for parallel blocks once all 100 internal simulations are complete
 						val_card[i] <= 4'd0;
 						card_val_count[i] <= 1'd0;
 						drum_state[i] <= 4'd13;
-						//num_wins[i] <= num_wins_internal;
 						all_simul_done[i] <= 1'd1;
 					end
 				end
@@ -1349,97 +1157,6 @@ Computer_System The_System (
 endmodule // end top level
 
 
-// color write data module
-/*
-module color_write(clk, counter, max_iterations, write_data_out);
-	input clk;
-	input [11:0] counter, max_iterations;
-	output [7:0] write_data_out;
-
-	reg [7:0] write_data;
-
-	always@(posedge clk) begin
-		if (counter >= max_iterations) begin
-		  write_data <= 8'b_000_000_00 ; // black
-		end
-		else if (counter >= (max_iterations >>> 1)) begin
-		  write_data <= 8'b_011_001_00 ; 
-		end
-		else if (counter >= (max_iterations >>> 2)) begin
-		  write_data <= 8'b_011_001_00 ;
-		end
-		else if (counter >= (max_iterations >>> 3)) begin
-		  write_data <= 8'b_101_010_01 ;
-		end
-		else if (counter >= (max_iterations >>> 4)) begin
-		  write_data <= 8'b_011_001_01 ;
-		end
-		else if (counter >= (max_iterations >>> 5)) begin
-		  write_data <= 8'b_001_001_01 ;
-		end
-		else if (counter >= (max_iterations >>> 6)) begin
-		  write_data <= 8'b_011_010_10 ;
-		end
-		else if (counter >= (max_iterations >>> 7)) begin
-		  write_data <= 8'b_010_100_10 ;
-		end
-		else if (counter >= (max_iterations >>> 8)) begin
-		  write_data <= 8'b_010_100_10 ; 
-		end
-		else begin
-		  write_data <= 8'b_010_100_10 ;
-		end
-	end
-	
-	assign write_data_out = write_data;
-endmodule*/
-
-/*
-// Key debouncing logic
-module key_debouncing(clk,button_in,button_state);
-	input clk, button_in;
-	output [1:0] button_state;
-
-	reg possible_button_press;
-	reg [1:0] track_button;
-	
-	always @(posedge clk) begin
-		if (track_button == 2'd0) begin //not pressed
-			if (~button_in) begin
-				track_button <= 2'd1;
-				possible_button_press <= (~button_in);
-			end
-		end
-		else if (track_button == 2'd1) begin //maybe pressed
-			if ((~button_in) && possible_button_press) begin
-				track_button <= 2'd2;
-			end
-			else begin
-				track_button <= 2'd0;
-			end
-		end
-		else if (track_button == 2'd2) begin //pressed
-			if (button_in && possible_button_press) begin
-				track_button <= 2'd3;
-			end
-			else begin
-				track_button <= 2'd2;
-			end
-		end
-		else if (track_button == 2'd3) begin //maybe not pressed
-			if ((~button_in) && possible_button_press) begin
-				track_button <= 2'd2;
-			end
-			else begin
-				track_button <= 2'd0;
-			end
-		end
-	end
-	
-	assign button_state = track_button;
-endmodule
-*/
-
 // Declaration of module, include width and signedness of each input/output
 module vga_driver (
 	input wire clock,
@@ -1626,60 +1343,30 @@ module vga_driver (
 
 endmodule
 
-//////////////////////////////////////////////////////////////
-////////////	Mandelbrot Set Visualizer	    //////////////
-//////////////////////////////////////////////////////////////
-
+/*
+Binary boolean logic module determining if the current card has:
+	1) Already been chosen from a previous draw
+	2) Chosen from an already removed index in dynamic deck
+*/
 module Search_hit_card(picked_card, mem_start, card, picked);
-	//input clock;
-	//input [3:0] picked_cards_arr [11:0];
-	input [255:0] picked_card;
-	input [7:0]card;
-	input [31:0] mem_start;
-	//reg picked_inter;
-	output picked;
-    //reg [2:0] check_state; 
-	//reg [3:0] arr_itr;
-	
-	/*always  @ (posedge clock) begin
-		if (!check_state) begin
-			check_state <= 3'd1;
-			arr_itr <= 4'd0;
-		end 
-		else if check_state == 3'd1 begin
-			if (card == array_hit_card[arr_itr]) begin
-				picked_inter <= 1'd1;
-			end
-			
-			if (picked == 1'd1) begin
-				check_state <= 3'd0;
-			end
-			else if (picked == 1'd0 && arr_itr ==16) begin
-				check_state <= 3'd0;
-			end
-			else begin
-				check_state <= 3'd1;
-			end
-		end
-	end
-	
-	arr_itr <= arr_itr + 4'd1;
-	assign picked = picked_inter;*/
-	
-	/*assign picked = (picked_cards_arr[0] == card) || (picked_cards_arr[1] == card) || (picked_cards_arr[2] == card) || (picked_cards_arr[3] == card) || 
-					(picked_cards_arr[4] == card) || (picked_cards_arr[5] == card) || (picked_cards_arr[6] == card) || (picked_cards_arr[7] == card) || 
-					(picked_cards_arr[8] == card) || (picked_cards_arr[9] == card) || (picked_cards_arr[10] == card) || (picked_cards_arr[11] == card);*/
+	input [255:0] picked_card; //All cards current chosen and available
+	input [7:0]card; //Chosen card mapped index
+	input [31:0] mem_start; //Current deck starting point in Card Value SRAM
+	output picked; //binary result
 					
 	assign picked = (card < mem_start[7:0] || card >= 8'd255 || (((picked_card) & (1 << card)) >> card));
 	
 endmodule
-
+/*
+8-Bit Linear Feedback Shift Register using (8^6^5^4) tap methodology to generate
+periodically random 8-bit values. 
+*/
 module rand6(rand_out, seed_in, clock_in, reset_in);
-	output wire [7:0] rand_out;
+	output wire [7:0] rand_out; //Output 8-bit LFSR value
 	input wire clock_in, reset_in;
-	input wire [7:0] seed_in;
+	input wire [7:0] seed_in; //Unique seed - start value
 	
-	reg [7:0] interm_rand;
+	reg [7:0] interm_rand; //Intermediate shift register
 	
 	always @(posedge clock_in)
 	begin
@@ -1691,87 +1378,6 @@ module rand6(rand_out, seed_in, clock_in, reset_in);
 		end
 	end
 	assign rand_out = interm_rand;
-endmodule
-//////////////////////////////////////////////////////////
-// 16-bit parallel random number generator ///////////////
-//////////////////////////////////////////////////////////
-// Algorithm is based on:
-// A special-purpose processor for the Monte Carlo simulation of ising spin systems
-// A. Hoogland, J. Spaa, B. Selman and A. Compagner
-// Journal of Computational Physics
-// Volume 51, Issue 2, August 1983, Pages 250-260
-//////////////////////////////////////////////////////////
-module rand127(rand_out, seed_in, clock_in, reset_in);
-	// 16-bit random number on every cycle
-	output wire [7:0] rand_out ;
-	// the clocks and stuff
-	//input wire [3:0] state_in ;
-	input wire clock_in, reset_in ;
-	input wire [64:1] seed_in; // 128 bits is 32 hex digits 0xffff_ffff_ffff_ffff_ffff_ffff_ffff_ffff
-
-	reg [8:1] sr1, sr2, sr3, sr4, sr5, sr6, sr7, sr8; 
-				//sr9, sr10, sr11, sr12, sr13, sr14, sr15, sr16;
-	
-	// state names
-	parameter react_start= 4'd0 ;
-
-	// generate random numbers	
-	assign rand_out = {sr1[7], sr2[7], sr3[7], sr4[7],
-							sr5[7], sr6[7], sr7[7], sr8[7]};
-							//sr9[7], sr10[7], sr11[7], sr12[7],
-							//sr13[7], sr14[7], sr15[7], sr16[7]} ;
-							
-	always @ (posedge clock_in) //
-	begin
-		if (reset_in)
-		begin	
-			//init random number generator 
-			sr1 <= seed_in[8:1] ;
-			sr2 <= seed_in[16:9] ;
-			sr3 <= seed_in[24:17] ;
-			sr4 <= seed_in[32:25] ;
-			sr5 <= seed_in[40:33] ;
-			sr6 <= seed_in[48:41] ;
-			sr7 <= seed_in[56:49] ;
-			sr8 <= {1'b0, seed_in[63:57]};
-			//sr8 <= seed_in[64:57] ;
-			/*
-			sr9 <= seed_in[72:65] ;
-			sr10 <= seed_in[80:73] ;
-			sr11 <= seed_in[88:81] ;
-			sr12 <= seed_in[96:89] ;
-			sr13 <= seed_in[104:97] ;
-			sr14 <= seed_in[112:105] ;
-			sr15 <= seed_in[120:113] ;
-			sr16 <= {1'b0,seed_in[127:121]} ;*/
-		end
-		
-		// update 127-bit shift register
-		// 16 times in parallel
-		else 
-		begin
-			//if(state_in == react_start) 
-			//begin
-				sr1 <= {sr1[7:1], sr1[7]^sr8[7]} ;
-				sr2 <= {sr2[7:1], sr2[7]^sr1[8]}  ;
-				sr3 <= {sr3[7:1], sr3[7]^sr2[8]}  ;
-				sr4 <= {sr4[7:1], sr4[7]^sr3[8]}  ;
-				sr5 <= {sr5[7:1], sr5[7]^sr4[8]}  ;
-				sr6 <= {sr6[7:1], sr6[7]^sr5[8]}  ;
-				sr7 <= {sr7[7:1], sr7[7]^sr6[8]}  ;
-				sr8 <= {sr8[7:1], sr8[7]^sr7[8]}  ;
-				//sr9 <= {sr9[7:1], sr9[7]^sr8[8]}  ;
-				/*
-				sr10 <= {sr10[7:1], sr10[7]^sr9[8]}  ;
-				sr11 <= {sr11[7:1], sr11[7]^sr10[8]}  ;
-				sr12 <= {sr12[7:1], sr12[7]^sr11[8]}  ;
-				sr13 <= {sr13[7:1], sr13[7]^sr12[8]}  ;
-				sr14 <= {sr14[7:1], sr14[7]^sr13[8]}  ;
-				sr15 <= {sr15[7:1], sr15[7]^sr14[8]}  ;
-				sr16 <= {sr16[6:1], sr16[7]^sr15[8]}  ;*/
-			//end	
-		end
-	end
 endmodule
 
 //============================================================
